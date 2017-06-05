@@ -1,0 +1,88 @@
+@CHARSET "UTF-8";
+
+#myRow{
+    margin: 4px;
+}
+
+.custom-container {
+    margin-top: 20px;
+}
+
+.custom-footer {
+    margin-top:10px
+}
+
+.custom-wrapper {
+    min-height: 550px;
+}
+
+.transprent-button{
+    background:none;
+    border:0;
+    padding:0;
+}
+
+.custom-navbar {
+    margin-bottom: 0
+}
+
+.create-custom-button {
+    display:inline-block;
+    margin-top:10px;
+}
+
+.custom-search{
+    margin-top:10px;
+}
+
+.custom-panelHeading {
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+
+.custom-breadcrumb {
+    margin-bottom: 0px;
+}
+
+.custom-select{
+    width: 50%;
+}
+
+.deleteImage{
+    float:right;
+    margin-right: 5px;
+}
+
+.nav-third-level{
+    margin-left: 20px;
+}
+
+.nextLink, .prevLink, .currentStep, .step{
+    position: relative;
+    float: left;
+    padding: 6px 12px;
+    margin-left: -1px;
+    line-height: 1.42857143;
+    color: #337ab7;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    border-radius: 10%;
+}
+
+.currentStep{
+    background-color: #337ab7;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 10%;
+}
+
+.myPagination a:hover {
+    background-color: #ddd;
+    text-decoration: none;
+}
+
+.g-recaptcha {
+    width: 304px;
+    margin: auto;
+}

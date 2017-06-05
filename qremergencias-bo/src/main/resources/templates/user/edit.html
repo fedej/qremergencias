@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/main :: head"></head>
+<body>
+<div id="wrapper">
+
+    <nav th:replace="fragments/main :: navbar"></nav>
+
+    <div id="page-wrapper" class="custom-wrapper">
+        <div class="row">
+            <div class="col-lg-12 custom-container">
+                <div class="panel panel-default">
+
+                    <div th:replace="fragments/main :: breadcrum(#{user.breadcrum.label})" />
+
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div id="edit-user" class="content scaffold-edit" role="main">
+                                    <div class="page-header">
+                                        <h1 th:text="#{user.edit.label}">Edit</h1>
+                                    </div>
+
+                                    <br/>
+
+                                    <div th:replace="fragments/main :: messages"></div>
+
+                                    <form th:action="@{/user/update/(id=${user.id})}" th:method="put" method="post" th:object="${user}" autocomplete="off">
+                                        <fieldset th:replace="fragments/user :: fields(${false})" />
+                                        <br />
+                                        <div class="row" id="myRow">
+                                            <div class="form-group">
+                                                <div class="control-label col-sm-3 col-sm-offset-2"></div>
+                                                <div class="col-md-3">
+                                                    <button th:inline="text" class="save btn btn-primary" type="submit">
+                                                        [[#{default.update.label}]]
+                                                        <i class="fa fa-refresh"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="fragments/main :: footer"></footer>
+</body>
+</html>

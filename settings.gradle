@@ -1,0 +1,8 @@
+rootProject.name = 'qremergencias'
+include ':qremergencias-core'
+include ':qremergencias-bo'
+include ':qremergencias-ws'
+
+project(':qremergencias-core').projectDir = "$rootDir/qremergencias-core" as File
+project(':qremergencias-bo').projectDir = "$rootDir/qremergencias-bo" as File
+project(':qremergencias-ws').projectDir = "$rootDir/qremergencias-ws" as File

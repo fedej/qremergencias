@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+	<fieldset th:fragment="fields (creating)" class="form">
+		<input type="hidden" th:field="*{id}" th:if="${!creating}" /> <!-- verificar -->
+
+	    <div class="row" id="myRow">
+	        <div class="fieldcontain required">
+	            <label th:inline="text" for="authority" class="control-label col-sm-3 col-sm-offset-1">
+	                [[#{role.authority.label}]]
+	                <span class="required-indicator">*</span>
+	            </label>
+	            <div class="col-sm-4">
+	                <input th:field="*{authority}" type="text" name="authority" maxlength="50" class="form-control" id="authority" />
+	                <label class="alert alert-danger" th:if="${#fields.hasErrors()}" th:errors="*{authority}">authority error</label>
+	            </div>
+	        </div>
+	    </div>
+	    
+	    <br/>
+	    <br/>
+	    <div class="row" id="myRow">
+	        <div class="fieldcontain required">
+	            <label th:inline="text" for="adminpassword" class="control-label col-sm-3 col-sm-offset-1">
+	                [[#{user.adminpassword.label}]]
+	                <span class="required-indicator">*</span>
+	            </label>
+	            <div class="col-sm-4">
+	            	<input style="display:none" /> 
+	                <input type="password" name="adminpassword" class="form-control" id="adminpassword" />
+	                <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+	                    <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">...</p>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</fieldset>
+</html>

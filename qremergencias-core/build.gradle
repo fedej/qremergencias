@@ -1,0 +1,21 @@
+plugins {
+    id 'org.springframework.boot' version '1.5.3.RELEASE'
+    id 'java'
+}
+
+bootRepackage {
+    enabled = false
+}
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-undertow')
+    compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+    compile('org.springframework.boot:spring-boot-starter-security')
+    compile('org.springframework.boot:spring-boot-starter-mail')
+    compile('org.springframework.boot:spring-boot-starter-thymeleaf') {
+        exclude(module: 'thymeleaf-layout-dialect')
+    }
+    compile('net.sf.ehcache:ehcache')
+    compile('com.fasterxml.jackson.core:jackson-databind')
+}

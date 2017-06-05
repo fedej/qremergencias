@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+        >
+
+<head th:fragment="head">
+
+    <title>QR Emergencias</title>
+    <style>
+        a {color: #6C9152; font-weight: bold; text-decoration: none}
+        a:hover { color: #111; text-decoration: no-underline; }
+        a:hover#vw { background-color: #CCC; text-decoration: none; color:#000; }
+        a:hover#ff { background-color: #6CF; text-decoration: none; color:#FFF; }
+    </style>
+
+</head>
+
+<body th:fragment="body (mailMessage)"  marginheight="0" topmargin="0" marginwidth="0" style="margin: 0px; background-color: #FFF;" bgcolor="#FFF" leftmargin="0">
+    <!--100% body table-->
+    <table cellspacing="0" border="0" cellpadding="0" width="100%" bgcolor="#FFFFFF">
+        <tr>
+            <td>
+                <!--email container-->
+                <table cellspacing="0" border="0" align="center" cellpadding="0" width="624">
+                    <tr>
+                        <td>
+                            <!--header-->
+                            <table cellspacing="0" border="0" cellpadding="0" width="624">
+                                <tr>
+                                    <td valign="top">
+
+                                        <!--line break-->
+                                        <table cellspacing="0" border="0" cellpadding="0" width="624">
+                                            <tr>
+                                                <td valign="top" width="624">
+                                                    <img th:src="'cid:header-mail.jpg'" src="../../static/images/mail/header-mail.jpg"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <!--/line break-->
+                                        <!--header content-->
+                                        <table cellspacing="0" border="0" cellpadding="0" width="624">
+                                            <tr>
+                                                <td>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <!--/header content-->
+                                    </td>
+                                </tr>
+                            </table>
+                            <!--/header-->
+                            <!--line break-->
+                            <table cellspacing="0" border="0" cellpadding="0" width="624">
+                                <tr>
+                                    <td height="50" valign="middle" width="624"></td>
+                                </tr>
+                            </table>
+                            <!--/line break-->
+                            <!--email content-->
+                            <table cellspacing="0" border="0" id="email-content" cellpadding="0" width="624">
+                                <tr>
+                                    <td>
+                                        <!--section 1-->
+                                        <table cellspacing="0" border="0" cellpadding="0" width="624">
+                                            <tr>
+                                                <td th:replace="mail/_mail :: ${mailMessage}"></td>
+                                            </tr>
+                                        </table>
+                                        <!--/section 1-->
+                                        <!--line break-->
+                                        <table cellspacing="0" border="0" cellpadding="0" width="624">
+                                            <tr>
+                                                <td height="30" valign="middle" width="624">
+
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <!--/line break-->
+
+                                        <!--/line break-->
+                                        <!--footer-->
+                                        <table cellspacing="0" border="0" cellpadding="0" width="624">
+                                            <tr>
+                                                <td>
+                                                    <br/><br/>
+                                                    <div style="text-align:center;"><img th:src="'cid:logo-footer.png'"/></div>
+                                                    <br/><br/>
+                                                    <div style="padding-top: 10px; text-align:center; background-color: white; vertical-align: bottom; width: 600px; height: 80px;">
+                                                        <p style="color: black; text-decoration: none; font-size: 14px; font-family: Arial; color: black; margin: 0px;">
+                                                            <span th:inline="text">&nbsp;&nbsp; &copy; [[${#calendars.format(T(java.util.Calendar).getInstance(),'yyyy')}]]</span>
+                                                            <a target="_blank" href="http://qremergencias.com.ar/">QR Emergencias</a>, Todos los derechos reservados.
+                                                            <br/>
+                                                            <a href="http://terminos-y-condiciones.com.ar/">T&eacute;rminos y Condiciones</a> |
+                                                            <a href="http://politica-de-privacidad.com.ar/">Pol&iacute;ticas de Privacidad</a>
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <!--/footer-->
+                                    </td>
+                                </tr>
+                            </table>
+                            <!--/email content-->
+                        </td>
+                    </tr>
+                    <tr><td>
+
+                    </td></tr>
+                </table>
+                <!--/email container-->
+            </td>
+        </tr>
+    </table>
+    <!--/100% body table-->
+</body>
+
+<td th:fragment="greeting" style="font-family: Arial; text-align:center; margin: 0px;">
+    <h2 style="font-size: 28px; color: #6C9152;">&iexcl;Te damos la bienvenida a QR Emergencias!</h2>
+    <p style="font-size: 18px; line-height: 24px; color: #333;" th:inline="text">
+        Ya pod&eacute;s empezar a cargar tus cupones para canjearlos en el punto de venta.
+        <br/>
+        <br/>
+        &iexcl;Elegirnos tiene recompensa!
+        <br/>
+        <br/>
+        <a th:href="${url}" style="color: #4b98d7; text-decoration: none;"><img th:src="'cid:btn-codigo.png'" src="../../static/images/mail/btn-codigo.png"/></a>
+    </p>
+</td>
+
+<td th:fragment="forgotPassword" style="text-align:center; margin: 0px; font-family: Arial;">
+    <h2 style="font-size: 28px; color: #6C9152;">Restablec&eacute; tu Contrase&ntilde;a</h2><br/>
+    <p style="font-size: 20px; line-height: 24px; color: #414042;"> Recibimos una solicitud para restablecer tu contrase&ntilde;a.
+        <br/>
+        Hac&eacute; click en el siguiente link y segu&iacute; los pasos:
+        <br/>
+        <br/>
+        <a th:href="${url}" style="color: #6C9152; text-decoration: none;">Restablec&eacute; tu Contrase&ntilde;a</a>
+        <br/>
+        <br/>
+        Record&aacute; que este link funciona <b>solo una vez.</b> Si el mismo expira deber&aacute;s realizar nuevamente la solicitud de recuperaci&oacute;n de contrase&ntilde;a desde el sitio de QR Emergencias.
+        <br/>
+    </p>
+    <br/>
+    <span style="color: #414042;">Si no solicitaste restablecer tu contrase&ntilde;a, simplemente desestim&aacute; este email.</span>
+</td>
+
+</html>

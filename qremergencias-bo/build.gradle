@@ -1,0 +1,19 @@
+plugins {
+    id 'org.springframework.boot' version '1.5.3.RELEASE'
+    id 'java'
+}
+
+bootRepackage {
+    mainClass = 'ar.com.utn.proyecto.qremergencias.bo.QREmergenciasApplication'
+}
+
+dependencies {
+    compile project(':qremergencias-core')
+    compile group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-springsecurity4'
+    compile group: 'org.webjars', name: 'webjars-locator', version: '0.32'
+    compile group: 'org.webjars', name: 'startbootstrap-sb-admin-2', version:'1.0.8'
+    compile group: 'org.webjars', name: 'metisMenu', version:'2.5.2'
+    compile group: 'org.webjars', name: 'bootstrap', version:'3.3.7'
+    compile group: 'org.webjars', name: 'font-awesome', version:'4.6.3'
+    compile group: 'org.webjars', name: 'jquery-ui', version:'1.12.1'
+}

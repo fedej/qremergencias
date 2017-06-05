@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/main :: head"></head>
+<body>
+<script src="https://www.google.com/recaptcha/api.js" async="async" defer="defer"></script>
+<script>
+    function recaptchaCallback() {
+        $('#submit').removeAttr('disabled');
+    };
+</script>
+<div class="custom-wrapper">
+
+    <div class="container" style="text-align: center">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4">
+                <div class="login-panel panel panel-default">
+                    <div class="panel-heading">
+                        <h1 class="panel-title" th:text="#{default.signin.label}">Sign in</h1>
+                    </div>
+                    <div th:if="${param.error}" class="alert alert-danger" role="status" th:text="#{default.login.wrongLogin}"> Invalid username or password. </div>
+                    <div class="panel-body" id="panel">
+                        <form th:action="@{${@environment.getProperty('qremergencias.login.loginPage')}}" method="post" id="loginForm" class="cssform" autocomplete="off">
+                            <fieldset>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" th:placeholder="#{user.username.label}" name="username" id="username" autofocus="autofocus" value="" />
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" class="form-control" th:placeholder="#{user.password.label}" name="password" id="password" value="" />
+                                </div>
+                                <div th:if="${session.showCaptcha}">
+                                    <div class="g-recaptcha" data-callback="recaptchaCallback" th:attr="data-sitekey=${@environment.getProperty('recaptcha.site-key')}"></div>
+                                    <br/>
+                                </div>
+                            </fieldset>
+                            <input class="btn btn-lg btn-success btn-block" type="submit" id="submit" th:value="#{default.login.label}" th:disabled="${session.showCaptcha}" />
+                        </form>
+                        <br/>
+                        <div><a th:href="@{/forgotPassword/index}" th:text="#{default.forgot.label}">Forgot password?</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer th:replace="fragments/main :: footer"></footer>
+</body>
+</html>

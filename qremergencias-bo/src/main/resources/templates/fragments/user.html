@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<fieldset th:fragment="fields (creating)" class="form">
+    <div class="row" id="myRow" th:if="${creating}">
+        <div class="fieldcontain required">
+            <label th:inline="text" for="username" class="control-label col-sm-3 col-sm-offset-1">
+                [[#{user.username.label}]]
+                <span class="required-indicator">*</span>
+            </label>
+            <div class="col-sm-4">
+                <input th:field="*{username}" type="text" name="username" maxlength="50" class="form-control" id="username" />
+                <label class="alert alert-danger" th:if="${#fields.hasErrors()}" th:errors="*{username}">Username error</label>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="myRow" th:if="${creating}">
+        <div class="fieldcontain required">
+            <label th:inline="text" for="password" class="control-label col-sm-3 col-sm-offset-1">
+                [[#{user.password.label}]]
+                <span class="required-indicator">*</span>
+            </label>
+            <div class="col-sm-4">
+                <input th:field="*{password}" type="password" name="password" class="form-control" id="password" />
+                <label class="alert alert-danger" th:if="${#fields.hasErrors()}" th:errors="*{password}">Password error</label>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="myRow" th:if="${creating}">
+        <div class="fieldcontain required">
+            <label th:inline="text" for="password" class="control-label col-sm-3 col-sm-offset-1">
+                [[#{user.repassword.label}]]
+                <span class="required-indicator">*</span>
+            </label>
+            <div class="col-sm-4">
+                <input th:field="*{repassword}" type="password" name="password" class="form-control" id="repassword" />
+                <label class="alert alert-danger" th:if="${#fields.hasErrors()}" th:errors="*{repassword}">Repassword error</label>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="myRow" th:if="${creating}">
+        <div class="fieldcontain required">
+            <label th:inline="text" for="email" class="control-label col-sm-3 col-sm-offset-1">
+                [[#{user.email.label}]]
+                <span class="required-indicator">*</span>
+            </label>
+            <div class="col-sm-4">
+                <input th:field="*{email}" type="email" name="email" data-error="Bruh, that email address is invalid" class="form-control" id="email" />
+                <label class="alert alert-danger" th:if="${#fields.hasErrors()}" th:errors="*{email}">Email error</label>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="myRow">
+        <div class="fieldcontain form-group">
+            <label th:inline="text" for="accountNonLocked" class="control-label col-sm-3 col-sm-offset-1">
+                [[#{user.accountNonLocked.label}]]
+            </label>
+            <div class="col-sm-4">
+                <input class="alert alert-danger" th:field="*{accountNonLocked}" type="checkbox" name="accountNonLocked" id="accountNonLocked" />
+            </div>
+        </div>
+    </div>
+    <div class="row" id="myRow">
+        <div class="fieldcontain form-group">
+            <label th:inline="text" for="credentialsNonExpired" class="control-label col-sm-3 col-sm-offset-1">
+                [[#{user.credentialsNonExpired.label}]]
+            </label>
+            <div class="col-sm-4">
+                <input class="alert alert-danger" th:field="*{credentialsNonExpired}" type="checkbox" name="credentialsNonExpired" id="credentialsNonExpired" />
+            </div>
+        </div>
+    </div>
+    <div class="row" id="myRow">
+        <div class="fieldcontain form-group">
+            <label th:inline="text" for="enabled" class="control-label col-sm-3 col-sm-offset-1">
+                [[#{user.enabled.label}]]
+            </label>
+            <div class="col-sm-4">
+                <input class="alert alert-danger" th:field="*{enabled}" type="checkbox" name="enabled" checked="checked" id="enabled"  />
+            </div>
+        </div>
+    </div>
+    <br/>
+    <br/>
+    <div class="row" id="myRow">
+        <div class="fieldcontain required">
+            <label th:inline="text" for="adminpassword" class="control-label col-sm-3 col-sm-offset-1">
+                [[#{user.adminpassword.label}]]
+                <span class="required-indicator">*</span>
+            </label>
+            <div class="col-sm-4">
+                <input type="password" name="adminpassword" class="form-control" id="adminpassword" />
+                <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                    <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</fieldset>
+
+</html>

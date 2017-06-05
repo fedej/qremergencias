@@ -1,0 +1,80 @@
+
+allprojects  {
+    version = '0.0.1-SNAPSHOT'
+    group = 'ar.com.utn.proyecto.qremergencias'
+    project.ext.set('env', System.getProperty('env', 'local'))
+
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'findbugs'
+    apply plugin: 'pmd'
+    apply plugin: 'checkstyle'
+    apply plugin: 'jacoco'
+
+    def pmdVersion = '5.5.5'
+    def checkstyleVersion = '7.6.1'
+    def jacocoVersion = '0.7.9'
+
+    pmd {
+        toolVersion = pmdVersion
+        ruleSetFiles = files("$rootDir/config/pmd/ruleset.xml")
+    }
+
+    checkstyle {
+        toolVersion = checkstyleVersion
+        configFile = file("$rootDir/config/checkstyle/checkstyle.xml")
+    }
+
+    jacoco {
+        toolVersion = jacocoVersion
+    }
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+
+    apply plugin: 'java'
+    apply plugin: 'jacoco'
+
+    compileJava.options.encoding = 'UTF-8'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    def powerMockVersion = '1.6.6'
+    def lombokVersion = '1.16.16'
+
+    dependencies {
+        compileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
+        testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
+            exclude(module: 'commons-logging')
+        }
+        testCompile group: 'org.powermock', name: 'powermock-api-mockito', version: "${powerMockVersion}"
+        testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: "${powerMockVersion}"
+    }
+
+    configurations {
+        compile.exclude module: "spring-boot-starter-tomcat"
+    }
+
+    def excluded = ['ar/com/utn/proyecto/qremergencias/**/repository/**',
+                    'ar/com/utn/proyecto/qremergencias/**/config/**',
+                    'ar/com/utn/proyecto/qremergencias/**/dto/**',
+                    'ar/com/utn/proyecto/qremergencias/**/domain/**',
+                    'ar/com/utn/proyecto/qremergencias/**/exception/**',
+                    'ar/com/utn/proyecto/qremergencias/**/*Application.*']
+
+    jacocoTestReport {
+        doFirst {
+            classDirectories = fileTree(dir: "${buildDir}/classes/main/").exclude(excluded)
+        }
+    }
+
+    check.dependsOn jacocoTestReport
+
+    apply from: file('../gradle/install-git-hooks.gradle')
+
+}
