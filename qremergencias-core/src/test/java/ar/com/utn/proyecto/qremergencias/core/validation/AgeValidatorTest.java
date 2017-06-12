@@ -25,8 +25,7 @@ public class AgeValidatorTest {
 
     @Test
     public void testValidationTodayBirtday() {
-        LocalDate now = LocalDate.now();
-        now = now.minusYears(13);
+        final LocalDate now = LocalDate.now().minusYears(13L);
         assertTrue(
                 AGE_VALIDATOR.validate(now.getDayOfMonth(), now.getMonthValue(), now.getYear()));
     }

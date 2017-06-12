@@ -1,17 +1,16 @@
 package ar.com.utn.proyecto.qremergencias.bo.controller;
 
-import ar.com.utn.proyecto.qremergencias.core.config.ApiLoginConfigurer;
-import ar.com.utn.proyecto.qremergencias.core.domain.ForgotPassword;
-import ar.com.utn.proyecto.qremergencias.core.domain.Role;
-import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.bo.dto.ExpiredPasswordDTO;
 import ar.com.utn.proyecto.qremergencias.bo.dto.ForgotPasswordDTO;
+import ar.com.utn.proyecto.qremergencias.bo.service.FlashMessageService;
+import ar.com.utn.proyecto.qremergencias.bo.service.PasswordExpiredService;
+import ar.com.utn.proyecto.qremergencias.core.config.ApiLoginConfigurer;
+import ar.com.utn.proyecto.qremergencias.core.domain.ForgotPassword;
+import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.dto.ResetPasswordDTO;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserRepository;
-import ar.com.utn.proyecto.qremergencias.bo.service.FlashMessageService;
 import ar.com.utn.proyecto.qremergencias.core.service.ForgotPasswordService;
 import ar.com.utn.proyecto.qremergencias.core.service.MailService;
-import ar.com.utn.proyecto.qremergencias.bo.service.PasswordExpiredService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -89,10 +88,7 @@ public class ForgotPasswordController {
         final User dbUser = userRepository.findByUsernameAndEmail(forgotPasswordDTO.getUsername(),
                 forgotPasswordDTO.getEmail());
 
-        final Role role = new Role();
-        role.setAuthority(Role.ROLE_USER);
-
-        if (dbUser == null || dbUser.getRoles().contains(role)) {
+        if (dbUser == null || dbUser.getRoles().contains("ROLE_USER")) {
             flashMessageService.addFlashMessage(model, FORGOT_PASSWORD_EMAIL_SENT);
             model.addAttribute(FORGOT_PASSWORD_DTO, new ForgotPasswordDTO());
             return INDEX;

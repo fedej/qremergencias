@@ -35,8 +35,8 @@
                                             <div class="form-group input-group col-sm-11">
                                                 <select name="role" class="form-control col-lg-8" id="role">
                                                     <option value=""></option>
-                                                    <option th:each="role : ${rolesList}" th:value="${role.id}"
-                                                            th:text="${role.authority}" th:selected="${param.role != null and role.id.toString() == param.role[0]}">
+                                                    <option th:each="role : ${rolesList}" th:value="${role}"
+                                                            th:text="${role}" th:selected="${param.role != null and role == param.role[0]}">
                                                     </option>
                                                 </select>
                                                 <div class="input-group-btn">

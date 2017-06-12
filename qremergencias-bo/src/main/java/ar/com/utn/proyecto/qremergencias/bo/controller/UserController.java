@@ -2,11 +2,9 @@ package ar.com.utn.proyecto.qremergencias.bo.controller;
 
 import ar.com.utn.proyecto.qremergencias.bo.dto.EditUserDTO;
 import ar.com.utn.proyecto.qremergencias.bo.service.FlashMessageService;
-import ar.com.utn.proyecto.qremergencias.core.domain.Role;
 import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.dto.ChangePasswordDTO;
 import ar.com.utn.proyecto.qremergencias.core.service.PasswordChangeService;
-import ar.com.utn.proyecto.qremergencias.core.service.RoleService;
 import ar.com.utn.proyecto.qremergencias.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 
 @Controller
 @RequestMapping("/user")
@@ -45,25 +44,22 @@ public class UserController {
     private PasswordChangeService passwordChangeService;
 
     @Autowired
-    private RoleService roleService;
-
-    @Autowired
     private FlashMessageService flashMessageService;
 
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     @SuppressWarnings("PMD.ConfusingTernary")
-    public String list(final Role role, final Model model, final Pageable page) {
+    public String list(final String role, final Model model, final Pageable page) {
 
         Page<User> users;
 
-        if (role != null && role.getAuthority() != null && !"".equals(role.getAuthority())) {
+        if (role != null && !"".equals(role)) {
             users = userService.findByRole(role, page);
         } else {
             users = userService.findAll(page);
         }
 
         model.addAttribute("page", users);
-        model.addAttribute("rolesList", roleService.findAll());
+        model.addAttribute("rolesList", Arrays.asList("ROLE_ADMIN", "ROLE_OPERATOR"));
         return USER_INDEX;
     }
 
@@ -188,7 +184,7 @@ public class UserController {
             return USER_CREATE;
         }
 
-        user.getRoles().add(roleService.getRoleOperator());
+        user.getRoles().add("ROLE_OPERATOR");
 
         userService.save(user);
 

@@ -159,7 +159,8 @@ public class UserFrontController {
             throw new RuntimeException(INVALID_PASSWORD);
         }
 
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final Authentication authentication = SecurityContextHolder
+                .getContext().getAuthentication();
         final User user = (User) authentication.getPrincipal();
 
         final boolean validPassword = passwordChangeService.validate(changePassword.getPassword(),

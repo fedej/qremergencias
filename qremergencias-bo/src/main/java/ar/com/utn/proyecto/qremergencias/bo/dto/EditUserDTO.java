@@ -1,6 +1,5 @@
 package ar.com.utn.proyecto.qremergencias.bo.dto;
 
-import ar.com.utn.proyecto.qremergencias.core.domain.Role;
 import lombok.Data;
 
 import java.util.List;
@@ -13,6 +12,6 @@ public class EditUserDTO {
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
     private boolean enabled;
-    private List<Role> roles;
+    private List<String> roles;
 
 }

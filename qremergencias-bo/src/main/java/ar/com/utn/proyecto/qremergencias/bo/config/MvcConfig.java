@@ -61,10 +61,10 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         return emailTemplateResolver;
     }
 
-    //@Override
-    //public Validator getValidator() {
-    //    final LocalValidatorFactoryBean factory = new LocalValidatorFactoryBean();
-    //    factory.setValidationMessageSource(messageSource);
-    //    return factory;
-    //}
+    @Override
+    public Validator getValidator() {
+        final LocalValidatorFactoryBean factory = new LocalValidatorFactoryBean();
+        factory.setValidationMessageSource(messageSource);
+        return factory;
+    }
 }

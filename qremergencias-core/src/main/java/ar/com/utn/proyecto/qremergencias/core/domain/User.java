@@ -46,8 +46,7 @@ public class User implements Serializable, UserDetails {
 
     private String repassword;
 
-    @DBRef
-    private List<Role> roles;
+    private List<String> roles;
 
     @DBRef
     private List<PasswordChange> passwordChanges;
@@ -63,7 +62,6 @@ public class User implements Serializable, UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(Role::getAuthority)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }

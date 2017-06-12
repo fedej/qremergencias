@@ -43,7 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
 
         http
-                .apply(new ApiLoginConfigurer<HttpSecurity>())
+                .apply(new ApiLoginConfigurer<>())
                     .loginProcessingUrl("/api/login")
                     .successHandler(authHandler)
                     .failureHandler(authHandler)

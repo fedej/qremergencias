@@ -13,7 +13,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.Assert.assertFalse;
@@ -22,6 +21,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 public class CaptchaServiceTest {
 
     private static final String URL = "http://localhost";
@@ -55,11 +55,17 @@ public class CaptchaServiceTest {
 
         when(restTemplate.postForEntity(eq(URL), any(MultiValueMap.class), any(Class.class)))
                 .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
-
         assertTrue(service.validate(InetAddress.getLocalHost().getHostAddress(), "asdasd"));
+    }
 
+    @Test
+    public void testValidateNoSuccess() throws UnknownHostException {
+
+        final CaptchaService.RecaptchaResponse response = new CaptchaService.RecaptchaResponse();
         response.setSuccess(false);
-        response.setErrorCodes(Arrays.asList("invalid captcha"));
+        response.setErrorCodes(Collections.singletonList("invalid captcha"));
+        when(restTemplate.postForEntity(eq(URL), any(MultiValueMap.class), any(Class.class)))
+                .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
         assertFalse(service.validate(InetAddress.getLocalHost().getHostAddress(), "asdasd"));
     }
 
