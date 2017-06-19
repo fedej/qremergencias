@@ -41,7 +41,8 @@ public class CaptchaService {
                 recaptchaUrl, createBody(remoteIp, response), RecaptchaResponse.class)
                 .getBody();
 
-        return recaptchaResponse.success && recaptchaResponse.errorCodes.isEmpty();
+        return recaptchaResponse.success && (recaptchaResponse.errorCodes == null
+                || recaptchaResponse.errorCodes.isEmpty());
 
     }
 

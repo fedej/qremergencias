@@ -11,8 +11,8 @@ allprojects  {
     apply plugin: 'checkstyle'
     apply plugin: 'jacoco'
 
-    def pmdVersion = '5.5.5'
-    def checkstyleVersion = '7.6.1'
+    def pmdVersion = '5.7.0'
+    def checkstyleVersion = '7.8.1'
     def jacocoVersion = '0.7.9'
 
     pmd {
@@ -46,6 +46,9 @@ subprojects {
 
     def powerMockVersion = '1.6.6'
     def lombokVersion = '1.16.16'
+    ext['thymeleaf.version'] = '3.0.6.RELEASE'
+    ext['thymeleaf-extras-springsecurity4.version'] = '3.0.2.RELEASE'
+    ext['thymeleaf-extras-java8time.version'] = '3.0.0.RELEASE'
 
     dependencies {
         compileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"

@@ -2,12 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/main :: head"></head>
 <body>
-<script src="https://www.google.com/recaptcha/api.js" async="async" defer="defer"></script>
-<script>
-    function recaptchaCallback() {
-        $('#submit').removeAttr('disabled');
-    };
-</script>
 <div class="custom-wrapper">
 
     <div class="container" style="text-align: center">
@@ -27,12 +21,9 @@
                                 <div class="form-group">
                                     <input type="password" class="form-control" th:placeholder="#{user.password.label}" name="password" id="password" value="" />
                                 </div>
-                                <div th:if="${session.showCaptcha}">
-                                    <div class="g-recaptcha" data-callback="recaptchaCallback" th:attr="data-sitekey=${@environment.getProperty('recaptcha.site-key')}"></div>
-                                    <br/>
-                                </div>
+                                <div th:replace="fragments/main :: recaptcha"></div>
                             </fieldset>
-                            <input class="btn btn-lg btn-success btn-block" type="submit" id="submit" th:value="#{default.login.label}" th:disabled="${session.showCaptcha}" />
+                            <input class="btn btn-lg btn-success btn-block" type="submit" id="btnSubmit" th:value="#{default.login.label}" />
                         </form>
                         <br/>
                         <div><a th:href="@{/forgotPassword/index}" th:text="#{default.forgot.label}">Forgot password?</a></div>
@@ -42,6 +33,7 @@
         </div>
     </div>
 </div>
+<div th:replace="fragments/main :: recaptcha-script('loginForm','btnSubmit')"></div>
 <footer th:replace="fragments/main :: footer"></footer>
 </body>
 </html>

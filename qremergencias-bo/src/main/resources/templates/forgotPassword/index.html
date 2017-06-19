@@ -2,7 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/main :: head"></head>
 <body>
-<script src="https://www.google.com/recaptcha/api.js" async="async" defer="defer"></script>
 <div class="custom-wrapper">
     <div class="login-form well">
         <div class="content">
@@ -11,7 +10,7 @@
                     <h3 th:text="#{default.forgot.label}">Forgot password?</h3>
                     <br/>
                     <div th:replace="fragments/main :: messages"></div>
-                    <form th:action="@{/forgotPassword/sendMailConfirmation}" method="post" th:object="${forgotPasswordDTO}" autocomplete="off">
+                    <form id="forgotPasswordForm" th:action="@{/forgotPassword/sendMailConfirmation}" method="post" th:object="${forgotPasswordDTO}" autocomplete="off">
                         <fieldset>
                             <div class="form-group">
                                 <input class="form-control" type="text" th:field="*{username}" th:placeholder="#{user.username.label}" />
@@ -20,12 +19,11 @@
                                 <input class="form-control" type="email" th:field="*{email}" th:placeholder="#{user.email.label}" />
                             </div>
                             <div class="clearfix">
-                                <br/>
-                                <div class="g-recaptcha" th:attr="data-sitekey=${@environment.getProperty('recaptcha.site-key')}"></div>
+                                <div th:replace="fragments/main :: recaptcha"></div>
                             </div>
                             <br/>
                             <input class="btn btn-primary" type="submit" th:value="#{default.send.label}" />
-                            <a class="btn btn-primary" type="button" th:href="@{${@environment.getProperty('qremergencias.login.loginPage')}}" th:text="#{default.cancel.label}"></a>
+                            <a class="btn btn-primary" id="btnSubmit" type="button" th:href="@{${@environment.getProperty('qremergencias.login.loginPage')}}" th:text="#{default.cancel.label}"></a>
                         </fieldset>
                     </form>
                 </div>
@@ -33,6 +31,7 @@
         </div>
     </div>
 </div>
+<div th:replace="fragments/main :: recaptcha-script('forgotPasswordForm','btnSubmit')"></div>
 <footer th:replace="fragments/main :: footer"></footer>
 </body>
 </html>

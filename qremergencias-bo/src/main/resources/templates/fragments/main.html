@@ -10,8 +10,7 @@
 
     <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet"/>
     <link th:href="@{/webjars/metisMenu/metisMenu.min.css}" rel="stylesheet"/>
-    <link th:href="@{/webjars/startbootstrap-sb-admin-2/css/timeline.css}" rel="stylesheet"/>
-    <link th:href="@{/webjars/startbootstrap-sb-admin-2/css/sb-admin-2.css}" rel="stylesheet"/>
+    <link th:href="@{/webjars/startbootstrap-sb-admin-2/css/sb-admin-2.min.css}" rel="stylesheet"/>
     <link th:href="@{/webjars/font-awesome/css/font-awesome.min.css}" rel="stylesheet"/>
     <link th:href="@{/stylesheets/customStyle.css}" rel="stylesheet" href="../../static/stylesheets/customStyle.css"/>
 
@@ -20,7 +19,7 @@
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
     <script th:src="@{/webjars/metisMenu/metisMenu.min.js}"></script>
-    <script th:src="@{/webjars/startbootstrap-sb-admin-2/js/sb-admin-2.js}"></script>
+    <script th:src="@{/webjars/startbootstrap-sb-admin-2/js/sb-admin-2.min.js}"></script>
 
 </head>
 
@@ -140,8 +139,31 @@
     </div>
 </div>
 
+<div th:fragment="recaptcha" th:if="${session.showCaptcha}">
+    <div class="g-recaptcha" data-callback="formSubmit" data-size="invisible" th:attr="data-sitekey=${@environment.getProperty('recaptcha.site-key')}"></div>
+</div>
+<th:block th:fragment="recaptcha-script(formId, btnSubmitId)" th:if="${session.showCaptcha}">
+    <script src="https://www.google.com/recaptcha/api.js" async="async" defer="defer"></script>
+    <script th:inline="javascript">
+        var formId = [[${formId}]];
+        var btnSubmitId = [[${btnSubmitId}]];
+
+        $('#' + btnSubmitId).click(function (event) {
+            event.preventDefault();
+            $('#' + btnSubmitId).prop('disabled', true);
+            grecaptcha.reset();
+            grecaptcha.execute();
+        });
+
+        function formSubmit() {
+            $('#' + formId).submit();
+            $('#' + btnSubmitId).prop('disabled', false);
+        }
+    </script>
+</th:block>
+
 <footer th:fragment="footer" style="text-align: center">
-    <span th:inline="text">&nbsp;&nbsp; &copy; [[${#calendars.format(T(java.util.Calendar).getInstance(),'yyyy')}]]. Todos los derechos reservados. </span>
+    <span th:inline="text">&nbsp;&nbsp; &copy; [[${#temporals.year(#temporals.createNow())}]]. Todos los derechos reservados.</span>
 </footer>
 
 </html>

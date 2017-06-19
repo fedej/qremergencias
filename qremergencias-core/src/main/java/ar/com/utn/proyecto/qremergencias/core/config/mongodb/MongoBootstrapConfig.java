@@ -4,24 +4,28 @@ import com.mongodb.util.JSON;
 import lombok.Data;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 import static org.springframework.data.mongodb.core.BulkOperations.BulkMode.ORDERED;
 
 @Configuration
-@ConditionalOnBean(MongoTemplate.class)
+@AutoConfigureAfter(MongoAutoConfiguration.class)
 @Log
 public class MongoBootstrapConfig {
 
@@ -47,20 +51,25 @@ public class MongoBootstrapConfig {
 
         if (config.isEnabled()) {
 
-            final Resource resource = resourceLoader.getResource(config.getLocation());
+            try (final InputStream inputStream = resourceLoader.getResource(CLASSPATH_URL_PREFIX
+                    + config.getLocation()).getInputStream();
+                 final Reader inputStreamReader = new InputStreamReader(inputStream, UTF_8.name());
+                 final BufferedReader reader = new BufferedReader(inputStreamReader)) {
 
-            try {
-                final Path p = resource.getFile().toPath();
                 final BulkOperations bulkOperations = mongoTemplate
                         .bulkOps(ORDERED, config.getCollectionName());
-                Files.readAllLines(p)
-                        .stream()
-                        .map(JSON::parse)
-                        .forEach(bulkOperations::insert);
+
+                while (reader.ready()) {
+                    final String line = reader.readLine();
+                    bulkOperations.insert(JSON.parse(line));
+                }
                 bulkOperations.execute();
+
+
             } catch (IOException e) {
                 log.severe(e::getMessage);
             }
+
         }
         return new Object();
     }

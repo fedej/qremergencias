@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class ForgotPassword implements Serializable {
 
     @Id
-    private Long id;
+    private String id;
 
     @Version
     private Long version;

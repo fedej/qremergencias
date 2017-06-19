@@ -104,7 +104,7 @@ public class PasswordChangeServiceTest {
         PasswordChange pc;
         for (int i = 0; i < 10; i++) {
             pc = new PasswordChange();
-            pc.setId(i * 10L);
+            pc.setId(Long.toString(i * 10L));
             pc.setPassword("laClaveAnteriorDistinta" + i);
             content.add(pc);
         }
