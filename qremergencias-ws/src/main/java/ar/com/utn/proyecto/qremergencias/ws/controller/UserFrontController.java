@@ -5,13 +5,11 @@ import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.ChangePasswordDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.CreateUserDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.LoginUserDTO;
-import ar.com.utn.proyecto.qremergencias.core.dto.RegisterUserDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.ResetPasswordDTO;
 import ar.com.utn.proyecto.qremergencias.core.service.CaptchaService;
 import ar.com.utn.proyecto.qremergencias.core.service.ForgotPasswordService;
 import ar.com.utn.proyecto.qremergencias.core.service.MailService;
 import ar.com.utn.proyecto.qremergencias.core.service.PasswordChangeService;
-import ar.com.utn.proyecto.qremergencias.core.validation.AgeValidator;
 import ar.com.utn.proyecto.qremergencias.ws.auth.LoginAdapter;
 import ar.com.utn.proyecto.qremergencias.ws.service.UserFrontService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +24,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,7 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.thymeleaf.context.Context;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -47,13 +43,9 @@ import java.util.Locale;
 @RequestMapping("/api/userFront")
 public class UserFrontController {
 
-    private static final String COOKIE_NAME = "low13";
-    private static final int MIN_AGE = 13;
     private static final String SUBJECT = "default.forgot.email.subject";
     private static final String GREETING_SUBJECT = "default.greeting.email.subject";
     private static final String INVALID_PASSWORD = "Invalid password";
-
-    private final AgeValidator ageValidator = new AgeValidator(MIN_AGE);
 
     @Value("${qremergencias.front.baseUrl}")
     private String baseUrl;
@@ -87,11 +79,8 @@ public class UserFrontController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public LoginUserDTO register(@Valid final CreateUserDTO model, final NativeWebRequest request,
-                                 final HttpServletResponse response,
-                                 @CookieValue(value = COOKIE_NAME, required = false)
-                                     final String ageCookie) {
+                                 final HttpServletResponse response) {
 
-        validateAge(model, request, response, ageCookie);
 
         final UserFront user = userFrontService.create(model);
         if (user != null) {
@@ -188,27 +177,6 @@ public class UserFrontController {
         mailService.sendMail(user.getEmail(),
                 messageSource.getMessage(GREETING_SUBJECT, null, locale), "mail/greeting", ctx,
                 Arrays.asList(header, button));
-    }
-
-    private void validateAge(final RegisterUserDTO model, final NativeWebRequest request,
-            final HttpServletResponse response, final String ageCookie) {
-
-        if (ageCookie != null) {
-            throw new IllegalArgumentException();
-        }
-
-        if (!ageValidator.validate(model.getDay(), model.getMonth(), model.getYear())) {
-            final Cookie cookie = new Cookie(COOKIE_NAME, "1");
-            cookie.setMaxAge(86400);
-            cookie.setHttpOnly(true);
-
-            if (request.isSecure()) {
-                cookie.setSecure(true);
-            }
-
-            response.addCookie(cookie);
-            throw new IllegalArgumentException();
-        }
     }
 
 }
