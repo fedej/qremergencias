@@ -14,16 +14,14 @@ public class UserFrontService extends UserService {
     private UserFrontRepository userFrontRepository;
 
     public UserFront create(final CreateUserDTO createUserDTO) {
-        if (createUserDTO == null || !createUserDTO.isTyc()) {
+        if (createUserDTO == null) {
             return null;
         }
         final UserFront user = new UserFront();
         user.setUsername(createUserDTO.getEmail());
         user.setEmail(createUserDTO.getEmail());
         user.setPassword(createUserDTO.getPassword());
-        user.getRoles().add("ROLE_USER");
-        user.setName(createUserDTO.getName());
-        user.setLastname(createUserDTO.getLastname());
+        user.getRoles().add(createUserDTO.getRole());
         return save(user);
 
     }

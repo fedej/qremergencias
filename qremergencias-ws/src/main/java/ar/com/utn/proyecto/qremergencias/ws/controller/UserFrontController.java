@@ -26,7 +26,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -87,11 +86,8 @@ public class UserFrontController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public LoginUserDTO register(@Valid final CreateUserDTO model, final NativeWebRequest request,
-                                 final HttpServletResponse response,
-                                 @CookieValue(value = COOKIE_NAME, required = false)
-                                     final String ageCookie) {
+                                 final HttpServletResponse response) {
 
-        validateAge(model, request, response, ageCookie);
 
         final UserFront user = userFrontService.create(model);
         if (user != null) {

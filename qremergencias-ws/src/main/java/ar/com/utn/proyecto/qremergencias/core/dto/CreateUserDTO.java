@@ -29,4 +29,7 @@ public class CreateUserDTO extends RegisterUserDTO {
     @NotEmpty
     private String email;
 
+    @NotEmpty
+    private String role;
+
 }
