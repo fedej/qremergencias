@@ -1,4 +1,4 @@
-QR Emergencias - branch santimano
+QR Emergencias
 ====================
 
 Installation
