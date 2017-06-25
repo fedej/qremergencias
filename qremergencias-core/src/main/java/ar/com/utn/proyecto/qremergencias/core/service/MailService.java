@@ -34,7 +34,6 @@ public class MailService {
 
         try {
             final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-            mimeMessage.setFrom();
             final MimeMessageHelper message =
                     new MimeMessageHelper(mimeMessage, true, "UTF-8");
             message.setSubject(subject);
