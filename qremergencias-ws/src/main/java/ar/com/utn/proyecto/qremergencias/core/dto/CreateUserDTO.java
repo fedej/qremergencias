@@ -1,35 +1,31 @@
 package ar.com.utn.proyecto.qremergencias.core.dto;
 
-import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
-
+import ar.com.utn.proyecto.qremergencias.core.validation.Captcha;
 import ar.com.utn.proyecto.qremergencias.core.validation.Password;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.Pattern;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @SuppressWarnings("PMD.UnusedPrivateField")
-public class CreateUserDTO extends RegisterUserDTO {
+public class CreateUserDTO {
 
     @Password
     private String password;
-
-    @NotEmpty
-    @Size(max = 50, min = 4)
-    private String name;
-
-    @NotEmpty
-    @Size(max = 50, min = 4)
-    private String lastname;
 
     @Email
     @NotEmpty
     private String email;
 
     @NotEmpty
+    @Pattern(regexp = "ROLE_PACIENTE|ROLE_MEDICO")
     private String role;
+
+    //@Captcha
+    //private String recaptchaResponse;
 
 }

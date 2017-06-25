@@ -19,11 +19,13 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,7 +35,6 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.thymeleaf.context.Context;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.Collections;
@@ -77,9 +78,10 @@ public class UserFrontController {
     @Autowired
     private LoginAdapter loginAdapter;
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public LoginUserDTO register(@Valid final CreateUserDTO model, final NativeWebRequest request,
-                                 final HttpServletResponse response) {
+    @RequestMapping(value = "/register", method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public LoginUserDTO register(@Valid @RequestBody final CreateUserDTO model,
+                                 final NativeWebRequest request) {
 
 
         final UserFront user = userFrontService.create(model);

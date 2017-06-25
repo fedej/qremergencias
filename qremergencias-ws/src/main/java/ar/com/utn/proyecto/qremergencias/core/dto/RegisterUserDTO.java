@@ -15,9 +15,6 @@ public class RegisterUserDTO {
     @AssertTrue
     private boolean tyc;
 
-    @Captcha
-    private String recaptchaResponse;
-
     @NotNull
     @Min(1)
     @Max(31)

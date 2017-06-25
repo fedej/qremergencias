@@ -12,5 +12,5 @@ public class LoginUserDTO implements Serializable {
 
     private final String name;
     private final String lastName;
-    private final String imageUrl;
+
 }

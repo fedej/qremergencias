@@ -25,23 +25,7 @@ dependencies {
 swagger {
     inputSpec = projectDir.toPath().resolve('src/main/resources/swagger.json').toFile()
     outputDir = buildDir.toPath().resolve('swagger').toFile()
-    lang = 'java'
-
-    additionalProperties = [
-            'invokerPackage'   : 'ar.com.utn.proyecto.qremergencias.client',
-            'apiPackage'       : 'ar.com.utn.proyecto.qremergencias.client.api',
-            'modelPackage'     : 'ar.com.utn.proyecto.qremergencias.core.dto',
-            'dateLibrary'      : 'java8',
-            'library'          : 'retrofit2'
-    ]
-
-    // NO SPACES
-    def models = ''
-
-    systemProperties = [
-            'apis' : '',
-            //'models': models
-    ]
+    lang = 'javascript'
 }
 
 def mainPackage = 'ar/com/utn/proyecto/qremergencias'

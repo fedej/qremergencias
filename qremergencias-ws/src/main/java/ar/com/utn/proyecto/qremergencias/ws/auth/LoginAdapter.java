@@ -27,11 +27,11 @@ public class LoginAdapter {
 
         doAuthenticate(request, token);
 
-        return getLoginUserDto(user, null);
+        return getLoginUserDto(user);
     }
 
-    public LoginUserDTO getLoginUserDto(final UserFront user, final String picture) {
-        return new LoginUserDTO(user.getName(), user.getLastname(), picture);
+    public LoginUserDTO getLoginUserDto(final UserFront user) {
+        return new LoginUserDTO(user.getName(), user.getLastname());
     }
 
     private void doAuthenticate(final NativeWebRequest request,
