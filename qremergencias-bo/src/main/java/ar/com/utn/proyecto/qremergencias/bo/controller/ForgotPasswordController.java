@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,7 +28,7 @@ import org.thymeleaf.context.Context;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Locale;
 
 @Controller
@@ -69,6 +70,9 @@ public class ForgotPasswordController {
     @Value("${qremergencias.baseUrl}")
     private String baseUrl;
 
+    @Value("${qremergencias.forgotPassword.expirationHours}")
+    private Integer expirationHours;
+
     @RequestMapping("/index")
     @ModelAttribute(FORGOT_PASSWORD_DTO)
     public ForgotPasswordDTO index() {
@@ -102,11 +106,16 @@ public class ForgotPasswordController {
                                         + forgotPassword.getToken());
 
         ctx.setVariable("baseUrl", baseUrl);
+        ctx.setVariable("expirationHours",expirationHours);
+
+        final Resource header = resourceLoader
+                .getResource("classpath:static/images/mail/header-mail.jpg");
+
+        final Resource footer = resourceLoader
+                .getResource("classpath:static/images/mail/logo-footer.png");
 
         mailService.sendMail(dbUser.getEmail(), messageSource.getMessage(SUBJECT, null, locale),
-                "forgotPassword", ctx,
-                Collections.singletonList(resourceLoader
-                        .getResource("classpath:static/images/mail/logo-footer.png")));
+                "forgotPassword", ctx, Arrays.asList(header, footer));
 
         flashMessageService.addFlashMessage(model, FORGOT_PASSWORD_EMAIL_SENT);
         model.addAttribute(FORGOT_PASSWORD_DTO, new ForgotPasswordDTO());
