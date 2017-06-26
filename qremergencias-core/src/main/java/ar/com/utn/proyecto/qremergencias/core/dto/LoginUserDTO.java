@@ -1,8 +1,9 @@
 package ar.com.utn.proyecto.qremergencias.core.dto;
 
-import java.io.Serializable;
-
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.List;
 
 @Data
 @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.ImmutableField", "PMD.SingularField" })
@@ -12,5 +13,6 @@ public class LoginUserDTO implements Serializable {
 
     private final String name;
     private final String lastName;
+    private final List<String> roles;
 
 }

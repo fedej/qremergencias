@@ -31,7 +31,7 @@ public class LoginAdapter {
     }
 
     public LoginUserDTO getLoginUserDto(final UserFront user) {
-        return new LoginUserDTO(user.getName(), user.getLastname());
+        return new LoginUserDTO(user.getName(), user.getLastname(), user.getRoles());
     }
 
     private void doAuthenticate(final NativeWebRequest request,
