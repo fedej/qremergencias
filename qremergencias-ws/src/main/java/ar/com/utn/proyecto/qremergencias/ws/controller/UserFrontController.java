@@ -2,15 +2,14 @@ package ar.com.utn.proyecto.qremergencias.ws.controller;
 
 import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
+import ar.com.utn.proyecto.qremergencias.core.domain.UserVerificationToken;
 import ar.com.utn.proyecto.qremergencias.core.dto.ChangePasswordDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.CreateUserDTO;
-import ar.com.utn.proyecto.qremergencias.core.dto.LoginUserDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.ResetPasswordDTO;
 import ar.com.utn.proyecto.qremergencias.core.service.CaptchaService;
 import ar.com.utn.proyecto.qremergencias.core.service.ForgotPasswordService;
 import ar.com.utn.proyecto.qremergencias.core.service.MailService;
 import ar.com.utn.proyecto.qremergencias.core.service.PasswordChangeService;
-import ar.com.utn.proyecto.qremergencias.ws.auth.LoginAdapter;
 import ar.com.utn.proyecto.qremergencias.ws.service.UserFrontService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,11 +30,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.NativeWebRequest;
 import org.thymeleaf.context.Context;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
@@ -47,12 +48,17 @@ public class UserFrontController {
     private static final String SUBJECT = "default.forgot.email.subject";
     private static final String GREETING_SUBJECT = "default.greeting.email.subject";
     private static final String INVALID_PASSWORD = "Invalid password";
+    private static final String INVALID_TOKEN = "Invalid token";
+    private static final String TOKEN_NOT_FOUND = "Token not found";
 
     @Value("${qremergencias.front.baseUrl}")
     private String baseUrl;
 
     @Value("${qremergencias.front.resetPasswordUrl}")
     private String resetPasswordUrl;
+
+    @Value("${qremergencias.front.confirmRegistrationUrl}")
+    private String confirmRegistrationUrl;
 
     @Autowired
     private UserFrontService userFrontService;
@@ -75,27 +81,23 @@ public class UserFrontController {
     @Autowired
     private PasswordChangeService passwordChangeService;
 
-    @Autowired
-    private LoginAdapter loginAdapter;
-
     @RequestMapping(value = "/register", method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public LoginUserDTO register(@Valid @RequestBody final CreateUserDTO model,
-                                 final NativeWebRequest request) {
-
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public void register(@Valid @RequestBody final CreateUserDTO model) {
 
         final UserFront user = userFrontService.create(model);
+
         if (user != null) {
-            sendGreetingMail(user);
-            return loginAdapter.login(user, model.getPassword(), request);
+            sendMailConfirmation(user);
         }
-        return null;
+
     }
 
-    @RequestMapping(value = "/sendMailConfirmation", method = RequestMethod.POST)
-    public void sendMailConfirmation(final HttpServletRequest request,
-            @RequestParam(value = "g-recaptcha-response") final String response,
-            @RequestParam final String username, final Locale locale) {
+    @RequestMapping(value = "/sendForgotPassword", method = RequestMethod.POST)
+    public void sendForgotPassword(final HttpServletRequest request,
+                               @RequestParam(value = "g-recaptcha-response") final String response,
+                               @RequestParam final String username, final Locale locale) {
 
         final boolean validate = captchaService.validate(request.getRemoteAddr(), response);
 
@@ -164,21 +166,51 @@ public class UserFrontController {
         passwordChangeService.changePassword(user, changePassword.getNewPassword());
     }
 
-    private void sendGreetingMail(final UserFront user) {
-        final Locale locale = LocaleContextHolder.getLocale();
-        final Context ctx = new Context(locale);
+    private void sendMailConfirmation(final UserFront user) {
 
-        ctx.setVariable("url", baseUrl);
+        if (!StringUtils.isEmpty(user.getEmail())) {
+            final Locale locale = LocaleContextHolder.getLocale();
+            final Context ctx = new Context(locale);
 
-        final Resource header = resourceLoader
-                .getResource("classpath:static/images/mail/header-mail.jpg");
+            ctx.setVariable("username", user.getUsername());
+            ctx.setVariable("url",
+                    confirmRegistrationUrl
+                            + userFrontService.getUserVerificationByUser(user).getToken());
 
-        final Resource button = resourceLoader
-                .getResource("classpath:static/images/mail/btn-codigo.png");
+            final Resource header = resourceLoader
+                    .getResource("classpath:static/images/mail/header-mail.jpg");
 
-        mailService.sendMail(user.getEmail(),
-                messageSource.getMessage(GREETING_SUBJECT, null, locale), "mail/greeting", ctx,
-                Arrays.asList(header, button));
+            final Resource button = resourceLoader
+                    .getResource("classpath:static/images/mail/btn-codigo.png");
+
+            mailService.sendMail(user.getEmail(),
+                    messageSource.getMessage(GREETING_SUBJECT, null, locale), "mail/greeting", ctx,
+                    Arrays.asList(header, button));
+        }
+    }
+
+
+    @RequestMapping(value = "/confirmRegistration", method = RequestMethod.GET)
+    public void confirmRegistration(@RequestParam("token") final String token,
+                                    final HttpServletResponse response)
+            throws IOException {
+
+        final UserVerificationToken userVerificationToken = userFrontService
+                .getUserVerificationByToken(token);
+
+        if (userVerificationToken == null) {
+            throw new RuntimeException(TOKEN_NOT_FOUND);
+        }
+
+        if (userVerificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException(INVALID_TOKEN);
+        }
+
+        final User user = userVerificationToken.getUser();
+        user.setEnabled(true);
+        userFrontService.save(user);
+        userFrontService.deleteVerificationToken(userVerificationToken);
+        response.sendRedirect(baseUrl);
     }
 
 }

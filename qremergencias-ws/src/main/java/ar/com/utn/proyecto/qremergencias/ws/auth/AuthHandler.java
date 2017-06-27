@@ -6,7 +6,6 @@ import ar.com.utn.proyecto.qremergencias.core.service.LoginAttemptCacheService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -36,9 +35,6 @@ public class AuthHandler implements AuthenticationSuccessHandler, Authentication
 
     @Autowired
     private ObjectMapper mapper;
-
-    @Autowired @Lazy
-    private LoginAdapter loginAdapter;
 
     @Value("${qremergencias.login.attempts.captcha}")
     private Integer loginAttempts;
@@ -83,7 +79,9 @@ public class AuthHandler implements AuthenticationSuccessHandler, Authentication
         loginAttemptCacheService.loginSuccess(req.getSession(false));
         final UserFront user = (UserFront) auth.getPrincipal();
 
-        final LoginUserDTO dto = loginAdapter.getLoginUserDto(user);
+        final LoginUserDTO dto =
+                new LoginUserDTO(user.getName(), user.getLastname(), user.getRoles());
+
         resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
         resp.getWriter().print(mapper.writeValueAsString(dto));
     }

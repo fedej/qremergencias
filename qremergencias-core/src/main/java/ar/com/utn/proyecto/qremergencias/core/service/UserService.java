@@ -1,7 +1,9 @@
 package ar.com.utn.proyecto.qremergencias.core.service;
 
 import ar.com.utn.proyecto.qremergencias.core.domain.User;
+import ar.com.utn.proyecto.qremergencias.core.domain.UserVerificationToken;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserRepository;
+import ar.com.utn.proyecto.qremergencias.core.repository.UserVerificationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Service
+@SuppressWarnings("PMD.TooManyMethods")
 public class UserService {
 
     private static final String ADMIN = "admin";
@@ -22,6 +25,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserVerificationTokenRepository userTokenRepository;
 
     public <T extends User> T save(final T user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -97,4 +103,21 @@ public class UserService {
         return userRepository.findByUsername(username) != null;
     }
 
+
+    public void createVerificationToken(final User user, final String token) {
+        final UserVerificationToken uvt = new UserVerificationToken(user, token);
+        userTokenRepository.save(uvt);
+    }
+
+    public UserVerificationToken getUserVerificationByToken(final String token) {
+        return userTokenRepository.findByToken(token);
+    }
+
+    public UserVerificationToken getUserVerificationByUser(final User user) {
+        return userTokenRepository.findByUser(user);
+    }
+
+    public void deleteVerificationToken(final UserVerificationToken userVerificationToken) {
+        userTokenRepository.delete(userVerificationToken);
+    }
 }

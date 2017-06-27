@@ -86,7 +86,7 @@ public class UserServiceTest {
         assertTrue(result.isAccountNonExpired());
         assertTrue(result.isAccountNonLocked());
         assertTrue(result.isCredentialsNonExpired());
-        assertTrue(result.isEnabled());
+        assertFalse(result.isEnabled());
 
     }
 
