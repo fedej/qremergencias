@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Service
+@SuppressWarnings("PMD.TooManyMethods")
 public class UserService {
 
     private static final String ADMIN = "admin";
@@ -116,4 +117,7 @@ public class UserService {
         return userTokenRepository.findByUser(user);
     }
 
+    public void deleteVerificationToken(final UserVerificationToken userVerificationToken) {
+        userTokenRepository.delete(userVerificationToken);
+    }
 }
