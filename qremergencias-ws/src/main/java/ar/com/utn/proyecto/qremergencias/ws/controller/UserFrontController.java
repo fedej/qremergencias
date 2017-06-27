@@ -2,14 +2,15 @@ package ar.com.utn.proyecto.qremergencias.ws.controller;
 
 import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
+import ar.com.utn.proyecto.qremergencias.core.domain.UserVerificationToken;
 import ar.com.utn.proyecto.qremergencias.core.dto.ChangePasswordDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.CreateUserDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.LoginUserDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.ResetPasswordDTO;
-import ar.com.utn.proyecto.qremergencias.core.service.CaptchaService;
 import ar.com.utn.proyecto.qremergencias.core.service.ForgotPasswordService;
 import ar.com.utn.proyecto.qremergencias.core.service.MailService;
 import ar.com.utn.proyecto.qremergencias.core.service.PasswordChangeService;
+import ar.com.utn.proyecto.qremergencias.core.service.UserService;
 import ar.com.utn.proyecto.qremergencias.ws.auth.LoginAdapter;
 import ar.com.utn.proyecto.qremergencias.ws.service.UserFrontService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,25 +35,29 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.thymeleaf.context.Context;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/userFront")
 public class UserFrontController {
 
-    private static final String SUBJECT = "default.forgot.email.subject";
+    //private static final String SUBJECT = "default.forgot.email.subject";
     private static final String GREETING_SUBJECT = "default.greeting.email.subject";
     private static final String INVALID_PASSWORD = "Invalid password";
+    private static final String INVALID_TOKEN = "Invalid token";
+    private static final String TOKEN_NOT_FOUND = "Token not found";
 
-    @Value("${qremergencias.front.baseUrl}")
-    private String baseUrl;
+    //@Value("${qremergencias.front.baseUrl}")
+    //private String baseUrl;
 
-    @Value("${qremergencias.front.resetPasswordUrl}")
-    private String resetPasswordUrl;
+    //@Value("${qremergencias.front.resetPasswordUrl}")
+    //private String resetPasswordUrl;
+
+    @Value("${qremergencias.front.confirmRegistrationUrl}")
+    private String confirmRegistrationUrl;
 
     @Autowired
     private UserFrontService userFrontService;
@@ -60,8 +65,8 @@ public class UserFrontController {
     @Autowired
     private ForgotPasswordService forgotPasswordService;
 
-    @Autowired
-    private CaptchaService captchaService;
+    //@Autowired
+    //private CaptchaService captchaService;
 
     @Autowired
     private MailService mailService;
@@ -78,6 +83,9 @@ public class UserFrontController {
     @Autowired
     private LoginAdapter loginAdapter;
 
+    @Autowired
+    private UserService userService;
+
     @RequestMapping(value = "/register", method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public LoginUserDTO register(@Valid @RequestBody final CreateUserDTO model,
@@ -86,39 +94,38 @@ public class UserFrontController {
 
         final UserFront user = userFrontService.create(model);
         if (user != null) {
-            sendGreetingMail(user);
+            //sendGreetingMail(user);
+            sendMailConfirmation(user.getUsername());
             return loginAdapter.login(user, model.getPassword(), request);
         }
         return null;
     }
 
+    @SuppressWarnings("PMD.DUAnomaly")
     @RequestMapping(value = "/sendMailConfirmation", method = RequestMethod.POST)
-    public void sendMailConfirmation(final HttpServletRequest request,
-            @RequestParam(value = "g-recaptcha-response") final String response,
-            @RequestParam final String username, final Locale locale) {
-
-        final boolean validate = captchaService.validate(request.getRemoteAddr(), response);
-
-        if (!validate) {
-            throw new RuntimeException("Invalid captcha");
-        }
+    public void sendMailConfirmation(@RequestParam final String username) {
 
         final UserFront userFront = userFrontService.findByUsername(username);
 
-        if (userFront == null) {
-            throw new RuntimeException("Invalid captcha");
-        }
+        final User user = userService.findByUsername(username);
 
         if (!StringUtils.isEmpty(userFront.getEmail())) {
+            final Locale locale = LocaleContextHolder.getLocale();
             final Context ctx = new Context(locale);
             ctx.setVariable("username", userFront.getUsername());
             ctx.setVariable("url",
-                    resetPasswordUrl + forgotPasswordService.create(userFront).getToken());
+                    confirmRegistrationUrl
+                            + userService.getUserVerificationByUser(user).getToken());
 
-            mailService.sendMail(userFront.getEmail(),
-                    messageSource.getMessage(SUBJECT, null, locale), "mail/forgotPassword", ctx,
-                    Collections.singletonList(resourceLoader
-                            .getResource("classpath:static/images/mail/header-mail.jpg")));
+            final Resource header = resourceLoader
+                    .getResource("classpath:static/images/mail/header-mail.jpg");
+
+            final Resource button = resourceLoader
+                    .getResource("classpath:static/images/mail/btn-codigo.png");
+
+            mailService.sendMail(user.getEmail(),
+                    messageSource.getMessage(GREETING_SUBJECT, null, locale), "mail/greeting", ctx,
+                    Arrays.asList(header, button));
         }
 
     }
@@ -164,7 +171,7 @@ public class UserFrontController {
         passwordChangeService.changePassword(user, changePassword.getNewPassword());
     }
 
-    private void sendGreetingMail(final UserFront user) {
+    /*private void sendGreetingMail(final UserFront user) {
         final Locale locale = LocaleContextHolder.getLocale();
         final Context ctx = new Context(locale);
 
@@ -179,6 +186,23 @@ public class UserFrontController {
         mailService.sendMail(user.getEmail(),
                 messageSource.getMessage(GREETING_SUBJECT, null, locale), "mail/greeting", ctx,
                 Arrays.asList(header, button));
+    }
+*/
+    @SuppressWarnings("PMD.DUAnomaly")
+    @RequestMapping(value = "/confirmRegistration", method = RequestMethod.GET)
+    public void confirmRegistration(@RequestParam("token") final String token) {
+        final UserVerificationToken userVerificationToken = userFrontService
+                .getUserVerificationByToken(token);
+        if (userVerificationToken == null) {
+            throw new RuntimeException(TOKEN_NOT_FOUND);
+        }
+        final User user = userVerificationToken.getUser();
+
+        if (userVerificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException(INVALID_TOKEN);
+        }
+        user.setEnabled(true);
+        userFrontService.save(user);
     }
 
 }

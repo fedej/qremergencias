@@ -7,6 +7,8 @@ import ar.com.utn.proyecto.qremergencias.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class UserFrontService extends UserService {
 
@@ -22,7 +24,10 @@ public class UserFrontService extends UserService {
         user.setEmail(createUserDTO.getEmail());
         user.setPassword(createUserDTO.getPassword());
         user.getRoles().add(createUserDTO.getRole());
-        return save(user);
+        final UserFront userFront = save(user);
+        final String token = UUID.randomUUID().toString();
+        createVerificationToken(userFront,token);
+        return userFront;
 
     }
 
