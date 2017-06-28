@@ -38,7 +38,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Locale;
 
 @RestController
@@ -59,6 +58,9 @@ public class UserFrontController {
 
     @Value("${qremergencias.front.confirmRegistrationUrl}")
     private String confirmRegistrationUrl;
+
+    @Value("${qremergencias.forgotPassword.expirationHours}")
+    private Integer expirationHours;
 
     @Autowired
     private UserFrontService userFrontService;
@@ -114,13 +116,19 @@ public class UserFrontController {
         if (!StringUtils.isEmpty(userFront.getEmail())) {
             final Context ctx = new Context(locale);
             ctx.setVariable("username", userFront.getUsername());
+            ctx.setVariable("expirationHours",expirationHours);
             ctx.setVariable("url",
                     resetPasswordUrl + forgotPasswordService.create(userFront).getToken());
 
+            final Resource header = resourceLoader
+                    .getResource("classpath:static/images/mail/header-mail.jpg");
+
+            final Resource footer = resourceLoader
+                    .getResource("classpath:static/images/mail/logo-footer.png");
+
             mailService.sendMail(userFront.getEmail(),
                     messageSource.getMessage(SUBJECT, null, locale), "mail/forgotPassword", ctx,
-                    Collections.singletonList(resourceLoader
-                            .getResource("classpath:static/images/mail/header-mail.jpg")));
+                    Arrays.asList(header, footer));
         }
 
     }
