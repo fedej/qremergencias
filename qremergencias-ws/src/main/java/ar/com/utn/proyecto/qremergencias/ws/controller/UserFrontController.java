@@ -4,6 +4,7 @@ import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserVerificationToken;
 import ar.com.utn.proyecto.qremergencias.core.dto.ChangePasswordDTO;
+import ar.com.utn.proyecto.qremergencias.core.dto.ConfirmRegistrationDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.CreateUserDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.ResetPasswordDTO;
 import ar.com.utn.proyecto.qremergencias.core.service.CaptchaService;
@@ -49,6 +50,7 @@ public class UserFrontController {
     private static final String INVALID_PASSWORD = "Invalid password";
     private static final String INVALID_TOKEN = "Invalid token";
     private static final String TOKEN_NOT_FOUND = "Token not found";
+    private static final String USER_NOT_FOUND = "User not found";
 
     @Value("${qremergencias.front.baseUrl}")
     private String baseUrl;
@@ -58,6 +60,9 @@ public class UserFrontController {
 
     @Value("${qremergencias.front.confirmRegistrationUrl}")
     private String confirmRegistrationUrl;
+
+    @Value("${qremergencias.front.completeRegistrationUrl}")
+    private String completeRegistrationUrl;
 
     @Value("${qremergencias.forgotPassword.expirationHours}")
     private Integer expirationHours;
@@ -215,10 +220,40 @@ public class UserFrontController {
         }
 
         final User user = userVerificationToken.getUser();
-        user.setEnabled(true);
-        userFrontService.save(user);
+
+        if (user == null) {
+            throw new RuntimeException(USER_NOT_FOUND);
+        }
+
+        response.sendRedirect(completeRegistrationUrl + token);
+    }
+
+
+    @RequestMapping(value = "/completeRegistration", method = RequestMethod.POST)
+    public void completeRegistration(@Valid final ConfirmRegistrationDTO request,
+                                     final HttpServletResponse response)
+            throws IOException {
+
+        final UserVerificationToken userVerificationToken = userFrontService
+                .getUserVerificationByToken(request.getToken());
+
+        final User user = userVerificationToken.getUser();
+
+        UserFront userFront;
+        if (user instanceof UserFront) {
+            userFront = (UserFront) user;
+        } else {
+            userFront = userFrontService.findByUsername(user.getUsername());
+        }
+
+        userFront.setEnabled(true);
+        userFront.setBirthdate(request.getBirthDate());
+        userFront.setName(request.getName());
+        userFront.setLastname(request.getLastName());
+        userFrontService.save(userFront);
         userFrontService.deleteVerificationToken(userVerificationToken);
         response.sendRedirect(baseUrl);
     }
+
 
 }
