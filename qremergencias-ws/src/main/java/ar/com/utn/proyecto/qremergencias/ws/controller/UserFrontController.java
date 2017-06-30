@@ -221,7 +221,7 @@ public class UserFrontController {
 
         final User user = userVerificationToken.getUser();
 
-        if(user == null){
+        if (user == null) {
             throw new RuntimeException(USER_NOT_FOUND);
         }
 
@@ -230,15 +230,21 @@ public class UserFrontController {
 
 
     @RequestMapping(value = "/completeRegistration", method = RequestMethod.POST)
-    public void completeRegistration(@Valid ConfirmRegistrationDTO request,
+    public void completeRegistration(@Valid final ConfirmRegistrationDTO request,
                                      final HttpServletResponse response)
             throws IOException {
 
-        UserVerificationToken userVerificationToken = userFrontService.getUserVerificationByToken(request.getToken());
+        final UserVerificationToken userVerificationToken = userFrontService
+                .getUserVerificationByToken(request.getToken());
 
-        User user = userVerificationToken.getUser();
+        final User user = userVerificationToken.getUser();
 
-        final UserFront userFront = userFrontService.findByUsername(user.getUsername());
+        UserFront userFront;
+        if (user instanceof UserFront) {
+            userFront = (UserFront) user;
+        } else {
+            userFront = userFrontService.findByUsername(user.getUsername());
+        }
 
         userFront.setEnabled(true);
         userFront.setBirthdate(request.getBirthDate());
