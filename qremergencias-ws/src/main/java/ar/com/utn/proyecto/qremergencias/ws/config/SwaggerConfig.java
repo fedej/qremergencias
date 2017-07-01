@@ -10,6 +10,7 @@ import springfox.documentation.builders.OperationBuilder;
 import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiDescription;
+import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.ApiListingScannerPlugin;
 import springfox.documentation.spi.service.contexts.DocumentationContext;
@@ -26,6 +27,7 @@ import static com.google.common.base.Predicates.and;
 import static com.google.common.base.Predicates.not;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static springfox.documentation.builders.PathSelectors.regex;
+import static springfox.documentation.service.ApiInfo.DEFAULT_CONTACT;
 
 @EnableSwagger2
 @Configuration
@@ -41,6 +43,8 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .protocols(Collections.singleton("http"))
                 .forCodeGeneration(true)
+                .apiInfo(new ApiInfo("QR Emergencias WS", "API Rest QR Emergencias",
+                        "1.0.0", "", DEFAULT_CONTACT,"", "", Collections.emptyList()))
                 .ignoredParameterTypes(Pageable.class)
                 .select()
                 .paths(and(not(regex("/error.*")), regex("/.*")))
@@ -77,6 +81,14 @@ public class SwaggerConfig {
                                             .parameterType("form")
                                             .parameterAccess("access")
                                             .required(true)
+                                            .modelRef(new ModelRef("string")) //<5>
+                                            .build(),
+                                    new ParameterBuilder()
+                                            .type(new TypeResolver().resolve(String.class))
+                                            .name("g-recaptcha-response")
+                                            .parameterType("form")
+                                            .parameterAccess("access")
+                                            .required(false)
                                             .modelRef(new ModelRef("string")) //<5>
                                             .build()))
                             .build()),
