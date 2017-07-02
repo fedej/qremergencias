@@ -1,7 +1,6 @@
 package ar.com.utn.proyecto.qremergencias.bo.config;
 
 import ar.com.utn.proyecto.qremergencias.bo.auth.listener.AuthFailureHandler;
-import ar.com.utn.proyecto.qremergencias.core.config.ApiLoginConfigurer;
 import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
 
         http
-                .apply(new ApiLoginConfigurer<>())
+                .formLogin()
                     .loginPage(ERROR_PAGE)
                     .defaultSuccessUrl(defaultSuccessUrl, true)
                     .loginProcessingUrl(loginPage)

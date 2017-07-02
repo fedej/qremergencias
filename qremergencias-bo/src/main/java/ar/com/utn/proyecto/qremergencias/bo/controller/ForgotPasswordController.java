@@ -4,7 +4,6 @@ import ar.com.utn.proyecto.qremergencias.bo.dto.ExpiredPasswordDTO;
 import ar.com.utn.proyecto.qremergencias.bo.dto.ForgotPasswordDTO;
 import ar.com.utn.proyecto.qremergencias.bo.service.FlashMessageService;
 import ar.com.utn.proyecto.qremergencias.bo.service.PasswordExpiredService;
-import ar.com.utn.proyecto.qremergencias.core.config.ApiLoginConfigurer;
 import ar.com.utn.proyecto.qremergencias.core.domain.ForgotPassword;
 import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.dto.ResetPasswordDTO;
@@ -176,8 +175,7 @@ public class ForgotPasswordController {
     @RequestMapping(value = "/credentialsExpired", method = RequestMethod.GET)
     public String passwordExpired(final HttpSession session, final Model model) {
 
-        final String username = (String) session
-                .getAttribute(ApiLoginConfigurer.USERNAME_PARAMETER);
+        final String username = (String) session.getAttribute("username");
 
         if (StringUtils.isEmpty(username)) {
             return ERROR;
@@ -204,8 +202,7 @@ public class ForgotPasswordController {
                                   final HttpSession session,
                                   final Model model) {
 
-        final String username = (String) session
-                .getAttribute(ApiLoginConfigurer.USERNAME_PARAMETER);
+        final String username = (String) session.getAttribute("username");
 
         if (StringUtils.isEmpty(username)) {
             return ERROR;

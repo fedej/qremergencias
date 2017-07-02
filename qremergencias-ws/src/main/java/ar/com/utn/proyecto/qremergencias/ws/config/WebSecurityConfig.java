@@ -1,6 +1,5 @@
 package ar.com.utn.proyecto.qremergencias.ws.config;
 
-import ar.com.utn.proyecto.qremergencias.core.config.ApiLoginConfigurer;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.ws.auth.AuthHandler;
 import ar.com.utn.proyecto.qremergencias.ws.service.UserFrontService;
@@ -15,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
@@ -31,11 +31,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserFrontService userFrontService;
 
+    @Autowired
+    private CorsConfiguration corsConfiguration;
+
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         http.csrf().disable();
+        http.cors().configurationSource((request) -> corsConfiguration);
         http
-                .apply(new ApiLoginConfigurer<>())
+                .formLogin()
                     .loginProcessingUrl("/api/login")
                     .successHandler(authHandler)
                     .failureHandler(authHandler)
@@ -55,7 +59,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionManagement()
                         .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                         .maximumSessions(1);
-
     }
 
     @Autowired
