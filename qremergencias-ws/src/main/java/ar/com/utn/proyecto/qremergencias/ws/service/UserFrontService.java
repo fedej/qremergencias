@@ -35,4 +35,8 @@ public class UserFrontService extends UserService {
         return userFrontRepository.findByUsername(username);
     }
 
+    public UserFront update(final UserFront toUpdate) {
+        return userFrontRepository.save(toUpdate);
+    }
+
 }

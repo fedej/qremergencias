@@ -58,9 +58,6 @@ public class UserFrontController {
     @Value("${qremergencias.front.resetPasswordUrl}")
     private String resetPasswordUrl;
 
-    @Value("${qremergencias.front.confirmRegistrationUrl}")
-    private String confirmRegistrationUrl;
-
     @Value("${qremergencias.front.completeRegistrationUrl}")
     private String completeRegistrationUrl;
 
@@ -187,7 +184,7 @@ public class UserFrontController {
 
             ctx.setVariable("username", user.getUsername());
             ctx.setVariable("url",
-                    confirmRegistrationUrl
+                    completeRegistrationUrl
                             + userFrontService.getUserVerificationByUser(user).getToken());
 
             final Resource header = resourceLoader
@@ -202,33 +199,6 @@ public class UserFrontController {
         }
     }
 
-
-    @RequestMapping(value = "/confirmRegistration", method = RequestMethod.GET)
-    public void confirmRegistration(@RequestParam("token") final String token,
-                                    final HttpServletResponse response)
-            throws IOException {
-
-        final UserVerificationToken userVerificationToken = userFrontService
-                .getUserVerificationByToken(token);
-
-        if (userVerificationToken == null) {
-            throw new RuntimeException(TOKEN_NOT_FOUND);
-        }
-
-        if (userVerificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException(INVALID_TOKEN);
-        }
-
-        final User user = userVerificationToken.getUser();
-
-        if (user == null) {
-            throw new RuntimeException(USER_NOT_FOUND);
-        }
-
-        response.sendRedirect(completeRegistrationUrl + token);
-    }
-
-
     @RequestMapping(value = "/completeRegistration", method = RequestMethod.POST)
     public void completeRegistration(@Valid final ConfirmRegistrationDTO request,
                                      final HttpServletResponse response)
@@ -237,7 +207,20 @@ public class UserFrontController {
         final UserVerificationToken userVerificationToken = userFrontService
                 .getUserVerificationByToken(request.getToken());
 
+        if (userVerificationToken == null) {
+            throw new RuntimeException(TOKEN_NOT_FOUND);
+        }
+
+        if (userVerificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            userFrontService.deleteVerificationToken(userVerificationToken);
+            throw new RuntimeException(INVALID_TOKEN);
+        }
+
         final User user = userVerificationToken.getUser();
+
+        if (user == null) {
+            throw new RuntimeException(USER_NOT_FOUND);
+        }
 
         UserFront userFront;
         if (user instanceof UserFront) {
@@ -250,7 +233,7 @@ public class UserFrontController {
         userFront.setBirthdate(request.getBirthDate());
         userFront.setName(request.getName());
         userFront.setLastname(request.getLastName());
-        userFrontService.save(userFront);
+        userFrontService.update(userFront);
         userFrontService.deleteVerificationToken(userVerificationToken);
         response.sendRedirect(baseUrl);
     }

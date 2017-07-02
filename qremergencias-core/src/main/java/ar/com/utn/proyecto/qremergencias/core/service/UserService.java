@@ -31,7 +31,7 @@ public class UserService {
 
     public <T extends User> T save(final T user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        return userRepository.insert(user);
     }
 
     public User update(final User user) {
