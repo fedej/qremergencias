@@ -115,7 +115,7 @@ public class UserFrontController {
         final UserFront userFront = userFrontService.findByUsername(username);
 
         if (userFront == null) {
-            throw new RuntimeException("Invalid captcha");
+            throw new RuntimeException("User name not valid");
         }
 
         if (!StringUtils.isEmpty(userFront.getEmail())) {
