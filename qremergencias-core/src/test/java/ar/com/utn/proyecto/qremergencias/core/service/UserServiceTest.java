@@ -71,7 +71,7 @@ public class UserServiceTest {
         final User userToreturn = createUser();
         userToreturn.setId("55");
 
-        when(userRepository.save(any(User.class))).thenReturn(userToreturn);
+        when(userRepository.insert(any(User.class))).thenReturn(userToreturn);
 
         final User user = createUser();
         final User result = userService.save(user);
