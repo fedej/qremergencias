@@ -24,6 +24,7 @@ public class UserFrontService extends UserService {
         user.setEmail(createUserDTO.getEmail());
         user.setPassword(createUserDTO.getPassword());
         user.getRoles().add(createUserDTO.getRole());
+        user.getRoles().add("ROLE_USER");
         final UserFront userFront = save(user);
         final String token = UUID.randomUUID().toString();
         createVerificationToken(userFront,token);

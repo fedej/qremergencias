@@ -99,6 +99,7 @@ public class UserFrontController {
     }
 
     @RequestMapping(value = "/sendForgotPassword", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
     public void sendForgotPassword(final HttpServletRequest request,
                                @RequestParam(value = "g-recaptcha-response") final String response,
                                @RequestParam final String username, final Locale locale) {
@@ -112,7 +113,8 @@ public class UserFrontController {
         final UserFront userFront = userFrontService.findByUsername(username);
 
         if (userFront == null) {
-            throw new RuntimeException("User name not valid");
+            // it should return error, but we put success for more pleasure
+            return;
         }
 
         if (!StringUtils.isEmpty(userFront.getEmail())) {
