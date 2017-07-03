@@ -195,9 +195,12 @@ public class UserFrontController {
             final Resource button = resourceLoader
                     .getResource("classpath:static/images/mail/btn-codigo.png");
 
+            final Resource footer = resourceLoader
+                    .getResource("classpath:static/images/mail/logo-footer.png");
+
             mailService.sendMail(user.getEmail(),
                     messageSource.getMessage(GREETING_SUBJECT, null, locale), "mail/greeting", ctx,
-                    Arrays.asList(header, button));
+                    Arrays.asList(header, button, footer));
         }
     }
 
