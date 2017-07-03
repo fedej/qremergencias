@@ -99,6 +99,7 @@ public class UserFrontController {
     }
 
     @RequestMapping(value = "/sendForgotPassword", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
     public void sendForgotPassword(final HttpServletRequest request,
                                @RequestParam(value = "g-recaptcha-response") final String response,
                                @RequestParam final String username, final Locale locale) {
@@ -112,7 +113,8 @@ public class UserFrontController {
         final UserFront userFront = userFrontService.findByUsername(username);
 
         if (userFront == null) {
-            throw new RuntimeException("Invalid captcha");
+            // it should return error, but we put success for more pleasure
+            return;
         }
 
         if (!StringUtils.isEmpty(userFront.getEmail())) {
@@ -193,9 +195,12 @@ public class UserFrontController {
             final Resource button = resourceLoader
                     .getResource("classpath:static/images/mail/btn-codigo.png");
 
+            final Resource footer = resourceLoader
+                    .getResource("classpath:static/images/mail/logo-footer.png");
+
             mailService.sendMail(user.getEmail(),
                     messageSource.getMessage(GREETING_SUBJECT, null, locale), "mail/greeting", ctx,
-                    Arrays.asList(header, button));
+                    Arrays.asList(header, button, footer));
         }
     }
 
