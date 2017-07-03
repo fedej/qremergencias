@@ -1,8 +1,10 @@
 plugins {
     id 'org.springframework.boot' version '1.5.4.RELEASE'
     id 'java'
-    id 'org.detoeuf.swagger-codegen' version '1.7.1'
 }
+
+import ar.com.utn.proyecto.qremergencias.SwaggerCodeGenPlugin
+apply plugin: SwaggerCodeGenPlugin
 
 bootRepackage {
     mainClass = 'ar.com.utn.proyecto.qremergencias.ws.QREmergenciasWsApplication'
@@ -26,6 +28,11 @@ swagger {
     inputSpec = projectDir.toPath().resolve('src/main/resources/swagger.json').toFile()
     outputDir = buildDir.toPath().resolve('swagger').toFile()
     lang = 'javascript'
+    additionalProperties = [
+        'useES6': true,
+        'usePromises': true
+    ]
+
 }
 
 def mainPackage = 'ar/com/utn/proyecto/qremergencias'
