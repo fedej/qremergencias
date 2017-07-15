@@ -17,6 +17,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 public class LoginAttemptCacheServiceTest {
 
     private static final String USER = "user";
@@ -30,8 +31,8 @@ public class LoginAttemptCacheServiceTest {
     @Mock
     private UserService userService;
 
-    private Cache sessionCache = new ConcurrentMapCache("userCache");
-    private Cache userCache = new ConcurrentMapCache("sessionCache");
+    private final Cache sessionCache = new ConcurrentMapCache("userCache");
+    private final Cache userCache = new ConcurrentMapCache("sessionCache");
 
     private static final int ALLOWED_ATTEMPTS_PER_USER = 3;
 

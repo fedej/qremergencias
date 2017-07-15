@@ -1,21 +1,20 @@
 package ar.com.utn.proyecto.qremergencias.bo.controller;
 
-import ar.com.utn.proyecto.qremergencias.core.config.ApiLoginConfigurer;
-import ar.com.utn.proyecto.qremergencias.core.domain.ForgotPassword;
-import ar.com.utn.proyecto.qremergencias.core.domain.Role;
-import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.bo.dto.ExpiredPasswordDTO;
 import ar.com.utn.proyecto.qremergencias.bo.dto.ForgotPasswordDTO;
+import ar.com.utn.proyecto.qremergencias.bo.service.FlashMessageService;
+import ar.com.utn.proyecto.qremergencias.bo.service.PasswordExpiredService;
+import ar.com.utn.proyecto.qremergencias.core.domain.ForgotPassword;
+import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.dto.ResetPasswordDTO;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserRepository;
-import ar.com.utn.proyecto.qremergencias.bo.service.FlashMessageService;
 import ar.com.utn.proyecto.qremergencias.core.service.ForgotPasswordService;
 import ar.com.utn.proyecto.qremergencias.core.service.MailService;
-import ar.com.utn.proyecto.qremergencias.bo.service.PasswordExpiredService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,7 +27,7 @@ import org.thymeleaf.context.Context;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Locale;
 
 @Controller
@@ -70,6 +69,9 @@ public class ForgotPasswordController {
     @Value("${qremergencias.baseUrl}")
     private String baseUrl;
 
+    @Value("${qremergencias.forgotPassword.expirationHours}")
+    private Integer expirationHours;
+
     @RequestMapping("/index")
     @ModelAttribute(FORGOT_PASSWORD_DTO)
     public ForgotPasswordDTO index() {
@@ -89,10 +91,7 @@ public class ForgotPasswordController {
         final User dbUser = userRepository.findByUsernameAndEmail(forgotPasswordDTO.getUsername(),
                 forgotPasswordDTO.getEmail());
 
-        final Role role = new Role();
-        role.setAuthority(Role.ROLE_USER);
-
-        if (dbUser == null || dbUser.getRoles().contains(role)) {
+        if (dbUser == null || dbUser.getRoles().contains("ROLE_USER")) {
             flashMessageService.addFlashMessage(model, FORGOT_PASSWORD_EMAIL_SENT);
             model.addAttribute(FORGOT_PASSWORD_DTO, new ForgotPasswordDTO());
             return INDEX;
@@ -106,11 +105,16 @@ public class ForgotPasswordController {
                                         + forgotPassword.getToken());
 
         ctx.setVariable("baseUrl", baseUrl);
+        ctx.setVariable("expirationHours",expirationHours);
+
+        final Resource header = resourceLoader
+                .getResource("classpath:static/images/mail/header-mail.jpg");
+
+        final Resource footer = resourceLoader
+                .getResource("classpath:static/images/mail/logo-footer.png");
 
         mailService.sendMail(dbUser.getEmail(), messageSource.getMessage(SUBJECT, null, locale),
-                "forgotPassword", ctx,
-                Collections.singletonList(resourceLoader
-                        .getResource("classpath:static/images/mail/logo-footer.png")));
+                "forgotPassword", ctx, Arrays.asList(header, footer));
 
         flashMessageService.addFlashMessage(model, FORGOT_PASSWORD_EMAIL_SENT);
         model.addAttribute(FORGOT_PASSWORD_DTO, new ForgotPasswordDTO());
@@ -171,8 +175,7 @@ public class ForgotPasswordController {
     @RequestMapping(value = "/credentialsExpired", method = RequestMethod.GET)
     public String passwordExpired(final HttpSession session, final Model model) {
 
-        final String username = (String) session
-                .getAttribute(ApiLoginConfigurer.USERNAME_PARAMETER);
+        final String username = (String) session.getAttribute("username");
 
         if (StringUtils.isEmpty(username)) {
             return ERROR;
@@ -199,8 +202,7 @@ public class ForgotPasswordController {
                                   final HttpSession session,
                                   final Model model) {
 
-        final String username = (String) session
-                .getAttribute(ApiLoginConfigurer.USERNAME_PARAMETER);
+        final String username = (String) session.getAttribute("username");
 
         if (StringUtils.isEmpty(username)) {
             return ERROR;

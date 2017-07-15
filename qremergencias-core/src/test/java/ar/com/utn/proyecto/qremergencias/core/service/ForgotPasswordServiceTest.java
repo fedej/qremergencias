@@ -23,6 +23,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 public class ForgotPasswordServiceTest {
 
     private static final int EXPIRATION_HOURS = 3;

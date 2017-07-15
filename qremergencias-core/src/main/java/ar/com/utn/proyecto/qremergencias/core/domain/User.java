@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,6 +31,7 @@ public class User implements Serializable, UserDetails {
     private Long version;
 
     @NotEmpty
+    @Indexed(unique = true)
     private String username;
 
     @Email
@@ -42,12 +44,11 @@ public class User implements Serializable, UserDetails {
     private boolean accountNonExpired = true;
     private boolean accountNonLocked = true;
     private boolean credentialsNonExpired = true;
-    private boolean enabled = true;
+    private boolean enabled;
 
     private String repassword;
 
-    @DBRef
-    private List<Role> roles;
+    private List<String> roles;
 
     @DBRef
     private List<PasswordChange> passwordChanges;
@@ -63,7 +64,6 @@ public class User implements Serializable, UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(Role::getAuthority)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }

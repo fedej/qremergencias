@@ -1,0 +1,1 @@
+{"_class" : "ar.com.utn.proyecto.qremergencias.core.domain.User", "version" : 0, "username" : "admin", "email" : "federico.jaite@gmail.com", "password" : "$2a$10$fAyFKtavBoykjrYXvdUxj.k/qv49s9mshn/mhR2qcdBv.QG2siQFm", "accountNonExpired" : true, "accountNonLocked" : true, "credentialsNonExpired" : true, "enabled" : true, "roles" : [ "ROLE_ADMIN" ], "passwordChanges" : [ ] }

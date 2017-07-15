@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '1.5.3.RELEASE'
+    id 'org.springframework.boot' version '1.5.4.RELEASE'
     id 'java'
 }
 
@@ -13,9 +13,14 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
     compile('org.springframework.boot:spring-boot-starter-security')
     compile('org.springframework.boot:spring-boot-starter-mail')
+
+    compile('org.springframework.boot:spring-boot-starter-data-redis')
+    compile('org.springframework.session:spring-session')
+    
     compile('org.springframework.boot:spring-boot-starter-thymeleaf') {
         exclude(module: 'thymeleaf-layout-dialect')
     }
-    compile('net.sf.ehcache:ehcache')
+    compile group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-java8time'
+
     compile('com.fasterxml.jackson.core:jackson-databind')
 }

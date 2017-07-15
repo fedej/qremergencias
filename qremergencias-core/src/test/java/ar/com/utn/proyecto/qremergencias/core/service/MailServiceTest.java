@@ -39,7 +39,7 @@ public class MailServiceTest {
     @Mock
     private JavaMailSender javaMailSender;
 
-    private TemplateEngine templateEngine = PowerMockito.mock(TemplateEngine.class);
+    private final TemplateEngine templateEngine = PowerMockito.mock(TemplateEngine.class);
 
     @Before
     public void setUp() {
@@ -48,11 +48,11 @@ public class MailServiceTest {
 
     @Test
     public void testSendMail() throws ExecutionException, InterruptedException {
-        MimeMessage message = mock(MimeMessage.class);
+        final MimeMessage message = mock(MimeMessage.class);
         when(javaMailSender.createMimeMessage()).thenReturn(message);
         when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("html");
 
-        Future<Boolean> result = service.sendMail("to", "subject", "template", new Context(),
+        final Future<Boolean> result = service.sendMail("to", "subject", "template", new Context(),
                 Collections.EMPTY_LIST);
 
         assertTrue(result.get());
@@ -61,12 +61,12 @@ public class MailServiceTest {
 
     @Test
     public void testSendMailFails() throws ExecutionException, InterruptedException {
-        MimeMessage message = mock(MimeMessage.class);
+        final MimeMessage message = mock(MimeMessage.class);
         when(javaMailSender.createMimeMessage()).thenReturn(message);
         when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("html");
         doThrow(new MailSendException("Test error")).when(javaMailSender).send(message);
 
-        Future<Boolean> result = service.sendMail("to", "subject", "template", new Context(),
+        final Future<Boolean> result = service.sendMail("to", "subject", "template", new Context(),
                 Collections.EMPTY_LIST);
         assertFalse(result.get());
 

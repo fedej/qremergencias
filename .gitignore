@@ -25,4 +25,8 @@
 .metadata
 .recommenders
 .checkstyle
-
+classes/**
+.gradle/
+classes/
+*.ipr
+*.iws

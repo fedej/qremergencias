@@ -8,7 +8,9 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequestWrapper;
+import java.io.IOException;
 
 import static org.mockito.Mockito.isA;
 import static org.mockito.Mockito.verify;
@@ -18,7 +20,7 @@ public class RecaptchaResponseFilterTest {
     @Mock
     private FilterChain filterChain;
 
-    private RecaptchaResponseFilter filter = new RecaptchaResponseFilter();
+    private final RecaptchaResponseFilter filter = new RecaptchaResponseFilter();
 
     @Before
     public void setUp() {
@@ -26,12 +28,12 @@ public class RecaptchaResponseFilterTest {
     }
 
     @Test
-    public void testInit() throws Exception {
+    public void testInit() throws ServletException {
         filter.init(null);
     }
 
     @Test
-    public void testDoFilterWithCaptcha() throws Exception {
+    public void testDoFilterWithCaptcha() throws IOException, ServletException {
 
         final MockHttpServletRequest servletRequest = new MockHttpServletRequest();
         servletRequest.setParameter(RecaptchaResponseFilter.RECAPTCHA_RESPONSE_ORIGINAL,
@@ -44,7 +46,7 @@ public class RecaptchaResponseFilterTest {
     }
 
     @Test
-    public void testDoFilterWithoutCaptcha() throws Exception {
+    public void testDoFilterWithoutCaptcha() throws IOException, ServletException {
 
         filter.doFilter(new MockHttpServletRequest(), new MockHttpServletResponse(), filterChain);
 
@@ -53,7 +55,7 @@ public class RecaptchaResponseFilterTest {
     }
 
     @Test
-    public void testDestroy() throws Exception {
+    public void testDestroy() {
         filter.destroy();
     }
 }

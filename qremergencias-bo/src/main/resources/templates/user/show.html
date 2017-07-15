@@ -60,14 +60,14 @@
                                                 [[#{user.roles.label}]]
                                             </label>
                                             <div class="col-sm-3">
-                                                <label th:inline="text">[[${#strings.listJoin(user.roles.![authority], ',')}]]</label>
+                                                <label th:inline="text">[[${#strings.listJoin(user.roles, ',')}]]</label>
                                             </div>
                                         </div>
 
                                         <br/>
                                         <br/>
 
-                                        <form th:if="${#authentication.name != user.username and user.roles.?[authority == 'ROLE_ADMIN'].isEmpty()}" th:action="@{/user/delete(id=${user.id})}" th:method="delete" autocomplete="off" >
+                                        <form th:if="${#authentication.name != user.username}" th:action="@{/user/delete(id=${user.id})}" th:method="delete" autocomplete="off" >
                                             <fieldset class="buttons">
                                                 <div class="row">
                                                     <div class="col-sm-1 col-sm-offset-4">

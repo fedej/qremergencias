@@ -1,6 +1,5 @@
 package ar.com.utn.proyecto.qremergencias.bo.auth.listener;
 
-import ar.com.utn.proyecto.qremergencias.core.config.ApiLoginConfigurer;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
 
@@ -25,8 +24,8 @@ public class AuthFailureHandler extends ExceptionMappingAuthenticationFailureHan
                                         final AuthenticationException exception)
             throws IOException, ServletException {
 
-        request.getSession().setAttribute(ApiLoginConfigurer.USERNAME_PARAMETER,
-                request.getParameter(ApiLoginConfigurer.USERNAME_PARAMETER));
+        request.getSession().setAttribute("username",
+                request.getParameter("username"));
         super.onAuthenticationFailure(request, response, exception);
     }
 

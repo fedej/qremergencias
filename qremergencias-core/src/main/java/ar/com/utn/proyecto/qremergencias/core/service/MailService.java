@@ -34,10 +34,10 @@ public class MailService {
 
         try {
             final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-            mimeMessage.setFrom();
             final MimeMessageHelper message =
                     new MimeMessageHelper(mimeMessage, true, "UTF-8");
             message.setSubject(subject);
+            message.setFrom("no-reply@rrramundo.com.ar");
             message.setTo(to);
 
             final String htmlContent = templateEngine.process(template, ctx);

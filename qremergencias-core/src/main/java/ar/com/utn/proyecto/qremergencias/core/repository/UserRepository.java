@@ -1,6 +1,5 @@
 package ar.com.utn.proyecto.qremergencias.core.repository;
 
-import ar.com.utn.proyecto.qremergencias.core.domain.Role;
 import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,8 +16,8 @@ public interface UserRepository extends MongoRepository<User, String> {
 
     Long countByEmail(String email);
 
-    List<User> findByRolesContaining(@Param("role") Role role);
+    List<User> findByRolesContaining(@Param("role") String role);
 
-    Page<User> findByRolesContaining(@Param("role") Role role, Pageable page);
+    Page<User> findByRolesContaining(@Param("role") String role, Pageable page);
 
 }

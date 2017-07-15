@@ -11,8 +11,9 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.resource.WebJarsResourceResolver;
+import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import org.thymeleaf.templateresolver.TemplateResolver;
+import org.thymeleaf.templateresolver.ITemplateResolver;
 
 @Configuration
 public class MvcConfig extends WebMvcConfigurerAdapter {
@@ -51,20 +52,20 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public TemplateResolver emailTemplateResolver() {
+    public ITemplateResolver emailTemplateResolver() {
         final ClassLoaderTemplateResolver emailTemplateResolver = new ClassLoaderTemplateResolver();
         emailTemplateResolver.setPrefix("templates/mail/");
-        emailTemplateResolver.setTemplateMode("HTML5");
+        emailTemplateResolver.setTemplateMode(TemplateMode.HTML);
         emailTemplateResolver.setSuffix(".html");
-        emailTemplateResolver.setOrder(1);
+        emailTemplateResolver.setOrder(2);
 
         return emailTemplateResolver;
     }
 
-    //@Override
-    //public Validator getValidator() {
-    //    final LocalValidatorFactoryBean factory = new LocalValidatorFactoryBean();
-    //    factory.setValidationMessageSource(messageSource);
-    //    return factory;
-    //}
+    @Override
+    public Validator getValidator() {
+        final LocalValidatorFactoryBean factory = new LocalValidatorFactoryBean();
+        factory.setValidationMessageSource(messageSource);
+        return factory;
+    }
 }
