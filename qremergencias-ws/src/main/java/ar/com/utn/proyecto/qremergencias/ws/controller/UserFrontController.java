@@ -52,9 +52,6 @@ public class UserFrontController {
     private static final String TOKEN_NOT_FOUND = "Token not found";
     private static final String USER_NOT_FOUND = "User not found";
 
-    @Value("${qremergencias.front.baseUrl}")
-    private String baseUrl;
-
     @Value("${qremergencias.front.resetPasswordUrl}")
     private String resetPasswordUrl;
 
@@ -240,7 +237,7 @@ public class UserFrontController {
         userFront.setLastname(request.getLastName());
         userFrontService.update(userFront);
         userFrontService.deleteVerificationToken(userVerificationToken);
-        response.sendRedirect(baseUrl);
+
     }
 
 

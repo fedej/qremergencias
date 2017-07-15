@@ -56,6 +56,11 @@ public class SwaggerConfig {
         return new LoginSwaggerDocumentation();
     }
 
+    @Bean
+    public ApiListingScannerPlugin logoutSwaggerDocumentation() {
+        return new LogoutSwaggerDocumentation();
+    }
+
     private static class LoginSwaggerDocumentation implements ApiListingScannerPlugin {
 
         @Override
@@ -93,6 +98,27 @@ public class SwaggerConfig {
                                             .build()))
                             .build()),
                     false)));
+        }
+
+        @Override
+        public boolean supports(final DocumentationType delimiter) {
+            return DocumentationType.SWAGGER_2.equals(delimiter);
+        }
+
+    }
+
+    private static class LogoutSwaggerDocumentation implements ApiListingScannerPlugin {
+
+        @Override
+        public List<ApiDescription> apply(final DocumentationContext context) {
+            return new ArrayList<>(Collections.singletonList(new ApiDescription(
+                    "/api/logout", "Logout Endpoint", Collections.singletonList(
+                    new OperationBuilder(new CachingOperationNameGenerator())
+                        .codegenMethodNameStem("logoutUsingPOST")
+                        .consumes(Collections.singleton(APPLICATION_FORM_URLENCODED_VALUE))
+                        .method(HttpMethod.POST)
+                        .tags(Collections.singleton("user-front-controller"))
+                        .build()), false)));
         }
 
         @Override
