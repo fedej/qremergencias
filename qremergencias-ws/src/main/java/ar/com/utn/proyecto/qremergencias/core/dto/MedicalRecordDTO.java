@@ -1,6 +1,7 @@
 package ar.com.utn.proyecto.qremergencias.core.dto;
 
 import ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord;
+import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import com.mongodb.gridfs.GridFSFile;
 import lombok.Value;
 
@@ -48,7 +49,8 @@ public class MedicalRecordDTO {
         MedicalRecordChangeDTO(final MedicalRecord.MedicalRecordChange medicalRecordChange) {
             this.action = medicalRecordChange.getAction().toString();
             this.timestamp = medicalRecordChange.getTimestamp();
-            this.modifiedBy = medicalRecordChange.getModifiedBy().getUsername();
+            final User modifiedBy = medicalRecordChange.getModifiedBy();
+            this.modifiedBy = modifiedBy != null ? modifiedBy.getUsername() : null;
         }
 
         @Override
