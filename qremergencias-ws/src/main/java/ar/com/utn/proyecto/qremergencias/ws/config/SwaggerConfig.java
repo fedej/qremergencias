@@ -6,6 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import springfox.documentation.builders.OperationBuilder;
 import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.schema.ModelRef;
@@ -42,6 +43,7 @@ public class SwaggerConfig {
     public Docket swaggerSpringMvcPlugin() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .protocols(Collections.singleton("http"))
+                .ignoredParameterTypes(AuthenticationPrincipal.class)
                 .forCodeGeneration(true)
                 .apiInfo(new ApiInfo("QR Emergencias WS", "API Rest QR Emergencias",
                         "1.0.0", "", DEFAULT_CONTACT,"", "", Collections.emptyList()))
