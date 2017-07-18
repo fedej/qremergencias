@@ -6,14 +6,12 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 @SpringBootApplication(scanBasePackages = "ar.com.utn.proyecto.qremergencias")
 @EnableCaching
 @EnableAsync
 @EntityScan(basePackages = "ar.com.utn.proyecto.qremergencias")
 @EnableMongoRepositories(basePackages = "ar.com.utn.proyecto.qremergencias")
-@EnableRedisHttpSession
 @SuppressWarnings("PMD.UseUtilityClass")
 public class QREmergenciasApplication {
 

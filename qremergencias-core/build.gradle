@@ -23,4 +23,6 @@ dependencies {
     compile group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-java8time'
 
     compile('com.fasterxml.jackson.core:jackson-databind')
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
+
 }

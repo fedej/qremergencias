@@ -22,6 +22,8 @@ dependencies {
     if (profiles =~ ".*local.*") {
         compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
     }
+
+    testCompile group: 'org.springframework.security', name: 'spring-security-test'
 }
 
 swagger {

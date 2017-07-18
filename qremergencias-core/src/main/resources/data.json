@@ -1,1 +1,91 @@
-{"_class" : "ar.com.utn.proyecto.qremergencias.core.domain.User", "version" : 0, "username" : "admin", "email" : "federico.jaite@gmail.com", "password" : "$2a$10$fAyFKtavBoykjrYXvdUxj.k/qv49s9mshn/mhR2qcdBv.QG2siQFm", "accountNonExpired" : true, "accountNonLocked" : true, "credentialsNonExpired" : true, "enabled" : true, "roles" : [ "ROLE_ADMIN" ], "passwordChanges" : [ ] }
+{
+  "@class": "ar.com.utn.proyecto.qremergencias.core.config.mongodb.MongoInitializer",
+  "collections": [
+    "java.util.List",
+    [
+      {
+        "@class": "ar.com.utn.proyecto.qremergencias.core.config.mongodb.MongoCollection",
+        "name": "user",
+        "objects": [
+          "java.util.List",
+          [
+            {
+              "@class": "ar.com.utn.proyecto.qremergencias.core.config.mongodb.MongoObject",
+              "data": {
+                "@class": "ar.com.utn.proyecto.qremergencias.core.domain.UserFront",
+                "name": "Federico",
+                "lastname": "Jaite",
+                "version": 0,
+                "username": "user@rrramundo.com.ar",
+                "email": "user@rrramundo.com.ar",
+                "password": "$2a$10$Vyr9C8LVWoIm3kX9CHuXTOY0MkavEWEc/wOUlGastKr27oTwwfx9S",
+                "accountNonExpired": true,
+                "accountNonLocked": true,
+                "credentialsNonExpired": true,
+                "enabled": true,
+                "roles": [
+                  "java.util.List",
+                  [
+                    "ROLE_PACIENTE",
+                    "ROLE_USER"
+                  ]
+                ]
+              }
+            },
+            {
+              "@class": "ar.com.utn.proyecto.qremergencias.core.config.mongodb.MongoObject",
+              "data": {
+                "@class": "ar.com.utn.proyecto.qremergencias.core.domain.User",
+                "username": "admin",
+                "email": "admin@rrramundo.com.ar",
+                "password": "$2a$10$fAyFKtavBoykjrYXvdUxj.k/qv49s9mshn/mhR2qcdBv.QG2siQFm",
+                "accountNonExpired": true,
+                "accountNonLocked": true,
+                "credentialsNonExpired": true,
+                "enabled": true,
+                "roles": [
+                  "java.util.List",
+                  [
+                    "ROLE_ADMIN"
+                  ]
+                ]
+              }
+            }
+          ]
+        ]
+      },
+      {
+        "@class": "ar.com.utn.proyecto.qremergencias.core.config.mongodb.MongoCollection",
+        "name": "medicalRecord",
+        "objects": [
+          "java.util.List",
+          [
+            {
+              "@class": "ar.com.utn.proyecto.qremergencias.core.config.mongodb.MongoObject",
+              "relationships": {
+                "@class": "java.util.Map",
+                "user": "user[0]"
+              },
+              "data": {
+                "@class": "ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord",
+                "version": 0,
+                "name": "Colonoscopia",
+                "text": "Salio muy bien",
+                "performed": "2017-07-16T03:00:00Z",
+                "changes": [
+                  "java.util.Set",
+                  [
+                    {
+                      "action": "CREATE",
+                      "timestamp": "2017-07-16T21:36:51.867Z"
+                    }
+                  ]
+                ]
+              }
+            }
+          ]
+        ]
+      }
+    ]
+  ]
+}
