@@ -23,4 +23,7 @@ public class ConfirmRegistrationDTO {
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
+
+    @NotNull
+    private String numeroDocumento;
 }
