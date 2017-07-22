@@ -3,7 +3,6 @@ package ar.com.utn.proyecto.qremergencias.ws.controller;
 import ar.com.utn.proyecto.qremergencias.QREmergenciasWsApplication;
 import ar.com.utn.proyecto.qremergencias.ws.service.UserFrontService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = QREmergenciasWsApplication.class)
-@Ignore
 public class MedicalRecordControllerIT {
 
     @Autowired
