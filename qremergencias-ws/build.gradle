@@ -1,10 +1,8 @@
 plugins {
     id 'org.springframework.boot' version '1.5.4.RELEASE'
     id 'java'
+    id 'org.detoeuf.swagger-codegen' version '1.7.2'
 }
-
-import ar.com.utn.proyecto.qremergencias.SwaggerCodeGenPlugin
-apply plugin: SwaggerCodeGenPlugin
 
 bootRepackage {
     mainClass = 'ar.com.utn.proyecto.qremergencias.QREmergenciasWsApplication'
@@ -23,7 +21,6 @@ dependencies {
         compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
     }
 
-    testCompile group: 'org.springframework.security', name: 'spring-security-test'
 }
 
 swagger {
