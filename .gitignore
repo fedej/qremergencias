@@ -31,3 +31,4 @@ classes/
 *.ipr
 *.iws
 */out/
+.rdb

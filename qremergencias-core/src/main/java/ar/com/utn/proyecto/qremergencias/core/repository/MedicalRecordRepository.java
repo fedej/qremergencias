@@ -8,6 +8,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface MedicalRecordRepository extends MongoRepository<MedicalRecord, String> {
 
-    Page<MedicalRecord> findByUser(User user, Pageable pageable);
+    Page<MedicalRecord> findByUserAndDeletedIsFalse(User user, Pageable pageable);
 
 }
