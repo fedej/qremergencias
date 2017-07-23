@@ -235,6 +235,7 @@ public class UserFrontController {
         userFront.setBirthdate(request.getBirthDate());
         userFront.setName(request.getName());
         userFront.setLastname(request.getLastName());
+        userFront.setNumeroDocumento(request.getNumeroDocumento());
         userFrontService.update(userFront);
         userFrontService.deleteVerificationToken(userVerificationToken);
 
