@@ -2,35 +2,26 @@ package ar.com.utn.proyecto.qremergencias.ws.service;
 
 import ar.com.utn.proyecto.qremergencias.core.domain.UserEmergencyContact;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserEmergencyContactRepository;
-import ar.com.utn.proyecto.qremergencias.core.repository.UserFrontRepository;
-import ar.com.utn.proyecto.qremergencias.core.repository.UserRepository;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 public class EmergencyDataServiceTest {
 
+    public static final String ID_CONTACT = "123123123";
     @InjectMocks
     private final EmergencyDataService service = new EmergencyDataService();
 
     @Mock
-    private UserFrontRepository userFrontRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
     private UserEmergencyContactRepository userEmergencyContactRepository;
 
-    UserEmergencyContact contactForTest;
+    private UserEmergencyContact contactForTest;
 
     @Before
     public void setUp() throws Exception {
@@ -39,24 +30,21 @@ public class EmergencyDataServiceTest {
         contactForTest = new UserEmergencyContact();
         contactForTest.setFirstName("Gonzalo");
         contactForTest.setLastName("RRRamundo");
-        contactForTest.setId("123131231");
+        contactForTest.setId(ID_CONTACT);
         contactForTest.setPhoneNumber("1514565543");
     }
 
     @Test
     public void testFindContact() {
-        when(userEmergencyContactRepository.findOne("123131231")).thenReturn(contactForTest);
-        UserEmergencyContact contactFound = service.findContact("123131231");
+        when(userEmergencyContactRepository.findOne(ID_CONTACT)).thenReturn(contactForTest);
+        final UserEmergencyContact contactFound = service.findContact(ID_CONTACT);
         assertNotNull(contactFound);
-        assertEquals("Gonzalo", contactFound.getFirstName());
-        assertEquals("RRRamundo", contactFound.getLastName());
-        assertNotEquals("1566776655", contactFound.getPhoneNumber());
     }
 
     @Test
     public void testContactNotFound() {
-        when(userEmergencyContactRepository.findOne("123131231")).thenReturn(null);
-        UserEmergencyContact contact = service.findContact("123131231");
+        when(userEmergencyContactRepository.findOne(ID_CONTACT)).thenReturn(null);
+        final UserEmergencyContact contact = service.findContact(ID_CONTACT);
         assertNull(contact);
     }
 
