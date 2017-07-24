@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class UserContactDTO {
 
+    private String id;
     private String firstName;
     private String lastName;
     private String phoneNumber;

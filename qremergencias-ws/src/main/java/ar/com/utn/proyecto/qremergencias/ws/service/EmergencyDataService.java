@@ -30,12 +30,25 @@ public class EmergencyDataService {
         return userFront.getContacts();
     }
 
-    public void saveContact(UserFront userFront, UserEmergencyContact contact){
-        if(userFront.getContacts()==null)
+    public void saveContact(UserFront userFront, UserEmergencyContact contact) {
+        if (userFront.getContacts() == null)
             userFront.setContacts(new ArrayList<>());
         userFront.getContacts().add(contact);
         userEmergencyContactRepository.save(contact);
         userFrontRepository.save(userFront);
+    }
+
+    public void updateContact(UserFront userFront, UserEmergencyContact contact){
+        userEmergencyContactRepository.save(contact);
+        userFrontRepository.save(userFront);
+    }
+
+    public UserEmergencyContact findContact(String idContact) {
+        return userEmergencyContactRepository.findOne(idContact);
+    }
+
+    public void deleteContact(UserEmergencyContact contact){
+        userEmergencyContactRepository.delete(contact);
     }
 
 }
