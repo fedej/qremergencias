@@ -2,9 +2,11 @@ package ar.com.utn.proyecto.qremergencias.core.domain;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -16,4 +18,6 @@ public class UserFront extends User {
     private String lastname;
     private LocalDate birthdate;
     private String numeroDocumento;
+    @DBRef
+    private List<UserEmergencyContact> contacts;
 }
