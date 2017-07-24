@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -28,46 +27,55 @@ public class EmergencyDataController {
     @Autowired
     private UserFrontService userFrontService;
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}",
+            method = RequestMethod.GET)
     public UserFront getUserData(@PathVariable final String id) {
         log.info("Llamado a EmergencyDataController.getUserData");
-        User userFound = userFrontService.findById(id);
+        final User userFound = userFrontService.findById(id);
         return userFrontService.findByUsername(userFound.getUsername());
     }
 
-    @RequestMapping(value = "/{id}/contacts", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}/contacts",
+            method = RequestMethod.GET)
     public List<UserEmergencyContact> getUserContacts(@PathVariable final String id) {
         log.info("Llamado a EmergencyDataController.getUserContacts");
         return emergencyDataService.findContactsByUserId(id);
     }
 
-    @RequestMapping(value = "/{id}/contacts", method = RequestMethod.POST, consumes = "application/json")
-    public void postUserContact(@PathVariable String id, @RequestBody UserContactDTO userContactDTO) {
+    @RequestMapping(value = "/{id}/contacts",
+            method = RequestMethod.POST,
+            consumes = "application/json")
+    public void postUserContact(@PathVariable final String id,
+                                @RequestBody final UserContactDTO userContactDTO) {
         log.info("Llamado a EmergencyDataController.postUserContact");
-        User userFound = userFrontService.findById(id);
-        UserFront userFront = userFrontService.findByUsername(userFound.getUsername());
-        UserEmergencyContact contact = new UserEmergencyContact();
+        final User userFound = userFrontService.findById(id);
+        final UserFront userFront = userFrontService.findByUsername(userFound.getUsername());
+        final UserEmergencyContact contact = new UserEmergencyContact();
         contact.setFirstName(userContactDTO.getFirstName());
         contact.setLastName(userContactDTO.getLastName());
         contact.setPhoneNumber(userContactDTO.getPhoneNumber());
         emergencyDataService.saveContact(userFront, contact);
     }
 
-    @RequestMapping(value = "/{idUser}/contacts/{idContact}", method = RequestMethod.DELETE)
-    public void deleteUserContact(@PathVariable String idUser, @PathVariable String idContact){
+    @RequestMapping(value = "/{idUser}/contacts/{idContact}",
+            method = RequestMethod.DELETE)
+    public void deleteUserContact(@PathVariable final String idUser,
+                                  @PathVariable final String idContact) {
         log.info("Llamado a EmergencyDataController.deleteUserContact");
-        User userFound = userFrontService.findById(idUser);
-        UserFront userFront = userFrontService.findByUsername(userFound.getUsername());
-        UserEmergencyContact contact = emergencyDataService.findContact(idContact);
+        final UserEmergencyContact contact = emergencyDataService.findContact(idContact);
         emergencyDataService.deleteContact(contact);
     }
 
-    @RequestMapping(value = "/{id}/contacts", method = RequestMethod.PUT, consumes = "application/json")
-    public void updateUserContact(@PathVariable String id, @RequestBody UserContactDTO userContactDTO) {
+    @RequestMapping(value = "/{id}/contacts",
+            method = RequestMethod.PUT,
+            consumes = "application/json")
+    public void updateUserContact(@PathVariable final String id,
+                                  @RequestBody final UserContactDTO userContactDTO) {
         log.info("Llamado a EmergencyDataController.updateUserContact");
-        User userFound = userFrontService.findById(id);
-        UserFront userFront = userFrontService.findByUsername(userFound.getUsername());
-        UserEmergencyContact contactToUpdate = emergencyDataService.findContact(userContactDTO.getId());
+        final User userFound = userFrontService.findById(id);
+        final UserFront userFront = userFrontService.findByUsername(userFound.getUsername());
+        final UserEmergencyContact contactToUpdate =
+                emergencyDataService.findContact(userContactDTO.getId());
         contactToUpdate.setFirstName(userContactDTO.getFirstName());
         contactToUpdate.setLastName(userContactDTO.getLastName());
         contactToUpdate.setPhoneNumber(userContactDTO.getPhoneNumber());

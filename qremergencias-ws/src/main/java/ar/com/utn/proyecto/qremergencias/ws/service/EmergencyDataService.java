@@ -24,30 +24,31 @@ public class EmergencyDataService {
     @Autowired
     private UserEmergencyContactRepository userEmergencyContactRepository;
 
-    public List<UserEmergencyContact> findContactsByUserId(String id) {
-        User user = userRepository.findOne(id);
-        UserFront userFront = userFrontRepository.findByUsername(user.getUsername());
+    public List<UserEmergencyContact> findContactsByUserId(final String id) {
+        final User user = userRepository.findOne(id);
+        final UserFront userFront = userFrontRepository.findByUsername(user.getUsername());
         return userFront.getContacts();
     }
 
-    public void saveContact(UserFront userFront, UserEmergencyContact contact) {
-        if (userFront.getContacts() == null)
+    public void saveContact(final UserFront userFront, final UserEmergencyContact contact) {
+        if (userFront.getContacts() == null) {
             userFront.setContacts(new ArrayList<>());
+        }
         userFront.getContacts().add(contact);
         userEmergencyContactRepository.save(contact);
         userFrontRepository.save(userFront);
     }
 
-    public void updateContact(UserFront userFront, UserEmergencyContact contact){
+    public void updateContact(final UserFront userFront, final UserEmergencyContact contact) {
         userEmergencyContactRepository.save(contact);
         userFrontRepository.save(userFront);
     }
 
-    public UserEmergencyContact findContact(String idContact) {
+    public UserEmergencyContact findContact(final String idContact) {
         return userEmergencyContactRepository.findOne(idContact);
     }
 
-    public void deleteContact(UserEmergencyContact contact){
+    public void deleteContact(final UserEmergencyContact contact) {
         userEmergencyContactRepository.delete(contact);
     }
 

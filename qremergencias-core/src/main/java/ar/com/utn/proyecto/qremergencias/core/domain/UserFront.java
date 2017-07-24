@@ -2,11 +2,9 @@ package ar.com.utn.proyecto.qremergencias.core.domain;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
