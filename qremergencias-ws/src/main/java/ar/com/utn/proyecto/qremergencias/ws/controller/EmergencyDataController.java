@@ -4,10 +4,11 @@ import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserEmergencyContact;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.UserContactDTO;
-import ar.com.utn.proyecto.qremergencias.core.service.EmergencyDataService;
+import ar.com.utn.proyecto.qremergencias.ws.service.EmergencyDataService;
 import ar.com.utn.proyecto.qremergencias.ws.service.UserFrontService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,8 +37,8 @@ public class EmergencyDataController {
         return emergencyDataService.findContactsByUserId(id);
     }
 
-    @RequestMapping(value = "/{id}/contacts", method = RequestMethod.POST)
-    public void postUserContact(@PathVariable String id, @Valid final UserContactDTO userContactDTO) {
+    @RequestMapping(value = "/{id}/contacts", method = RequestMethod.POST, consumes = "application/json")
+    public void postUserContact(@PathVariable String id, @RequestBody UserContactDTO userContactDTO) {
         User userFound = userFrontService.findById(id);
         UserFront userFront = userFrontService.findByUsername(userFound.getUsername());
         UserEmergencyContact contact = new UserEmergencyContact();

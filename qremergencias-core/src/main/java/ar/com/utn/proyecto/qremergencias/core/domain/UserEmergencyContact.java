@@ -20,5 +20,7 @@ public class UserEmergencyContact implements Serializable {
     private String lastName;
     @NotEmpty
     private String phoneNumber;
+    @DBRef
+    private User user;
 
 }

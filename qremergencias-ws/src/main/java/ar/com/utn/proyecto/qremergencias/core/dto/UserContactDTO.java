@@ -12,4 +12,5 @@ public class UserContactDTO {
     private String firstName;
     private String lastName;
     private String phoneNumber;
+
 }

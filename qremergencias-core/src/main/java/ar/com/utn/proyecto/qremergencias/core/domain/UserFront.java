@@ -18,6 +18,4 @@ public class UserFront extends User {
     private String lastname;
     private LocalDate birthdate;
     private String numeroDocumento;
-    @DBRef
-    private List<UserEmergencyContact> contacts;
 }

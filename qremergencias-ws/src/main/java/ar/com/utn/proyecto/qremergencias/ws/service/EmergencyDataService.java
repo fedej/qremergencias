@@ -1,8 +1,9 @@
-package ar.com.utn.proyecto.qremergencias.core.service;
+package ar.com.utn.proyecto.qremergencias.ws.service;
 
 import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserEmergencyContact;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
+import ar.com.utn.proyecto.qremergencias.core.repository.UserEmergencyContactRepository;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserFrontRepository;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class EmergencyDataService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserEmergencyContactRepository userEmergencyContactRepository;
+
     public List<UserEmergencyContact> findContactsByUserId(String id) {
         User user = userRepository.findOne(id);
         UserFront userFront = userFrontRepository.findByUsername(user.getUsername());
@@ -30,6 +34,7 @@ public class EmergencyDataService {
         if(userFront.getContacts()==null)
             userFront.setContacts(new ArrayList<>());
         userFront.getContacts().add(contact);
+        userEmergencyContactRepository.save(contact);
         userFrontRepository.save(userFront);
     }
 

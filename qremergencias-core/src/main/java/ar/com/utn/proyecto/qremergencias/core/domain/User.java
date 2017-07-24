@@ -56,9 +56,13 @@ public class User implements Serializable, UserDetails {
     @DBRef
     private List<ForgotPassword> forgotPasswords;
 
+    @DBRef
+    private List<UserEmergencyContact> contacts;
+
     public User() {
         this.roles = new ArrayList<>();
         this.passwordChanges = new ArrayList<>();
+        this.contacts = new ArrayList<>();
     }
 
     @Override
