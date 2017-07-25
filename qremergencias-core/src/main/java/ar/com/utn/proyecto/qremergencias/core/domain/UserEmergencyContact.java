@@ -14,12 +14,21 @@ public class UserEmergencyContact implements Serializable {
     @Id
     private String id;
     @NotEmpty
-    private String firstName;
+    private final String firstName;
     @NotEmpty
-    private String lastName;
+    private final String lastName;
     @NotEmpty
-    private String phoneNumber;
+    private final String phoneNumber;
     @DBRef
-    private User user;
+    private final User user;
 
+    public UserEmergencyContact(final String firstName,
+                                final String lastName,
+                                final String phoneNumber,
+                                final User user) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+        this.user = user;
+    }
 }

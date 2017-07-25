@@ -14,4 +14,14 @@ public class UserContactDTO {
     private String lastName;
     private String phoneNumber;
 
+    public UserContactDTO() {
+
+    }
+
+    public UserContactDTO(String id, String firstName, String lastName, String phoneNumber) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+    }
 }
