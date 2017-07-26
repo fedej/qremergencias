@@ -35,6 +35,29 @@
             {
               "@class": "ar.com.utn.proyecto.qremergencias.core.config.mongodb.MongoObject",
               "data": {
+                "@class": "ar.com.utn.proyecto.qremergencias.core.domain.UserFront",
+                "name": "Federico",
+                "lastname": "Jaite",
+                "version": 0,
+                "username": "medico@rrramundo.com.ar",
+                "email": "medico@rrramundo.com.ar",
+                "password": "$2a$10$Vyr9C8LVWoIm3kX9CHuXTOY0MkavEWEc/wOUlGastKr27oTwwfx9S",
+                "accountNonExpired": true,
+                "accountNonLocked": true,
+                "credentialsNonExpired": true,
+                "enabled": true,
+                "roles": [
+                  "java.util.List",
+                  [
+                    "ROLE_MEDICO",
+                    "ROLE_USER"
+                  ]
+                ]
+              }
+            },
+            {
+              "@class": "ar.com.utn.proyecto.qremergencias.core.config.mongodb.MongoObject",
+              "data": {
                 "@class": "ar.com.utn.proyecto.qremergencias.core.domain.User",
                 "username": "admin",
                 "email": "admin@rrramundo.com.ar",

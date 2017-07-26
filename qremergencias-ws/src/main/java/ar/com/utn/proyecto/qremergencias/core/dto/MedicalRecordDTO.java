@@ -3,6 +3,8 @@ package ar.com.utn.proyecto.qremergencias.core.dto;
 import ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord;
 import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import com.mongodb.gridfs.GridFSFile;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 import java.time.LocalDate;
@@ -13,13 +15,15 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-@Value
+@Data
+@RequiredArgsConstructor
 public class MedicalRecordDTO {
 
-    private final String id;
+    private String id;
     private final String name;
     private final String text;
     private final LocalDate performed;
+    private final String user;
     private final SortedSet<MedicalRecordChangeDTO> changes = new TreeSet<>();
     private final Set<Object> files = new HashSet<>();
 
@@ -28,6 +32,7 @@ public class MedicalRecordDTO {
         this.name = medicalRecord.getName();
         this.text = medicalRecord.getText();
         this.performed = medicalRecord.getPerformed();
+        this.user = medicalRecord.getUser().getId();
         this.changes.addAll(medicalRecord.getChanges()
                 .stream()
                 .map(MedicalRecordChangeDTO::new)
