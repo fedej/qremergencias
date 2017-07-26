@@ -23,7 +23,7 @@ public class ProfileController {
     private UserProfileService emergencyDataService;
 
     @GetMapping
-    @PreAuthorize("isFullyAuthenticated()")
+    //@PreAuthorize("isFullyAuthenticated()")
     public UserProfileDTO list(@AuthenticationPrincipal final User user) {
         log.info("Llamado a ");
         return emergencyDataService.findByUser(user);
