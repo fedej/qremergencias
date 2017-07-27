@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops","PMD.DataflowAnomalyAnalysis"})
 public class UserProfileService {
 
     @Autowired
@@ -45,15 +45,17 @@ public class UserProfileService {
         userFront.setName(userProfileDTO.getFirstName());
         userFront.setLastname(userProfileDTO.getLastName());
         final List<UserEmergencyContact> contacts = new ArrayList<>();
-        for (final UserContactDTO contactDTO : userProfileDTO.getContacts()) {
-            contacts.add(
-                    new UserEmergencyContact(
-                            contactDTO.getFirstName(),
-                            contactDTO.getLastName(),
-                            contactDTO.getPhoneNumber(),
-                            user));
+        if (userProfileDTO.getContacts() != null) {
+            for (final UserContactDTO contactDTO : userProfileDTO.getContacts()) {
+                contacts.add(
+                        new UserEmergencyContact(
+                                contactDTO.getFirstName(),
+                                contactDTO.getLastName(),
+                                contactDTO.getPhoneNumber(),
+                                user));
+            }
+            userFront.setContacts(contacts);
         }
-        userFront.setContacts(contacts);
         userFrontRepository.save(userFront);
     }
 }
