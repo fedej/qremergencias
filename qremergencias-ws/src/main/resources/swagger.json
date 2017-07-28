@@ -1,1 +1,702 @@
-{"swagger":"2.0","info":{"description":"API Rest QR Emergencias","version":"1.0.0","title":"QR Emergencias WS","contact":{},"license":{}},"host":"localhost:8082","basePath":"/qremergencias","tags":[{"name":"medical-record-controller","description":"Medical Record Controller"},{"name":"user-front-controller","description":"User Front Controller"}],"schemes":["http"],"paths":{"/api/login":{"post":{"tags":["user-front-controller"],"operationId":"loginUsingPOST","consumes":["application/x-www-form-urlencoded"],"parameters":[{"name":"username","in":"formData","required":true,"type":"string"},{"name":"password","in":"formData","required":true,"type":"string"},{"name":"g-recaptcha-response","in":"formData","required":false,"type":"string"}]}},"/api/logout":{"post":{"tags":["user-front-controller"],"operationId":"logoutUsingPOST","consumes":["application/x-www-form-urlencoded"]}},"/api/medicalRecord":{"get":{"tags":["medical-record-controller"],"summary":"list","operationId":"listUsingGET","consumes":["application/json"],"produces":["*/*"],"parameters":[{"name":"page","in":"query","description":"Results page you want to retrieve (0..N)","required":false,"type":"integer","format":"int32"},{"name":"size","in":"query","description":"Number of records per page","required":false,"type":"integer","format":"int32"},{"name":"sort","in":"query","description":"Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.","required":false,"type":"array","items":{"type":"string"},"collectionFormat":"multi"}],"responses":{"200":{"description":"OK","schema":{"$ref":"#/definitions/PageOfMedicalRecordDTO"}},"401":{"description":"Unauthorized"},"403":{"description":"Forbidden"},"404":{"description":"Not Found"}}}},"/api/userFront/changePassword":{"post":{"tags":["user-front-controller"],"summary":"changePassword","operationId":"changePasswordUsingPOST","consumes":["application/json"],"produces":["*/*"],"parameters":[{"name":"id","in":"query","required":false,"type":"string"},{"name":"password","in":"query","required":false,"type":"string"},{"name":"newPassword","in":"query","required":false,"type":"string"},{"name":"confirmPassword","in":"query","required":false,"type":"string"},{"name":"recaptchaResponse","in":"query","required":false,"type":"string"}],"responses":{"200":{"description":"OK"},"201":{"description":"Created"},"401":{"description":"Unauthorized"},"403":{"description":"Forbidden"},"404":{"description":"Not Found"}}}},"/api/userFront/completeRegistration":{"post":{"tags":["user-front-controller"],"summary":"completeRegistration","operationId":"completeRegistrationUsingPOST","consumes":["application/json"],"produces":["*/*"],"parameters":[{"name":"token","in":"query","required":false,"type":"string"},{"name":"lastName","in":"query","required":false,"type":"string"},{"name":"name","in":"query","required":false,"type":"string"},{"name":"birthDate","in":"query","required":false,"type":"string","format":"date"},{"name":"numeroDocumento","in":"query","required":false,"type":"string"}],"responses":{"200":{"description":"OK"},"201":{"description":"Created"},"401":{"description":"Unauthorized"},"403":{"description":"Forbidden"},"404":{"description":"Not Found"}}}},"/api/userFront/register":{"post":{"tags":["user-front-controller"],"summary":"register","operationId":"registerUsingPOST","consumes":["application/json"],"produces":["*/*"],"parameters":[{"in":"body","name":"model","description":"model","required":true,"schema":{"$ref":"#/definitions/CreateUserDTO"}}],"responses":{"201":{"description":"Created"},"401":{"description":"Unauthorized"},"403":{"description":"Forbidden"},"404":{"description":"Not Found"}}}},"/api/userFront/resetPassword":{"post":{"tags":["user-front-controller"],"summary":"resetPassword","operationId":"resetPasswordUsingPOST","consumes":["application/json"],"produces":["*/*"],"parameters":[{"name":"token","in":"query","required":false,"type":"string"},{"name":"newPassword","in":"query","required":false,"type":"string"},{"name":"confirmPassword","in":"query","required":false,"type":"string"},{"name":"recaptchaResponse","in":"query","required":false,"type":"string"}],"responses":{"200":{"description":"OK"},"201":{"description":"Created"},"401":{"description":"Unauthorized"},"403":{"description":"Forbidden"},"404":{"description":"Not Found"}}}},"/api/userFront/sendForgotPassword":{"post":{"tags":["user-front-controller"],"summary":"sendForgotPassword","operationId":"sendForgotPasswordUsingPOST","consumes":["application/json"],"produces":["*/*"],"parameters":[{"name":"g-recaptcha-response","in":"query","description":"g-recaptcha-response","required":true,"type":"string"},{"name":"username","in":"query","description":"username","required":true,"type":"string"}],"responses":{"200":{"description":"OK"},"201":{"description":"Created"},"401":{"description":"Unauthorized"},"403":{"description":"Forbidden"},"404":{"description":"Not Found"}}}}},"definitions":{"CreateUserDTO":{"type":"object","properties":{"email":{"type":"string"},"password":{"type":"string"},"role":{"type":"string"}}},"MedicalRecordChangeDTO":{"type":"object","properties":{"action":{"type":"string"},"modifiedBy":{"type":"string"},"timestamp":{"type":"string","format":"date-time"}}},"MedicalRecordDTO":{"type":"object","properties":{"changes":{"type":"array","items":{"$ref":"#/definitions/MedicalRecordChangeDTO"}},"files":{"type":"array","items":{"type":"object"}},"id":{"type":"string"},"name":{"type":"string"},"performed":{"type":"string","format":"date"},"text":{"type":"string"}}},"PageOfMedicalRecordDTO":{"type":"object","properties":{"content":{"type":"array","items":{"$ref":"#/definitions/MedicalRecordDTO"}},"first":{"type":"boolean"},"last":{"type":"boolean"},"number":{"type":"integer","format":"int32"},"numberOfElements":{"type":"integer","format":"int32"},"size":{"type":"integer","format":"int32"},"sort":{"$ref":"#/definitions/Sort"},"totalElements":{"type":"integer","format":"int64"},"totalPages":{"type":"integer","format":"int32"}}},"Sort":{"type":"object"}}}
+{
+    "basePath": "/qremergencias",
+    "definitions": {
+        "CreateUserDTO": {
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "MedicalRecordChangeDTO": {
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "modifiedBy": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "format": "date-time",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "MedicalRecordDTO": {
+            "properties": {
+                "changes": {
+                    "items": {
+                        "$ref": "#/definitions/MedicalRecordChangeDTO"
+                    },
+                    "type": "array"
+                },
+                "files": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "performed": {
+                    "format": "date",
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PageOfMedicalRecordDTO": {
+            "properties": {
+                "content": {
+                    "items": {
+                        "$ref": "#/definitions/MedicalRecordDTO"
+                    },
+                    "type": "array"
+                },
+                "first": {
+                    "type": "boolean"
+                },
+                "last": {
+                    "type": "boolean"
+                },
+                "number": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "numberOfElements": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "size": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "sort": {
+                    "$ref": "#/definitions/Sort"
+                },
+                "totalElements": {
+                    "format": "int64",
+                    "type": "integer"
+                },
+                "totalPages": {
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "Sort": {
+            "type": "object"
+        }
+    },
+    "host": "localhost:8082",
+    "info": {
+        "contact": {},
+        "description": "API Rest QR Emergencias",
+        "license": {},
+        "title": "QR Emergencias WS",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/login": {
+            "post": {
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "operationId": "loginUsingPOST",
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "username",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "password",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "g-recaptcha-response",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "tags": [
+                    "user-front-controller"
+                ]
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "operationId": "logoutUsingPOST",
+                "tags": [
+                    "user-front-controller"
+                ]
+            }
+        },
+        "/api/medicalRecord": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "listUsingGET",
+                "parameters": [
+                    {
+                        "description": "Results page you want to retrieve (0..N)",
+                        "format": "int32",
+                        "in": "query",
+                        "name": "page",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "description": "Number of records per page",
+                        "format": "int32",
+                        "in": "query",
+                        "name": "size",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "collectionFormat": "multi",
+                        "description": "Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "sort",
+                        "required": false,
+                        "type": "array"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PageOfMedicalRecordDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "list",
+                "tags": [
+                    "medical-record-controller"
+                ]
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "createUsingPOST",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "name",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "text",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "format": "date",
+                        "in": "query",
+                        "name": "performed",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "user",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "collectionFormat": "multi",
+                        "description": "files",
+                        "in": "formData",
+                        "items": {
+                            "type": "file"
+                        },
+                        "name": "files",
+                        "required": false,
+                        "type": "array"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "additionalProperties": {
+                                "type": "string"
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "create",
+                "tags": [
+                    "medical-record-controller"
+                ]
+            }
+        },
+        "/api/medicalRecord/{id}": {
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "deleteUsingDELETE",
+                "parameters": [
+                    {
+                        "description": "id",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "summary": "delete",
+                "tags": [
+                    "medical-record-controller"
+                ]
+            },
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "findByIdUsingGET",
+                "parameters": [
+                    {
+                        "description": "id",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/MedicalRecordDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "findById",
+                "tags": [
+                    "medical-record-controller"
+                ]
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "updateUsingPATCH",
+                "parameters": [
+                    {
+                        "description": "id",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "medicalRecord",
+                        "in": "body",
+                        "name": "medicalRecord",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/MedicalRecordDTO"
+                        }
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "summary": "update",
+                "tags": [
+                    "medical-record-controller"
+                ]
+            }
+        },
+        "/api/userFront/changePassword": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "changePasswordUsingPOST",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "id",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "password",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "newPassword",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "confirmPassword",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "recaptchaResponse",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "changePassword",
+                "tags": [
+                    "user-front-controller"
+                ]
+            }
+        },
+        "/api/userFront/completeRegistration": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "completeRegistrationUsingPOST",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "token",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "lastName",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "name",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "format": "date",
+                        "in": "query",
+                        "name": "birthDate",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "numeroDocumento",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "completeRegistration",
+                "tags": [
+                    "user-front-controller"
+                ]
+            }
+        },
+        "/api/userFront/register": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "registerUsingPOST",
+                "parameters": [
+                    {
+                        "description": "model",
+                        "in": "body",
+                        "name": "model",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CreateUserDTO"
+                        }
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "register",
+                "tags": [
+                    "user-front-controller"
+                ]
+            }
+        },
+        "/api/userFront/resetPassword": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "resetPasswordUsingPOST",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "token",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "newPassword",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "confirmPassword",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "recaptchaResponse",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "resetPassword",
+                "tags": [
+                    "user-front-controller"
+                ]
+            }
+        },
+        "/api/userFront/sendForgotPassword": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "sendForgotPasswordUsingPOST",
+                "parameters": [
+                    {
+                        "description": "g-recaptcha-response",
+                        "in": "query",
+                        "name": "g-recaptcha-response",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "username",
+                        "in": "query",
+                        "name": "username",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "sendForgotPassword",
+                "tags": [
+                    "user-front-controller"
+                ]
+            }
+        }
+    },
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "tags": [
+        {
+            "description": "Medical Record Controller",
+            "name": "medical-record-controller"
+        },
+        {
+            "description": "User Front Controller",
+            "name": "user-front-controller"
+        }
+    ]
+}

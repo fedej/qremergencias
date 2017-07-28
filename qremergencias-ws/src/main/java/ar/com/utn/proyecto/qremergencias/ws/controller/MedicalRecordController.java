@@ -18,11 +18,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -51,9 +54,10 @@ public class MedicalRecordController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('MEDICO')")
-    public Map<String, String> create(@Valid @RequestBody final MedicalRecordDTO medicalRecord,
-                                      @AuthenticationPrincipal final User user) {
-        final MedicalRecord saved = medicalRecordService.save(user, medicalRecord);
+    public Map<String, String> create(@Valid final MedicalRecordDTO medicalRecord,
+                                     @RequestPart(required = false) final List<MultipartFile> files,
+                                     @AuthenticationPrincipal final User user) {
+        final MedicalRecord saved = medicalRecordService.save(user, medicalRecord, files);
         return Collections.singletonMap("id", saved.getId());
     }
 
