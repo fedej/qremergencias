@@ -220,7 +220,7 @@
             },
             "post": {
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "operationId": "createUsingPOST",
                 "parameters": [
@@ -250,15 +250,11 @@
                         "type": "string"
                     },
                     {
-                        "collectionFormat": "multi",
-                        "description": "files",
+                        "description": "file",
                         "in": "formData",
-                        "items": {
-                            "type": "file"
-                        },
-                        "name": "files",
+                        "name": "file",
                         "required": false,
-                        "type": "array"
+                        "type": "file"
                     }
                 ],
                 "produces": [

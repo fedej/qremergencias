@@ -95,19 +95,16 @@ public class MedicalRecordControllerIT {
 
             final MockMultipartFile file = new MockMultipartFile("files", "file.txt",
                     "text/plain", "Estoy vacio".getBytes(Charset.defaultCharset()));
-            final MockMultipartFile file1 = new MockMultipartFile("files", "file2.txt",
-                    "text/plain", "Yo tambien".getBytes(Charset.defaultCharset()));
 
             this.mockMvc
                     .perform(fileUpload("/api/medicalRecord")
                             .file(file)
-                            .file(file1)
                             .param("name", STUDY_NAME)
                             .param("text", REPORT_TEXT)
                             .param("performed", LocalDate.now().toString())
                             .param("user", paciente.getId())
                             .with(user(medico))
-                            .contentType(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
                             .accept(MediaType.APPLICATION_JSON_UTF8_VALUE))
                     .andExpect(status().isCreated());
 
