@@ -8,6 +8,7 @@ import ar.com.utn.proyecto.qremergencias.ws.service.UserProfileService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,22 +29,19 @@ public class ProfileController {
     private UserFrontService userFrontService;
 
     @GetMapping
-    //@PreAuthorize("isFullyAuthenticatedj()")
+    @PreAuthorize("isFullyAuthenticated()")
     public UserProfileDTO list(@AuthenticationPrincipal final User user) {
-        log.info("Llamado a ");
-        final UserFront byUsername =
-                userFrontService.findByUsername("smanopella@est.frba.utn.edu.ar");
-        return emergencyDataService.findByUser(byUsername);
+        log.info("In ProfileController.list()");
+        return emergencyDataService.findByUser(user);
     }
 
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
-    //@PreAuthorize("isFullyAuthenticated()")
+    @PreAuthorize("isFullyAuthenticated()")
     public void update(@RequestBody final UserProfileDTO userProfileDTO,
             @AuthenticationPrincipal final User user) {
-        final UserFront byUsername =
-                userFrontService.findByUsername("smanopella@est.frba.utn.edu.ar");
-        emergencyDataService.update(byUsername, userProfileDTO);
+        log.info("In ProfileController.update()");
+        emergencyDataService.update(user, userProfileDTO);
     }
 
 }
