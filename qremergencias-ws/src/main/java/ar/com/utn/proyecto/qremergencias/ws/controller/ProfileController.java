@@ -1,9 +1,7 @@
 package ar.com.utn.proyecto.qremergencias.ws.controller;
 
 import ar.com.utn.proyecto.qremergencias.core.domain.User;
-import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.UserProfileDTO;
-import ar.com.utn.proyecto.qremergencias.ws.service.UserFrontService;
 import ar.com.utn.proyecto.qremergencias.ws.service.UserProfileService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProfileController {
 
     @Autowired
-    private UserProfileService emergencyDataService;
-
-    @Autowired
-    private UserFrontService userFrontService;
+    private UserProfileService userProfileService;
 
     @GetMapping
     @PreAuthorize("isFullyAuthenticated()")
     public UserProfileDTO list(@AuthenticationPrincipal final User user) {
         log.info("In ProfileController.list()");
-        return emergencyDataService.findByUser(user);
+        return userProfileService.findByUser(user);
     }
 
     @PatchMapping
@@ -41,7 +36,7 @@ public class ProfileController {
     public void update(@RequestBody final UserProfileDTO userProfileDTO,
             @AuthenticationPrincipal final User user) {
         log.info("In ProfileController.update()");
-        emergencyDataService.update(user, userProfileDTO);
+        userProfileService.update(user, userProfileDTO);
     }
 
 }
