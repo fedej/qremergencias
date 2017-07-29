@@ -1,6 +1,5 @@
 package ar.com.utn.proyecto.qremergencias.core.domain;
 
-import com.mongodb.gridfs.GridFSFile;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -38,10 +37,15 @@ public class MedicalRecord {
     @NotNull
     private final LocalDate performed;
 
+    private boolean deleted;
+
     private final Set<MedicalRecordChange> changes = new HashSet<>();
 
-    @DBRef
-    private final Set<GridFSFile> files = new HashSet<>();
+    private final Set<Object> files = new HashSet<>();
+
+    public void addAllChanges(final Set<MedicalRecordChange> changes) {
+        this.changes.addAll(changes);
+    }
 
     @Value
     @RequiredArgsConstructor
@@ -51,12 +55,12 @@ public class MedicalRecord {
             CREATE, DELETE, UPDATE
         }
 
-        private Action action = Action.CREATE;
+        private final Action action;
 
         @NotNull
-        private final LocalDateTime timestamp;
+        private final LocalDateTime timestamp = LocalDateTime.now();
 
         @DBRef
-        private final User modifiedBy;
+        private User modifiedBy;
     }
 }

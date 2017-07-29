@@ -39,7 +39,8 @@ public class MedicalRecordServiceTest {
     @Test
     public void testFindByUsernameString() {
         final List<MedicalRecord> medicalRecordList = Collections.singletonList(mock);
-        when(medicalRecordRepository.findByUser(any(UserFront.class),any(Pageable.class)))
+        when(medicalRecordRepository.findByUserAndDeletedIsFalse(any(UserFront.class),
+                any(Pageable.class)))
                 .thenReturn(new PageImpl<>(medicalRecordList));
 
         final Page<MedicalRecord> page = service.findByUser(new UserFront(),
