@@ -19,27 +19,7 @@ public class UserProfileService {
     @Autowired
     private UserFrontRepository userFrontRepository;
 
-    public UserProfileDTO findByUser(final User user) {
-        final UserFront userFront = userFrontRepository.findByUsername(user.getUsername());
-        final UserProfileDTO userProfileDTO = new UserProfileDTO();
-        userProfileDTO.setFirstName(userFront.getName());
-        userProfileDTO.setLastName(userFront.getLastname());
-        userProfileDTO.setBirthDate(userFront.getBirthdate());
-        userProfileDTO.setDocNumber(userFront.getNumeroDocumento());
-        for (final UserEmergencyContact contact : userFront.getContacts()) {
-            userProfileDTO.getContacts()
-                    .add(
-                            new UserContactDTO(
-                                    contact.getId(),
-                                    contact.getFirstName(),
-                                    contact.getLastName(),
-                                    contact.getPhoneNumber()));
-        }
-        return userProfileDTO;
-    }
-
-    public void update(final User user, final UserProfileDTO userProfileDTO) {
-        final UserFront userFront = userFrontRepository.findByUsername(user.getUsername());
+    public void update(final UserFront userFront, final UserProfileDTO userProfileDTO) {
         userFront.setBirthdate(userProfileDTO.getBirthDate());
         userFront.setNumeroDocumento(userProfileDTO.getDocNumber());
         userFront.setName(userProfileDTO.getFirstName());
@@ -51,8 +31,7 @@ public class UserProfileService {
                         new UserEmergencyContact(
                                 contactDTO.getFirstName(),
                                 contactDTO.getLastName(),
-                                contactDTO.getPhoneNumber(),
-                                user));
+                                contactDTO.getPhoneNumber()));
             }
             userFront.setContacts(contacts);
         }

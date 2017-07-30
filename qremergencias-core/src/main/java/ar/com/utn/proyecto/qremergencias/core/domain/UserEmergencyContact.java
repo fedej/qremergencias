@@ -11,24 +11,18 @@ import java.io.Serializable;
 @Data
 public class UserEmergencyContact implements Serializable {
 
-    @Id
-    private String id;
     @NotEmpty
     private final String firstName;
     @NotEmpty
     private final String lastName;
     @NotEmpty
     private final String phoneNumber;
-    @DBRef
-    private final User user;
 
     public UserEmergencyContact(final String firstName,
                                 final String lastName,
-                                final String phoneNumber,
-                                final User user) {
+                                final String phoneNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
-        this.user = user;
     }
 }
