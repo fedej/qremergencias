@@ -66,7 +66,7 @@ public class MedicalRecordControllerIT {
 
     @Before
     public void setUp() {
-        paciente = userFrontService.findByUsername("user@rrramundo.com.ar");
+        paciente = userFrontService.findByUsername("paciente@rrramundo.com.ar");
         medico = userFrontService.findByUsername("medico@rrramundo.com.ar");
         this.mockMvc = MockMvcBuilders
                 .webAppContextSetup(this.wac)
