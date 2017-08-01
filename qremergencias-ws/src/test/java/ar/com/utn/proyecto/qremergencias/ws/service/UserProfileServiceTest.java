@@ -1,12 +1,16 @@
 package ar.com.utn.proyecto.qremergencias.ws.service;
 
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
+import ar.com.utn.proyecto.qremergencias.core.dto.UserProfileDTO;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserFrontRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 
 public class UserProfileServiceTest {
 
@@ -24,17 +28,9 @@ public class UserProfileServiceTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    /*
-    @Test
-    public void testFindByUser() {
-        Mockito.when(repository.findByUsername(Mockito.anyString())).thenReturn(user);
-        UserProfileDTO profileDTO = service.findByUser(new UserFront());
-        Assert.assertNotNull(profileDTO);
-    }
-    */
-
     @Test
     public void testUpdate() {
-
+        service.update(user, new UserProfileDTO());
+        verify(repository).save(eq(user));
     }
 }

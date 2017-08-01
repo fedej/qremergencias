@@ -1,6 +1,5 @@
 package ar.com.utn.proyecto.qremergencias.ws.service;
 
-import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserEmergencyContact;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.UserContactDTO;
