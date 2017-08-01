@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,5 +20,5 @@ public class UserFront extends User {
     private LocalDate birthdate;
     private String numeroDocumento;
     @DBRef
-    private List<UserEmergencyContact> contacts = new ArrayList<>();
+    private final List<UserEmergencyContact> contacts = new ArrayList<>();
 }

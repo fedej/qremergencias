@@ -33,7 +33,7 @@ public class UserProfileService {
                                 contactDTO.getLastName(),
                                 contactDTO.getPhoneNumber()));
             }
-            userFront.setContacts(contacts);
+            userFront.getContacts().addAll(contacts);
         }
         userFrontRepository.save(userFront);
     }
