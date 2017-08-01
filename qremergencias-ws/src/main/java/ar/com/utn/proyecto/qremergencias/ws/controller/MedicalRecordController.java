@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,11 +19,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -48,12 +53,19 @@ public class MedicalRecordController {
         return new MedicalRecordDTO(medicalRecordService.findById(id));
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('MEDICO')")
-    public Map<String, String> create(@Valid @RequestBody final MedicalRecordDTO medicalRecord,
-                                      @AuthenticationPrincipal final User user) {
-        final MedicalRecord saved = medicalRecordService.save(user, medicalRecord);
+    public Map<String, String> create(@Valid final MedicalRecordDTO medicalRecord,
+                             @RequestPart(required = false, name = "file") final MultipartFile file,
+                             @AuthenticationPrincipal final User user) {
+
+        final List<MultipartFile> files = new ArrayList<>(1);
+        if (file != null) {
+            files.add(file);
+        }
+
+        final MedicalRecord saved = medicalRecordService.save(user, medicalRecord, files);
         return Collections.singletonMap("id", saved.getId());
     }
 

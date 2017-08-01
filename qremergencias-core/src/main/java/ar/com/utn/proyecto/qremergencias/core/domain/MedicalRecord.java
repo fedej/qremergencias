@@ -1,6 +1,5 @@
 package ar.com.utn.proyecto.qremergencias.core.domain;
 
-import com.mongodb.gridfs.GridFSFile;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +41,7 @@ public class MedicalRecord {
 
     private final Set<MedicalRecordChange> changes = new HashSet<>();
 
-    @DBRef
-    private final Set<GridFSFile> files = new HashSet<>();
+    private final Set<Object> files = new HashSet<>();
 
     public void addAllChanges(final Set<MedicalRecordChange> changes) {
         this.changes.addAll(changes);
