@@ -24,15 +24,17 @@ public class UserProfileService {
         userFront.setName(userProfileDTO.getFirstName());
         userFront.setLastname(userProfileDTO.getLastName());
         final List<UserEmergencyContact> contacts = new ArrayList<>();
+        userFront.setContacts(contacts);
+        userFrontRepository.save(userFront);
         if (userProfileDTO.getContacts() != null) {
             for (final UserContactDTO contactDTO : userProfileDTO.getContacts()) {
-                contacts.add(
-                        new UserEmergencyContact(
-                                contactDTO.getFirstName(),
-                                contactDTO.getLastName(),
-                                contactDTO.getPhoneNumber()));
+                UserEmergencyContact contact = new UserEmergencyContact(
+                        contactDTO.getFirstName(),
+                        contactDTO.getLastName(),
+                        contactDTO.getPhoneNumber());
+                contacts.add(contact);
             }
-            userFront.getContacts().addAll(contacts);
+            userFront.setContacts(contacts);
         }
         userFrontRepository.save(userFront);
     }

@@ -111,7 +111,7 @@
                 "firstName": {
                     "type": "string"
                 },
-                "lastName": {
+                "jaite": {
                     "type": "string"
                 },
                 "phoneNumber": {

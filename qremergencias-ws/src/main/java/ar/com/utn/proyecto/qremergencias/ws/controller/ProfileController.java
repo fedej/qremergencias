@@ -27,6 +27,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
@@ -51,14 +53,15 @@ public class ProfileController {
         userProfileDTO.setLastName(userFront.getLastname());
         userProfileDTO.setBirthDate(userFront.getBirthdate());
         userProfileDTO.setDocNumber(userFront.getNumeroDocumento());
+        List<UserContactDTO> contacts = new ArrayList<>();
         for (final UserEmergencyContact contact : userFront.getContacts()) {
-            userProfileDTO.getContacts()
-                    .add(
-                            new UserContactDTO(
-                                    contact.getFirstName(),
-                                    contact.getLastName(),
-                                    contact.getPhoneNumber()));
+            UserContactDTO contactDTO = new UserContactDTO(
+                    contact.getFirstName(),
+                    contact.getLastName(),
+                    contact.getPhoneNumber());
+                    contacts.add(contactDTO);
         }
+        userProfileDTO.setContacts(contacts);
         return userProfileDTO;
     }
 
