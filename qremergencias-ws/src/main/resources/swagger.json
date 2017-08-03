@@ -105,6 +105,44 @@
         },
         "Sort": {
             "type": "object"
+        },
+        "UserContactDTO": {
+            "properties": {
+                "firstName": {
+                    "type": "string"
+                },
+                "jaite": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "UserProfileDTO": {
+            "properties": {
+                "birthDate": {
+                    "format": "date",
+                    "type": "string"
+                },
+                "contacts": {
+                    "items": {
+                        "$ref": "#/definitions/UserContactDTO"
+                    },
+                    "type": "array"
+                },
+                "docNumber": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
         }
     },
     "host": "localhost:8082",
@@ -405,6 +443,76 @@
                 ]
             }
         },
+        "/api/profile": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "listUsingGET_1",
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/UserProfileDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "list",
+                "tags": [
+                    "profile-controller"
+                ]
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "updateUsingPATCH_1",
+                "parameters": [
+                    {
+                        "description": "userProfileDTO",
+                        "in": "body",
+                        "name": "userProfileDTO",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserProfileDTO"
+                        }
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "summary": "update",
+                "tags": [
+                    "profile-controller"
+                ]
+            }
+        },
         "/api/userFront/changePassword": {
             "post": {
                 "consumes": [
@@ -689,6 +797,10 @@
         {
             "description": "Medical Record Controller",
             "name": "medical-record-controller"
+        },
+        {
+            "description": "Profile Controller",
+            "name": "profile-controller"
         },
         {
             "description": "User Front Controller",
