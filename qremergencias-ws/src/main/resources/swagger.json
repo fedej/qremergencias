@@ -15,6 +15,88 @@
             },
             "type": "object"
         },
+        "EmergencyDataDTO": {
+            "properties": {
+                "age": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "alcoholism": {
+                    "type": "boolean"
+                },
+                "allergies": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "anemia": {
+                    "type": "boolean"
+                },
+                "asthma": {
+                    "type": "boolean"
+                },
+                "bloodType": {
+                    "type": "string"
+                },
+                "erectileDysfunction": {
+                    "type": "boolean"
+                },
+                "extend": {
+                    "type": "boolean"
+                },
+                "heartAttack": {
+                    "type": "boolean"
+                },
+                "hospitalizations": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "hypertension": {
+                    "type": "boolean"
+                },
+                "lastMedicalCheck": {
+                    "format": "date",
+                    "type": "string"
+                },
+                "medications": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "organDonor": {
+                    "type": "boolean"
+                },
+                "pneumonia": {
+                    "type": "boolean"
+                },
+                "psoriasis": {
+                    "type": "boolean"
+                },
+                "sex": {
+                    "type": "string"
+                },
+                "smoking": {
+                    "type": "boolean"
+                },
+                "suprarrenalInsufficiency": {
+                    "type": "boolean"
+                },
+                "surgeries": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "thrombosis": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
         "MedicalRecordChangeDTO": {
             "properties": {
                 "action": {
@@ -59,6 +141,46 @@
                 },
                 "user": {
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PageOfEmergencyDataDTO": {
+            "properties": {
+                "content": {
+                    "items": {
+                        "$ref": "#/definitions/EmergencyDataDTO"
+                    },
+                    "type": "array"
+                },
+                "first": {
+                    "type": "boolean"
+                },
+                "last": {
+                    "type": "boolean"
+                },
+                "number": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "numberOfElements": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "size": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "sort": {
+                    "$ref": "#/definitions/Sort"
+                },
+                "totalElements": {
+                    "format": "int64",
+                    "type": "integer"
+                },
+                "totalPages": {
+                    "format": "int32",
+                    "type": "integer"
                 }
             },
             "type": "object"
@@ -116,6 +238,105 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/emergencyData": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "listUsingGET",
+                "parameters": [
+                    {
+                        "description": "Results page you want to retrieve (0..N)",
+                        "format": "int32",
+                        "in": "query",
+                        "name": "page",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "description": "Number of records per page",
+                        "format": "int32",
+                        "in": "query",
+                        "name": "size",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "collectionFormat": "multi",
+                        "description": "Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "sort",
+                        "required": false,
+                        "type": "array"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PageOfEmergencyDataDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "list",
+                "tags": [
+                    "emergency-data-controller"
+                ]
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "createUsingPOST",
+                "parameters": [
+                    {
+                        "description": "emergencyDataDTO",
+                        "in": "body",
+                        "name": "emergencyDataDTO",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/EmergencyDataDTO"
+                        }
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "create",
+                "tags": [
+                    "emergency-data-controller"
+                ]
+            }
+        },
         "/api/login": {
             "post": {
                 "consumes": [
@@ -163,7 +384,7 @@
                 "consumes": [
                     "application/json"
                 ],
-                "operationId": "listUsingGET",
+                "operationId": "listUsingGET_1",
                 "parameters": [
                     {
                         "description": "Results page you want to retrieve (0..N)",
@@ -222,7 +443,7 @@
                 "consumes": [
                     "multipart/form-data"
                 ],
-                "operationId": "createUsingPOST",
+                "operationId": "createUsingPOST_1",
                 "parameters": [
                     {
                         "in": "query",
@@ -686,6 +907,10 @@
     ],
     "swagger": "2.0",
     "tags": [
+        {
+            "description": "Emergency Data Controller",
+            "name": "emergency-data-controller"
+        },
         {
             "description": "Medical Record Controller",
             "name": "medical-record-controller"

@@ -11,7 +11,7 @@ allprojects  {
     apply plugin: 'checkstyle'
     apply plugin: 'jacoco'
 
-    def pmdVersion = '5.7.0'
+    def pmdVersion = '5.8.1'
     def checkstyleVersion = '7.8.1'
     def jacocoVersion = '0.7.9'
 
