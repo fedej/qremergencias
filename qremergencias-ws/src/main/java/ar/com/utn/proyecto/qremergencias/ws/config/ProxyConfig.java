@@ -1,5 +1,7 @@
 package ar.com.utn.proyecto.qremergencias.ws.config;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.undertow.attribute.StoredResponse;
 import io.undertow.security.api.SecurityContext;
 import io.undertow.server.HttpHandler;
@@ -8,8 +10,7 @@ import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.StoredResponseHandler;
 import io.undertow.server.handlers.proxy.LoadBalancingProxyClient;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
-import io.undertow.util.HeaderValues;
-import io.undertow.util.Headers;
+import io.undertow.util.HeaderMap;
 import io.undertow.websockets.WebSocketProtocolHandshakeHandler;
 import io.undertow.websockets.core.AbstractReceiveListener;
 import io.undertow.websockets.core.BufferedTextMessage;
@@ -25,9 +26,11 @@ import org.springframework.context.annotation.Configuration;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Deque;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static ar.com.utn.proyecto.qremergencias.ws.config.ProxyConfig.MessagingEmitterHandler.messagingEmitterHandler;
 import static io.undertow.Handlers.path;
@@ -36,7 +39,6 @@ import static io.undertow.Handlers.resource;
 import static io.undertow.Handlers.websocket;
 import static io.undertow.server.handlers.ResponseCodeHandler.HANDLE_404;
 import static io.undertow.util.Headers.ACCEPT_LANGUAGE;
-import static io.undertow.util.Headers.CONTENT_TYPE;
 import static io.undertow.util.LocaleUtils.getLocalesFromHeader;
 
 @Configuration
@@ -44,7 +46,7 @@ import static io.undertow.util.LocaleUtils.getLocalesFromHeader;
 @SuppressWarnings("PMD")
 public class ProxyConfig {
 
-    private static final String HOST = "localhost:";
+    private static final String HOST = "://localhost:";
 
     private final ServerProperties serverProperties;
 
@@ -98,6 +100,7 @@ public class ProxyConfig {
 
         private final HttpHandler next;
         private final WebSocketProtocolHandshakeHandler wsHandler;
+        private final ObjectMapper objectMapper = new ObjectMapper();
 
         private MessagingEmitterHandler(final HttpHandler next, final WebSocketProtocolHandshakeHandler wsHandler) {
             this.next = next;
@@ -105,103 +108,84 @@ public class ProxyConfig {
         }
 
         protected static MessagingEmitterHandler messagingEmitterHandler(final HttpHandler next,
-                                                               final WebSocketProtocolHandshakeHandler wsHandler) {
+                                                                final WebSocketProtocolHandshakeHandler wsHandler) {
             return new MessagingEmitterHandler(next, wsHandler);
         }
 
         @Override
         public void handleRequest(final HttpServerExchange exchange) throws Exception {
-            final StringBuilder sb = new StringBuilder(500);
-
+            final Map<String, Object> request = new HashMap<>();
+            final Map<String, Object> response = new HashMap<>();
+            final HeaderMap requestHeaders = exchange.getRequestHeaders();
+            final List<String> requestHeadersList = new ArrayList<>(requestHeaders.size());
+            requestHeaders.forEach(c -> {
+                final String values = c.stream().collect(Collectors.joining(", "));
+                requestHeadersList.add(c.getHeaderName() + ": " + values);
+            });
+            request.put("headers", requestHeadersList);
+            request.put("uri", exchange.getRequestURI());
             final SecurityContext sc = exchange.getSecurityContext();
-            sb.append("\n----------------------------REQUEST---------------------------\n");
-            sb.append("URI=").append(exchange.getRequestURI()).append('\n');
-            sb.append("characterEncoding=").append(exchange.getRequestHeaders().get(Headers.CONTENT_ENCODING))
-                    .append('\n');
-            sb.append("contentLength=").append(exchange.getRequestContentLength()).append('\n');
-            sb.append("contentType=").append(exchange.getRequestHeaders().get(CONTENT_TYPE)).append('\n');
-            addAuthentication(sb, sc);
+            addAuthentication(request, sc);
 
-            final Map<String, Cookie> cookies = exchange.getRequestCookies();
-            if (cookies != null) {
-                for (final Map.Entry<String, Cookie> entry : cookies.entrySet()) {
-                    final Cookie cookie = entry.getValue();
-                    sb.append("cookie=").append(cookie.getName()).append("=").append(cookie.getValue()).append('\n');
-                }
-            }
-            for (final HeaderValues header : exchange.getRequestHeaders()) {
-                for (final String value : header) {
-                    sb.append("header=").append(header.getHeaderName()).append("=").append(value).append('\n');
-                }
-            }
-            sb.append("locale=").append(getLocalesFromHeader(exchange.getRequestHeaders().get(ACCEPT_LANGUAGE)))
-                    .append('\n');
-            sb.append("method=").append(exchange.getRequestMethod()).append('\n');
-            final Map<String, Deque<String>> pnames = exchange.getQueryParameters();
-            for (final Map.Entry<String, Deque<String>> entry : pnames.entrySet()) {
-                final String pname = entry.getKey();
-                sb.append("parameter=");
-                sb.append(pname);
-                sb.append('=');
-                final Iterator<String> pvalues = entry.getValue().iterator();
-                while (pvalues.hasNext()) {
-                    sb.append(pvalues.next());
-                    if (pvalues.hasNext()) {
-                        sb.append(", ");
-                    }
-                }
-                sb.append('\n');
-            }
-            sb.append("protocol=").append(exchange.getProtocol()).append('\n');
-            sb.append("queryString=").append(exchange.getQueryString()).append('\n');
-            sb.append("remoteAddr=").append(exchange.getSourceAddress()).append('\n');
-            sb.append("remoteHost=").append(exchange.getSourceAddress().getHostName()).append('\n');
-            sb.append("scheme=").append(exchange.getRequestScheme()).append('\n');
-            sb.append("host=").append(exchange.getRequestHeaders().getFirst(Headers.HOST)).append('\n');
-            sb.append("serverPort=").append(exchange.getDestinationAddress().getPort()).append('\n');
+            final Map<String, String> requestCookies = exchange.getRequestCookies().entrySet()
+                    .stream()
+                    .map(Map.Entry::getValue)
+                    .collect(Collectors.toMap(Cookie::getName, Cookie::getValue));
+            request.put("cookies", requestCookies);
+            request.put("locale", getLocalesFromHeader(exchange.getRequestHeaders().get(ACCEPT_LANGUAGE)));
+            request.put("method", exchange.getRequestMethod().toString());
+            request.put("protocol", exchange.getProtocol().toString());
+            request.put("queryString", exchange.getQueryString());
+            request.put("remoteAddr", exchange.getSourceAddress());
+            request.put("remoteHost", exchange.getSourceAddress().getHostName());
+            request.put("scheme", exchange.getRequestScheme());
+            request.put("serverPort", exchange.getDestinationAddress().getPort());
 
             exchange.addExchangeCompleteListener((exchange1, nextListener) -> {
-                // Log post-service information
-                sb.append("--------------------------RESPONSE--------------------------\n");
-                addAuthentication(sb, sc);
-                sb.append("contentLength=").append(exchange1.getResponseContentLength()).append('\n');
-                sb.append("contentType=").append(exchange1.getResponseHeaders().getFirst(CONTENT_TYPE)).append('\n');
-                final Map<String, Cookie> cookies1 = exchange1.getResponseCookies();
-                if (cookies1 != null) {
-                    for (final Cookie cookie : cookies1.values()) {
-                        sb.append("cookie=").append(cookie.getName()).append('=').append(cookie.getValue())
-                                .append("; domain=").append(cookie.getDomain())
-                                .append("; path=").append(cookie.getPath()).append('\n');
-                    }
-                }
-                for (final HeaderValues header : exchange1.getResponseHeaders()) {
-                    for (final String value : header) {
-                        sb.append("header=").append(header.getHeaderName()).append("=").append(value).append('\n');
-                    }
-                }
-                sb.append("status=").append(exchange1.getStatusCode()).append('\n');
+                addAuthentication(response, sc);
+
+                final HeaderMap responseHeaders = exchange.getResponseHeaders();
+                final List<String> responseHeadersList = new ArrayList<>(responseHeaders.size());
+                responseHeaders.forEach(c -> {
+                    final String values = c.stream().collect(Collectors.joining(", "));
+                    responseHeadersList.add(c.getHeaderName() + ": " + values);
+                });
+                response.put("headers", responseHeadersList);
+
+                Map<String, String> responseCookies = exchange.getResponseCookies().entrySet()
+                        .stream()
+                        .map(Map.Entry::getValue)
+                        .collect(Collectors.toMap(Cookie::getName, Cookie::getValue));
+                response.put("cookies", responseCookies);
+                response.put("status", exchange1.getStatusCode());
+
                 final String storedResponse = StoredResponse.INSTANCE.readAttribute(exchange1);
                 if (storedResponse != null) {
-                    sb.append("body=\n");
-                    sb.append(storedResponse);
+                    response.put("body", storedResponse);
                 }
 
-                sb.append("==============================================================");
-
                 nextListener.proceed();
-                wsHandler.getPeerConnections()
-                        .forEach(session -> WebSockets.sendText(sb.toString(), session, null));
+                final Map<String, Map<String, Object>> message = new HashMap<>(2);
+                message.put("request", request);
+                message.put("response", response);
+                try {
+                    final String value = objectMapper.writeValueAsString(message);
+                    wsHandler.getPeerConnections()
+                            .forEach(session -> WebSockets.sendText(value, session, null));
+                } catch (final JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
             });
             next.handleRequest(exchange);
         }
 
-        private void addAuthentication(final StringBuilder sb, final SecurityContext sc) {
+        private void addAuthentication(final Map<String, Object> element, final SecurityContext sc) {
             if (sc != null) {
                 if (sc.isAuthenticated()) {
-                    sb.append("authType=").append(sc.getMechanismName()).append('\n');
-                    sb.append("principle=").append(sc.getAuthenticatedAccount().getPrincipal()).append('\n');
+                    element.put("authType", sc.getMechanismName());
+                    element.put("principle", sc.getAuthenticatedAccount().getPrincipal());
                 } else {
-                    sb.append("authType=none" + '\n');
+                    element.put("authType", "none");
                 }
             }
         }

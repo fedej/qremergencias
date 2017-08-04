@@ -10,41 +10,25 @@
 <body>
 
 <div id="sse">
-    <a href="javascript:WebSocketTest()">Run WebSocket</a>
+    <a href="javascript:WebSocketTest()">Connect to WebSocket</a>
 </div>
 <div>
     <table id="myTable" style="width:100%">
         <thead>
         <tr>
-            <th>A</th>
+            <th>Actions</th>
             <th>Request-Response</th>
         </tr>
         </thead>
-        <tbody>
-        <tr>
-            <td>
-                <button type="button" class="btn btn-info" data-toggle="collapse"
-                        data-target="#r1">Show
-                </button>
-            </td>
-            <td>
-                <div id="r1" class="collapse">
-                    Sarasa
-                </div>
-            </td>
-        </tr>
-        </tbody>
+        <tbody></tbody>
     </table>
 </div>
 <script type="text/javascript">
     function WebSocketTest() {
 
-        var current = 2;
+        var current = 1;
 
         if ("WebSocket" in window) {
-            alert("WebSocket is supported by your Browser!");
-
-            // Let us open a web socket
             var ws = new WebSocket("ws://localhost:8083/echo");
 
             ws.onopen = function () {
@@ -69,10 +53,9 @@
                 newCell0.appendChild(btn);
 
                 var newCell1  = newRow.insertCell(1);
-                var newText  = document.createTextNode(received_msg);
-                var iDiv = document.createElement('div');
+                var iDiv = document.createElement('pre');
                 iDiv.setAttribute('id', rowId);
-                iDiv.appendChild(newText);
+                iDiv.innerHTML = JSON.stringify(JSON.parse(received_msg), null, 2);
                 newCell1.appendChild(iDiv);
             };
 
