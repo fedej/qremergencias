@@ -52,7 +52,8 @@ public class ProfileController {
         userProfileDTO.setFirstName(userFront.getName());
         userProfileDTO.setLastName(userFront.getLastname());
         userProfileDTO.setBirthDate(userFront.getBirthdate());
-        userProfileDTO.setDocNumber(userFront.getNumeroDocumento());
+        userProfileDTO.setIdNumber(userFront.getIdNumber());
+        userProfileDTO.setSex(userFront.getSex());
         List<UserContactDTO> contacts = new ArrayList<>();
         for (final UserEmergencyContact contact : userFront.getContacts()) {
             UserContactDTO contactDTO = new UserContactDTO(

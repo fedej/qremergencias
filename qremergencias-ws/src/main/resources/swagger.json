@@ -111,7 +111,7 @@
                 "firstName": {
                     "type": "string"
                 },
-                "jaite": {
+                "lastName": {
                     "type": "string"
                 },
                 "phoneNumber": {
@@ -132,13 +132,16 @@
                     },
                     "type": "array"
                 },
-                "docNumber": {
-                    "type": "string"
-                },
                 "firstName": {
                     "type": "string"
                 },
+                "idNumber": {
+                    "type": "string"
+                },
                 "lastName": {
+                    "type": "string"
+                },
+                "sex": {
                     "type": "string"
                 }
             },
@@ -611,7 +614,13 @@
                     },
                     {
                         "in": "query",
-                        "name": "numeroDocumento",
+                        "name": "idNumber",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sex",
                         "required": false,
                         "type": "string"
                     }

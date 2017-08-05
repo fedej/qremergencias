@@ -25,5 +25,8 @@ public class ConfirmRegistrationDTO {
     private LocalDate birthDate;
 
     @NotNull
-    private String numeroDocumento;
+    private String idNumber;
+
+    @NotNull
+    private char sex;
 }
