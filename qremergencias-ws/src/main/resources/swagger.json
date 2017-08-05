@@ -17,11 +17,37 @@
         },
         "EmergencyDataDTO": {
             "properties": {
-                "age": {
-                    "format": "int32",
-                    "type": "integer"
+                "general": {
+                    "$ref": "#/definitions/GeneralDataDTO"
                 },
-                "alcoholism": {
+                "hospitalizations": {
+                    "items": {
+                        "$ref": "#/definitions/HospitalizationDTO"
+                    },
+                    "type": "array"
+                },
+                "lastMedicalCheck": {
+                    "format": "date",
+                    "type": "string"
+                },
+                "medications": {
+                    "items": {
+                        "$ref": "#/definitions/MedicationDTO"
+                    },
+                    "type": "array"
+                },
+                "surgeries": {
+                    "items": {
+                        "$ref": "#/definitions/HospitalizationDTO"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "GeneralDataDTO": {
+            "properties": {
+                "allergic": {
                     "type": "boolean"
                 },
                 "allergies": {
@@ -30,69 +56,33 @@
                     },
                     "type": "array"
                 },
-                "anemia": {
-                    "type": "boolean"
-                },
-                "asthma": {
-                    "type": "boolean"
-                },
                 "bloodType": {
                     "type": "string"
                 },
-                "erectileDysfunction": {
+                "organDonor": {
                     "type": "boolean"
-                },
-                "extend": {
-                    "type": "boolean"
-                },
-                "heartAttack": {
-                    "type": "boolean"
-                },
-                "hospitalizations": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "hypertension": {
-                    "type": "boolean"
-                },
-                "lastMedicalCheck": {
+                }
+            },
+            "type": "object"
+        },
+        "HospitalizationDTO": {
+            "properties": {
+                "date": {
                     "format": "date",
                     "type": "string"
                 },
-                "medications": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "organDonor": {
-                    "type": "boolean"
-                },
-                "pneumonia": {
-                    "type": "boolean"
-                },
-                "psoriasis": {
-                    "type": "boolean"
-                },
-                "sex": {
+                "institution": {
                     "type": "string"
                 },
-                "smoking": {
-                    "type": "boolean"
+                "reason": {
+                    "type": "string"
                 },
-                "suprarrenalInsufficiency": {
-                    "type": "boolean"
-                },
-                "surgeries": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "thrombosis": {
-                    "type": "boolean"
+                "type": {
+                    "enum": [
+                        "SURGERY",
+                        "ADMISSION"
+                    ],
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -140,6 +130,24 @@
                     "type": "string"
                 },
                 "user": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "MedicationDTO": {
+            "properties": {
+                "amount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "period": {
                     "type": "string"
                 }
             },

@@ -1,8 +1,8 @@
 package ar.com.utn.proyecto.qremergencias.ws.controller;
 
-import ar.com.utn.proyecto.qremergencias.core.domain.EmergencyData;
+import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
-import ar.com.utn.proyecto.qremergencias.core.dto.EmergencyDataDTO;
+import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
 import ar.com.utn.proyecto.qremergencias.ws.service.EmergencyDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
