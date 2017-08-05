@@ -1,7 +1,7 @@
 package ar.com.utn.proyecto.qremergencias.ws.controller;
 
 import ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord;
-import ar.com.utn.proyecto.qremergencias.core.domain.User;
+import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.MedicalRecordDTO;
 import ar.com.utn.proyecto.qremergencias.ws.service.MedicalRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class MedicalRecordController {
     @GetMapping
     @PreAuthorize("isFullyAuthenticated()")
     public Page<MedicalRecordDTO> list(@PageableDefault final Pageable page,
-                                       @AuthenticationPrincipal final User user) {
+                                       @AuthenticationPrincipal final UserFront user) {
 
         final Page<MedicalRecord> domainPage = medicalRecordService.findByUser(user, page);
         return domainPage.map(MedicalRecordDTO::new);
@@ -58,8 +58,7 @@ public class MedicalRecordController {
     @PreAuthorize("hasRole('MEDICO')")
     public Map<String, String> create(@Valid final MedicalRecordDTO medicalRecord,
                              @RequestPart(required = false, name = "file") final MultipartFile file,
-                             @AuthenticationPrincipal final User user) {
-
+                             @AuthenticationPrincipal final UserFront user) {
         final List<MultipartFile> files = new ArrayList<>(1);
         if (file != null) {
             files.add(file);
@@ -74,7 +73,7 @@ public class MedicalRecordController {
     @PreAuthorize("hasRole('MEDICO')")
     public void update(@PathVariable final String id,
                        @Valid @RequestBody final MedicalRecordDTO medicalRecord,
-                       @AuthenticationPrincipal final User user) {
+                       @AuthenticationPrincipal final UserFront user) {
         medicalRecordService.update(id, user, medicalRecord);
     }
 
@@ -82,7 +81,7 @@ public class MedicalRecordController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('MEDICO')")
     public void delete(@PathVariable final String id,
-                       @AuthenticationPrincipal final User user) {
+                       @AuthenticationPrincipal final UserFront user) {
         medicalRecordService.delete(id, user);
     }
 
