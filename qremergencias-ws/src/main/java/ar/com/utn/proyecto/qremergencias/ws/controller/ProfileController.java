@@ -53,13 +53,13 @@ public class ProfileController {
         userProfileDTO.setLastName(userFront.getLastname());
         userProfileDTO.setBirthDate(userFront.getBirthdate());
         userProfileDTO.setDocNumber(userFront.getNumeroDocumento());
-        List<UserContactDTO> contacts = new ArrayList<>();
+        final List<UserContactDTO> contacts = new ArrayList<>();
         for (final UserEmergencyContact contact : userFront.getContacts()) {
-            UserContactDTO contactDTO = new UserContactDTO(
-                    contact.getFirstName(),
-                    contact.getLastName(),
-                    contact.getPhoneNumber());
-                    contacts.add(contactDTO);
+            final UserContactDTO contactDTO = new UserContactDTO(
+                contact.getFirstName(),
+                contact.getLastName(),
+                contact.getPhoneNumber());
+            contacts.add(contactDTO);
         }
         userProfileDTO.setContacts(contacts);
         return userProfileDTO;

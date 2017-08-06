@@ -112,6 +112,37 @@
             }
           ]
         ]
+      },
+      {
+        "@class": "ar.com.utn.proyecto.qremergencias.core.config.mongodb.MongoCollection",
+        "name": "emergencyData",
+        "objects": [
+          "java.util.List",
+          [
+            {
+              "@class": "ar.com.utn.proyecto.qremergencias.core.config.mongodb.MongoObject",
+              "relationships": {
+                "@class": "java.util.Map",
+                "user": "user[0]"
+              },
+              "data": {
+                "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData",
+                "version": 0,
+                "general": {
+                  "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.GeneralData",
+                  "bloodType": "O+",
+                  "allergies": [
+                    "java.util.List",
+                    [
+                      "Estudiar",
+                      "Tu vieja"
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        ]
       }
     ]
   ]

@@ -28,7 +28,7 @@ public class UserProfileService {
         userFrontRepository.save(userFront);
         if (userProfileDTO.getContacts() != null) {
             for (final UserContactDTO contactDTO : userProfileDTO.getContacts()) {
-                UserEmergencyContact contact = new UserEmergencyContact(
+                final UserEmergencyContact contact = new UserEmergencyContact(
                         contactDTO.getFirstName(),
                         contactDTO.getLastName(),
                         contactDTO.getPhoneNumber());

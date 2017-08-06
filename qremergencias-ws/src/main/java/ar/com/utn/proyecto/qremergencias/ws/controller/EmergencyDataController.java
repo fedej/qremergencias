@@ -1,13 +1,10 @@
 package ar.com.utn.proyecto.qremergencias.ws.controller;
 
-import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
+import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
 import ar.com.utn.proyecto.qremergencias.ws.service.EmergencyDataService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,18 +30,17 @@ public class EmergencyDataController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@Valid @RequestBody final EmergencyDataDTO emergencyDataDTO,
+    public void createEmergencyData(@Valid @RequestBody final EmergencyDataDTO emergencyDataDTO,
                        @AuthenticationPrincipal final UserFront user) {
         service.save(user, emergencyDataDTO);
     }
 
     @GetMapping
     @PreAuthorize("isFullyAuthenticated()")
-    public Page<EmergencyDataDTO> list(@PageableDefault final Pageable page,
-                                       @AuthenticationPrincipal final UserFront user) {
+    public EmergencyDataDTO getEmergencyData(@AuthenticationPrincipal final UserFront user) {
 
-        final Page<EmergencyData> domainPage = service.findByUser(user, page);
-        return domainPage.map(EmergencyDataDTO::new);
+        final EmergencyData domainPage = service.findByUser(user);
+        return new EmergencyDataDTO(domainPage);
     }
 
 }

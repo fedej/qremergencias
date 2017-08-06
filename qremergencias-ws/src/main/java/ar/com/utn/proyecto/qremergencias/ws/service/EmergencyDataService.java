@@ -29,4 +29,8 @@ public class EmergencyDataService {
     public Page<EmergencyData> findByUser(final User user, final Pageable page) {
         return repository.findByUser(user, page);
     }
+
+    public EmergencyData findByUser(final UserFront user) {
+        return repository.findByUser(user);
+    }
 }

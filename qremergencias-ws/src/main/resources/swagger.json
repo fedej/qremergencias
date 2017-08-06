@@ -153,46 +153,6 @@
             },
             "type": "object"
         },
-        "PageOfEmergencyDataDTO": {
-            "properties": {
-                "content": {
-                    "items": {
-                        "$ref": "#/definitions/EmergencyDataDTO"
-                    },
-                    "type": "array"
-                },
-                "first": {
-                    "type": "boolean"
-                },
-                "last": {
-                    "type": "boolean"
-                },
-                "number": {
-                    "format": "int32",
-                    "type": "integer"
-                },
-                "numberOfElements": {
-                    "format": "int32",
-                    "type": "integer"
-                },
-                "size": {
-                    "format": "int32",
-                    "type": "integer"
-                },
-                "sort": {
-                    "$ref": "#/definitions/Sort"
-                },
-                "totalElements": {
-                    "format": "int64",
-                    "type": "integer"
-                },
-                "totalPages": {
-                    "format": "int32",
-                    "type": "integer"
-                }
-            },
-            "type": "object"
-        },
         "PageOfMedicalRecordDTO": {
             "properties": {
                 "content": {
@@ -241,7 +201,7 @@
                 "firstName": {
                     "type": "string"
                 },
-                "jaite": {
+                "lastName": {
                     "type": "string"
                 },
                 "phoneNumber": {
@@ -289,36 +249,7 @@
                 "consumes": [
                     "application/json"
                 ],
-                "operationId": "listUsingGET",
-                "parameters": [
-                    {
-                        "description": "Results page you want to retrieve (0..N)",
-                        "format": "int32",
-                        "in": "query",
-                        "name": "page",
-                        "required": false,
-                        "type": "integer"
-                    },
-                    {
-                        "description": "Number of records per page",
-                        "format": "int32",
-                        "in": "query",
-                        "name": "size",
-                        "required": false,
-                        "type": "integer"
-                    },
-                    {
-                        "collectionFormat": "multi",
-                        "description": "Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
-                        "in": "query",
-                        "items": {
-                            "type": "string"
-                        },
-                        "name": "sort",
-                        "required": false,
-                        "type": "array"
-                    }
-                ],
+                "operationId": "getEmergencyDataUsingGET",
                 "produces": [
                     "*/*"
                 ],
@@ -326,7 +257,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/PageOfEmergencyDataDTO"
+                            "$ref": "#/definitions/EmergencyDataDTO"
                         }
                     },
                     "401": {
@@ -339,7 +270,7 @@
                         "description": "Not Found"
                     }
                 },
-                "summary": "list",
+                "summary": "getEmergencyData",
                 "tags": [
                     "emergency-data-controller"
                 ]
@@ -348,7 +279,7 @@
                 "consumes": [
                     "application/json"
                 ],
-                "operationId": "createUsingPOST",
+                "operationId": "createEmergencyDataUsingPOST",
                 "parameters": [
                     {
                         "description": "emergencyDataDTO",
@@ -377,7 +308,7 @@
                         "description": "Not Found"
                     }
                 },
-                "summary": "create",
+                "summary": "createEmergencyData",
                 "tags": [
                     "emergency-data-controller"
                 ]
@@ -430,7 +361,7 @@
                 "consumes": [
                     "application/json"
                 ],
-                "operationId": "listUsingGET_1",
+                "operationId": "listUsingGET",
                 "parameters": [
                     {
                         "description": "Results page you want to retrieve (0..N)",
@@ -489,7 +420,7 @@
                 "consumes": [
                     "multipart/form-data"
                 ],
-                "operationId": "createUsingPOST_1",
+                "operationId": "createUsingPOST",
                 "parameters": [
                     {
                         "in": "query",
