@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import static ar.com.utn.proyecto.qremergencias.ws.service.DomainMappers.EMERGENCY_DATA_MAPPER;
+
 @Service
 public class EmergencyDataService {
 
@@ -21,7 +23,7 @@ public class EmergencyDataService {
     }
 
     public void save(final UserFront user, final EmergencyDataDTO emergencyDataDTO) {
-        final EmergencyData emergencyData = DomainMappers.EMERGENCY_DATA_MAPPER.apply(emergencyDataDTO);
+        final EmergencyData emergencyData = EMERGENCY_DATA_MAPPER.apply(emergencyDataDTO);
         emergencyData.setUser(user);
         repository.save(emergencyData);
     }
@@ -32,5 +34,11 @@ public class EmergencyDataService {
 
     public EmergencyData findByUser(final UserFront user) {
         return repository.findByUser(user);
+    }
+
+    public void update(final UserFront user, final EmergencyDataDTO emergencyDataDTO) {
+        final EmergencyData oldData = repository.findByUser(user);
+        final EmergencyData emergencyData = EMERGENCY_DATA_MAPPER.apply(emergencyDataDTO, oldData);
+        repository.save(emergencyData);
     }
 }

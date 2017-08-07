@@ -275,6 +275,44 @@
                     "emergency-data-controller"
                 ]
             },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "updateEmergencyDataUsingPATCH",
+                "parameters": [
+                    {
+                        "description": "emergencyDataDTO",
+                        "in": "body",
+                        "name": "emergencyDataDTO",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/EmergencyDataDTO"
+                        }
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "summary": "updateEmergencyData",
+                "tags": [
+                    "emergency-data-controller"
+                ]
+            },
             "post": {
                 "consumes": [
                     "application/json"
