@@ -130,7 +130,7 @@
                 "version": 0,
                 "general": {
                   "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.GeneralData",
-                  "bloodType": "O+",
+                  "bloodType": "0+",
                   "allergies": [
                     "java.util.List",
                     [
