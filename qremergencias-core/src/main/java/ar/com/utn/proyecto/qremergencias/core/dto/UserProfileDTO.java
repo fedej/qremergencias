@@ -10,8 +10,9 @@ public class UserProfileDTO {
 
     private String firstName;
     private String lastName;
-    private String docNumber;
+    private String idNumber;
     private LocalDate birthDate;
+    private char sex;
     private List<UserContactDTO> contacts;
 
 }

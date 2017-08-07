@@ -20,9 +20,10 @@ public class UserProfileService {
 
     public void update(final UserFront userFront, final UserProfileDTO userProfileDTO) {
         userFront.setBirthdate(userProfileDTO.getBirthDate());
-        userFront.setNumeroDocumento(userProfileDTO.getDocNumber());
+        userFront.setIdNumber(userProfileDTO.getIdNumber());
         userFront.setName(userProfileDTO.getFirstName());
         userFront.setLastname(userProfileDTO.getLastName());
+        userFront.setSex(userProfileDTO.getSex());
         final List<UserEmergencyContact> contacts = new ArrayList<>();
         userFront.setContacts(contacts);
         userFrontRepository.save(userFront);
