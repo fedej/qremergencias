@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops","PMD.DataflowAnomalyAnalysis"})
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.DataflowAnomalyAnalysis"})
 public class UserProfileService {
 
     @Autowired
@@ -24,12 +24,12 @@ public class UserProfileService {
         userFront.setName(userProfileDTO.getFirstName());
         userFront.setLastname(userProfileDTO.getLastName());
         userFront.setSex(userProfileDTO.getSex());
-        final List<UserEmergencyContact> contacts = new ArrayList<>();
-        userFront.setContacts(contacts);
-        userFrontRepository.save(userFront);
+
         if (userProfileDTO.getContacts() != null) {
+            final List<UserEmergencyContact> contacts = new ArrayList<>();
+
             for (final UserContactDTO contactDTO : userProfileDTO.getContacts()) {
-                UserEmergencyContact contact = new UserEmergencyContact(
+                final UserEmergencyContact contact = new UserEmergencyContact(
                         contactDTO.getFirstName(),
                         contactDTO.getLastName(),
                         contactDTO.getPhoneNumber());

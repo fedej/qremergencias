@@ -54,14 +54,16 @@ public class ProfileController {
         userProfileDTO.setBirthDate(userFront.getBirthdate());
         userProfileDTO.setIdNumber(userFront.getIdNumber());
         userProfileDTO.setSex(userFront.getSex());
-        List<UserContactDTO> contacts = new ArrayList<>();
+
+        final List<UserContactDTO> contacts = new ArrayList<>();
         for (final UserEmergencyContact contact : userFront.getContacts()) {
-            UserContactDTO contactDTO = new UserContactDTO(
+            final UserContactDTO contactDTO = new UserContactDTO(
                     contact.getFirstName(),
                     contact.getLastName(),
                     contact.getPhoneNumber());
-                    contacts.add(contactDTO);
+            contacts.add(contactDTO);
         }
+
         userProfileDTO.setContacts(contacts);
         return userProfileDTO;
     }
@@ -90,7 +92,7 @@ public class ProfileController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isFullyAuthenticated()")
     public void update(@RequestBody final UserProfileDTO userProfileDTO,
-            @AuthenticationPrincipal final UserFront user) {
+                       @AuthenticationPrincipal final UserFront user) {
         log.info("In ProfileController.update()");
         userProfileService.update(user, userProfileDTO);
         updateSession(user);

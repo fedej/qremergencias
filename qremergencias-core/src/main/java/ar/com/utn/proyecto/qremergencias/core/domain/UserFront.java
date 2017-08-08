@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = "user")
-@SuppressWarnings("ImmutableField")
+@SuppressWarnings("PMD.ImmutableField")
 public class UserFront extends User {
 
     private static final long serialVersionUID = -3412836946169472092L;

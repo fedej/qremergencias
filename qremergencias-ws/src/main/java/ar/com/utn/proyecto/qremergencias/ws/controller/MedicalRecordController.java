@@ -5,6 +5,7 @@ import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.MedicalRecordDTO;
 import ar.com.utn.proyecto.qremergencias.ws.service.MedicalRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -51,6 +52,13 @@ public class MedicalRecordController {
     @PreAuthorize("isFullyAuthenticated()")
     public MedicalRecordDTO findById(@PathVariable final String id) {
         return new MedicalRecordDTO(medicalRecordService.findById(id));
+    }
+
+    @GetMapping("/file/{fileId}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("isFullyAuthenticated()")
+    public Resource findFileById(@PathVariable final String fileId) {
+        return medicalRecordService.findFileById(fileId);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

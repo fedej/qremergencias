@@ -8,10 +8,15 @@ import ar.com.utn.proyecto.qremergencias.core.dto.MedicalRecordDTO;
 import ar.com.utn.proyecto.qremergencias.core.mapper.Mapper;
 import ar.com.utn.proyecto.qremergencias.core.repository.MedicalRecordRepository;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserFrontRepository;
+import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSFile;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +27,7 @@ import java.util.List;
 import static ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord.MedicalRecordChange.Action.CREATE;
 import static ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord.MedicalRecordChange.Action.DELETE;
 import static ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord.MedicalRecordChange.Action.UPDATE;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service
 public class MedicalRecordService {
@@ -48,7 +54,7 @@ public class MedicalRecordService {
     public MedicalRecord save(final User user, final MedicalRecordDTO medicalRecordDTO,
                               final List<MultipartFile> files) {
         final MedicalRecord medicalRecord = MEDICAL_RECORD_DTO_MAPPER.apply(medicalRecordDTO);
-        final UserFront patient = userFrontRepository.findOne(medicalRecordDTO.getUser());
+        final UserFront patient = userFrontRepository.findByUsername(medicalRecordDTO.getUser());
         medicalRecord.setUser(patient);
         medicalRecord.getChanges().add(new MedicalRecordChange(CREATE, user));
 
@@ -85,5 +91,16 @@ public class MedicalRecordService {
 
     public MedicalRecord findById(final String id) {
         return medicalRecordRepository.findOne(id);
+    }
+
+    public Resource findFileById(final String fileId) {
+        final GridFSDBFile file = gridFsTemplate.findOne(new Query()
+                .addCriteria(where("_id").is(new ObjectId(fileId))));
+
+        if (file != null) {
+            return new InputStreamResource(file.getInputStream());
+        }
+
+        return null;
     }
 }
