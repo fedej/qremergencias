@@ -35,8 +35,12 @@ import java.util.Map;
 @RequestMapping("/api/medicalRecord")
 public class MedicalRecordController {
 
+    private final MedicalRecordService medicalRecordService;
+
     @Autowired
-    private MedicalRecordService medicalRecordService;
+    public MedicalRecordController(final MedicalRecordService medicalRecordService) {
+        this.medicalRecordService = medicalRecordService;
+    }
 
     @GetMapping
     @PreAuthorize("isFullyAuthenticated()")
