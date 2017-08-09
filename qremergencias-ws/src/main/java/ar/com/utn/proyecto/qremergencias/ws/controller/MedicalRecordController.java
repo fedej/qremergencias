@@ -5,6 +5,7 @@ import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.MedicalRecordDTO;
 import ar.com.utn.proyecto.qremergencias.ws.service.MedicalRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriTemplate;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -34,6 +36,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/medicalRecord")
 public class MedicalRecordController {
+
+    @Value("${qremergencias.baseUrl.file}")
+    private UriTemplate fileUriTemplate;
 
     private final MedicalRecordService medicalRecordService;
 
@@ -48,14 +53,14 @@ public class MedicalRecordController {
                                        @AuthenticationPrincipal final UserFront user) {
 
         final Page<MedicalRecord> domainPage = medicalRecordService.findByUser(user, page);
-        return domainPage.map(MedicalRecordDTO::new);
+        return domainPage.map(m -> new MedicalRecordDTO(m, fileUriTemplate));
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isFullyAuthenticated()")
     public MedicalRecordDTO findById(@PathVariable final String id) {
-        return new MedicalRecordDTO(medicalRecordService.findById(id));
+        return new MedicalRecordDTO(medicalRecordService.findById(id), fileUriTemplate);
     }
 
     @GetMapping("/file/{fileId}")

@@ -8,11 +8,13 @@ import lombok.NoArgsConstructor;
 import lombok.Value;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.util.UriTemplate;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -44,7 +46,7 @@ public class MedicalRecordDTO {
     @ApiParam(readOnly = true, hidden = true)
     private final Set<String> files = new HashSet<>();
 
-    public MedicalRecordDTO(final MedicalRecord medicalRecord) {
+    public MedicalRecordDTO(final MedicalRecord medicalRecord, final UriTemplate uriTemplate) {
         this.id = medicalRecord.getId();
         this.name = medicalRecord.getName();
         this.text = medicalRecord.getText();
@@ -58,7 +60,8 @@ public class MedicalRecordDTO {
         this.files.addAll(medicalRecord
                 .getFiles()
                 .stream()
-                .map(Object::toString)
+                .map(id -> uriTemplate.expand(id.toString()))
+                .map(Objects::toString)
                 .collect(Collectors.toList()));
     }
 
