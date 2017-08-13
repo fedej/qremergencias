@@ -4,10 +4,12 @@ import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.GeneralData;
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.Hospitalization;
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.Medication;
+import ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.GeneralDataDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.HospitalizationDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.MedicationDTO;
+import ar.com.utn.proyecto.qremergencias.core.dto.emergency.PathologyDTO;
 import ar.com.utn.proyecto.qremergencias.core.mapper.Mapper;
 
 import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.listConverter;
@@ -38,6 +40,13 @@ class DomainMappers {
                     .fields(MedicationDTO::getAmount, Medication::setAmount)
                     .fields(MedicationDTO::getPeriod, Medication::setPeriod);
 
+    private static final Mapper<PathologyDTO, Pathology> PATHOLOGY_DTO_MAPPER =
+            Mapper.mapping(PathologyDTO.class, Pathology.class)
+                    .constructor(Pathology::new)
+                    .fields(PathologyDTO::getDescription, Pathology::setDescription)
+                    .fields(PathologyDTO::getType, Pathology::setType, PathologyDTO.Type::name)
+                    .fields(PathologyDTO::getDate, Pathology::setDate);
+
     public static final Mapper<EmergencyDataDTO, EmergencyData> EMERGENCY_DATA_MAPPER =
             Mapper.mapping(EmergencyDataDTO.class, EmergencyData.class)
                     .constructor(EmergencyData::new)
@@ -48,6 +57,8 @@ class DomainMappers {
                             listConverter(HOSPITALIZATION_MAPPER))
                     .fields(EmergencyDataDTO::getLastMedicalCheck, EmergencyData::setLastMedicalCheck)
                     .fields(EmergencyDataDTO::getMedications, EmergencyData::setMedications,
-                            listConverter(MEDICATION_MAPPER));
+                            listConverter(MEDICATION_MAPPER))
+                    .fields(EmergencyDataDTO::getPathologies, EmergencyData::setPathologies,
+                            listConverter(PATHOLOGY_DTO_MAPPER));
 
 }

@@ -141,6 +141,11 @@ public class ProxyConfig {
             request.put("scheme", exchange.getRequestScheme());
             request.put("serverPort", exchange.getDestinationAddress().getPort());
 
+            //exchange.getRequestReceiver().receiveFullString((HttpServerExchange e, String message) -> {
+            //            System.out.println("CACA: " + message);
+            //        }
+            //);
+
             exchange.addExchangeCompleteListener((exchange1, nextListener) -> {
                 addAuthentication(response, sc);
 

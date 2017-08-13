@@ -23,6 +23,7 @@ public class EmergencyData {
     private List<Hospitalization> surgeries;
     private List<Hospitalization> hospitalizations;
     private List<Medication> medications;
+    private List<Pathology> pathologies;
     private LocalDate lastMedicalCheck;
 
     @DBRef

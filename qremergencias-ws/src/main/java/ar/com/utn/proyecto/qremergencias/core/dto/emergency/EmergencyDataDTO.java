@@ -23,12 +23,14 @@ public class EmergencyDataDTO {
                     .fields(EmergencyData::getSurgeries, EmergencyDataDTO::setSurgeries, listConverter(HospitalizationDTO.HOSPITALIZATION_DTO_MAPPER))
                     .fields(EmergencyData::getHospitalizations, EmergencyDataDTO::setHospitalizations, listConverter(HospitalizationDTO.HOSPITALIZATION_DTO_MAPPER))
                     .fields(EmergencyData::getMedications, EmergencyDataDTO::setMedications, listConverter(MedicationDTO.MEDICATION_DTO_MAPPER))
+                    .fields(EmergencyData::getPathologies, EmergencyDataDTO::setPathologies, listConverter(PathologyDTO.PATHOLOGY_DTO_MAPPER))
                     .fields(EmergencyData::getLastMedicalCheck, EmergencyDataDTO::setLastMedicalCheck);
 
     private GeneralDataDTO general;
     private List<HospitalizationDTO> surgeries;
     private List<HospitalizationDTO> hospitalizations;
     private List<MedicationDTO> medications;
+    private List<PathologyDTO> pathologies;
     private LocalDate lastMedicalCheck;
 
     public EmergencyDataDTO(final EmergencyData emergencyData) {

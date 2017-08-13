@@ -36,6 +36,12 @@
                     },
                     "type": "array"
                 },
+                "pathologies": {
+                    "items": {
+                        "$ref": "#/definitions/PathologyDTO"
+                    },
+                    "type": "array"
+                },
                 "surgeries": {
                     "items": {
                         "$ref": "#/definitions/HospitalizationDTO"
@@ -189,6 +195,27 @@
                 "totalPages": {
                     "format": "int32",
                     "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "PathologyDTO": {
+            "properties": {
+                "date": {
+                    "format": "date",
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "ANATOMICAL",
+                        "CLINICAL",
+                        "MOLECULAR",
+                        "ORAL"
+                    ],
+                    "type": "string"
                 }
             },
             "type": "object"

@@ -135,10 +135,27 @@
                     "java.util.List",
                     [
                       "Estudiar",
-                      "Tu vieja"
+                      "Pasear"
                     ]
                   ]
-                }
+                },
+                "pathologies" : [
+                  "java.util.List",
+                  [
+                    {
+                      "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology",
+                      "type":"CLINICAL",
+                      "description":"Infarto",
+                      "date":"2016-10-10"
+                    },
+                    {
+                      "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology",
+                      "type":"MOLECULAR",
+                      "description":"ADN",
+                      "date":"2015-07-10"
+                    }
+                  ]
+                ]
               }
             }
           ]
