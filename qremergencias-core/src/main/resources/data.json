@@ -139,6 +139,18 @@
                     ]
                   ]
                 },
+                "medications" : [
+                  "java.util.List",
+                  [
+                    {
+                      "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Medication",
+                      "name":"Cafe Veloz",
+                      "description":"La que toma Maradona",
+                      "amount":3,
+                      "period":"WEEKLY"
+                    }
+                  ]
+                ],
                 "pathologies" : [
                   "java.util.List",
                   [

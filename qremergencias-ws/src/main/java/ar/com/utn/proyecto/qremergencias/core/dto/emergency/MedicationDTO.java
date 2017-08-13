@@ -1,6 +1,7 @@
 package ar.com.utn.proyecto.qremergencias.core.dto.emergency;
 
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.Medication;
+import ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology;
 import ar.com.utn.proyecto.qremergencias.core.mapper.Mapper;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,11 +16,15 @@ public class MedicationDTO {
                     .fields(Medication::getName, MedicationDTO::setName)
                     .fields(Medication::getDescription, MedicationDTO::setDescription)
                     .fields(Medication::getAmount, MedicationDTO::setAmount)
-                    .fields(Medication::getPeriod, MedicationDTO::setPeriod);
+                    .fields(Medication::getPeriod, MedicationDTO::setPeriod, MedicationDTO.Period::valueOf);
 
     private String name;
     private String description;
     private Integer amount;
-    private String period;
+    private Period period;
+
+    public enum Period {
+        DAILY, WEEKLY, MONTHLY
+    }
 
 }

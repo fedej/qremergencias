@@ -38,7 +38,7 @@ class DomainMappers {
                     .fields(MedicationDTO::getName, Medication::setName)
                     .fields(MedicationDTO::getDescription, Medication::setDescription)
                     .fields(MedicationDTO::getAmount, Medication::setAmount)
-                    .fields(MedicationDTO::getPeriod, Medication::setPeriod);
+                    .fields(MedicationDTO::getPeriod, Medication::setPeriod, MedicationDTO.Period::name);
 
     private static final Mapper<PathologyDTO, Pathology> PATHOLOGY_DTO_MAPPER =
             Mapper.mapping(PathologyDTO.class, Pathology.class)
