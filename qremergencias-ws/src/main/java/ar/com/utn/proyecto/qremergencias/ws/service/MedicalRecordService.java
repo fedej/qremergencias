@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Function;
 
 import static ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord.MedicalRecordChange.Action.CREATE;
 import static ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord.MedicalRecordChange.Action.DELETE;
@@ -94,13 +95,22 @@ public class MedicalRecordService {
     }
 
     public Resource findFileById(final String fileId) {
-        final GridFSDBFile file = gridFsTemplate.findOne(new Query()
-                .addCriteria(where("_id").is(new ObjectId(fileId))));
+        final GridFSDBFile file = findGridFSFile().apply(fileId);
 
         if (file != null) {
             return new InputStreamResource(file.getInputStream());
         }
 
         return null;
+    }
+
+    public Function<String, GridFSDBFile> findGridFSFile() {
+        return (fileId) -> gridFsTemplate.findOne(new Query()
+                    .addCriteria(where("_id").is(new ObjectId(fileId))));
+    }
+
+    public Page<MedicalRecord> findByUsername(final String username, final Pageable page) {
+        final UserFront user = userFrontRepository.findByUsername(username);
+        return medicalRecordRepository.findByUserAndDeletedIsFalse(user, page);
     }
 }

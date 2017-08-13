@@ -1,5 +1,6 @@
 package ar.com.utn.proyecto.qremergencias.ws.config;
 
+import ar.com.utn.proyecto.qremergencias.core.dto.LoginUserDTO;
 import ar.com.utn.proyecto.qremergencias.ws.controller.GlobalExceptionHandler.ApiError;
 import com.fasterxml.classmate.TypeResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestMethod;
 import springfox.documentation.builders.OperationBuilder;
@@ -38,6 +40,7 @@ import static ar.com.utn.proyecto.qremergencias.ws.controller.GlobalExceptionHan
 import static com.google.common.base.Predicates.and;
 import static com.google.common.base.Predicates.not;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static springfox.documentation.builders.PathSelectors.regex;
 import static springfox.documentation.service.ApiInfo.DEFAULT_CONTACT;
 
@@ -86,7 +89,8 @@ public class SwaggerConfig {
                 .globalResponseMessage(RequestMethod.GET, responseMessageList)
                 .globalResponseMessage(RequestMethod.DELETE, responseMessageList)
                 .globalResponseMessage(RequestMethod.PUT, responseMessageList)
-                .additionalModels(typeResolver.resolve(ApiError.class))
+                .additionalModels(typeResolver.resolve(ApiError.class),
+                        typeResolver.resolve(LoginUserDTO.class))
                 .select()
                 .paths(and(not(regex("/error.*")), regex("/.*")))
                 .build();
@@ -112,6 +116,14 @@ public class SwaggerConfig {
                             .codegenMethodNameStem("loginUsingPOST")
                             .consumes(Collections.singleton(APPLICATION_FORM_URLENCODED_VALUE))
                             .method(HttpMethod.POST)
+                            .produces(Collections.singleton(APPLICATION_JSON_UTF8_VALUE))
+                            .responseMessages(Collections.singleton(
+                                    new ResponseMessageBuilder()
+                                            .code(HttpStatus.OK.value())
+                                            .message(HttpStatus.OK.name())
+                                            .responseModel(new ModelRef("LoginUserDTO"))
+                                            .build()
+                            ))
                             .tags(Collections.singleton("user-front-controller"))
                             .parameters(Arrays.asList(new ParameterBuilder()
                                             .type(new TypeResolver().resolve(String.class))

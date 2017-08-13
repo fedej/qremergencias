@@ -1,6 +1,46 @@
 {
     "basePath": "/qremergencias",
     "definitions": {
+        "ApiError": {
+            "properties": {
+                "code": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "errors": {
+                    "items": {
+                        "$ref": "#/definitions/ApiFieldError"
+                    },
+                    "type": "array"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "format": "date-time",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ApiFieldError": {
+            "properties": {
+                "field": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "rejectedValue": {
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
         "CreateUserDTO": {
             "properties": {
                 "email": {
@@ -11,6 +51,37 @@
                 },
                 "role": {
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "FileDTO": {
+            "properties": {
+                "extension": {
+                    "type": "string"
+                },
+                "mimeType": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "LoginUserDTO": {
+            "properties": {
+                "lastName": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "roles": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -40,7 +111,7 @@
                 },
                 "files": {
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/FileDTO"
                     },
                     "type": "array"
                 },
@@ -183,6 +254,17 @@
                         "type": "string"
                     }
                 ],
+                "produces": [
+                    "application/json;charset=UTF-8"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/LoginUserDTO"
+                        }
+                    }
+                },
                 "tags": [
                     "user-front-controller"
                 ]
@@ -204,7 +286,7 @@
                 "consumes": [
                     "application/json"
                 ],
-                "operationId": "listUsingGET",
+                "operationId": "listMyRecordsUsingGET",
                 "parameters": [
                     {
                         "description": "Results page you want to retrieve (0..N)",
@@ -244,17 +326,20 @@
                             "$ref": "#/definitions/PageOfMedicalRecordDTO"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized"
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     }
                 },
-                "summary": "list",
+                "summary": "listMyRecords",
                 "tags": [
                     "medical-record-controller"
                 ]
@@ -311,17 +396,91 @@
                             "type": "object"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized"
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     }
                 },
                 "summary": "create",
+                "tags": [
+                    "medical-record-controller"
+                ]
+            }
+        },
+        "/api/medicalRecord/user": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "listPatientRecordsUsingGET",
+                "parameters": [
+                    {
+                        "description": "username",
+                        "in": "query",
+                        "name": "username",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "Results page you want to retrieve (0..N)",
+                        "format": "int32",
+                        "in": "query",
+                        "name": "page",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "description": "Number of records per page",
+                        "format": "int32",
+                        "in": "query",
+                        "name": "size",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "collectionFormat": "multi",
+                        "description": "Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "sort",
+                        "required": false,
+                        "type": "array"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PageOfMedicalRecordDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "listPatientRecords",
                 "tags": [
                     "medical-record-controller"
                 ]
@@ -349,11 +508,17 @@
                     "204": {
                         "description": "No Content"
                     },
-                    "401": {
-                        "description": "Unauthorized"
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     },
-                    "403": {
-                        "description": "Forbidden"
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     }
                 },
                 "summary": "delete",
@@ -385,14 +550,17 @@
                             "$ref": "#/definitions/MedicalRecordDTO"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized"
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     }
                 },
                 "summary": "findById",
@@ -430,14 +598,17 @@
                     "200": {
                         "description": "OK"
                     },
-                    "204": {
-                        "description": "No Content"
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "403": {
-                        "description": "Forbidden"
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     }
                 },
                 "summary": "update",
@@ -451,7 +622,7 @@
                 "consumes": [
                     "application/json"
                 ],
-                "operationId": "listUsingGET_1",
+                "operationId": "listUsingGET",
                 "produces": [
                     "*/*"
                 ],
@@ -462,14 +633,17 @@
                             "$ref": "#/definitions/UserProfileDTO"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized"
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     }
                 },
                 "summary": "list",
@@ -500,14 +674,17 @@
                     "200": {
                         "description": "OK"
                     },
-                    "204": {
-                        "description": "No Content"
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "403": {
-                        "description": "Forbidden"
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     }
                 },
                 "summary": "update",
@@ -561,17 +738,17 @@
                     "200": {
                         "description": "OK"
                     },
-                    "201": {
-                        "description": "Created"
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     }
                 },
                 "summary": "changePassword",
@@ -632,17 +809,17 @@
                     "200": {
                         "description": "OK"
                     },
-                    "201": {
-                        "description": "Created"
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     }
                 },
                 "summary": "completeRegistration",
@@ -675,14 +852,17 @@
                     "201": {
                         "description": "Created"
                     },
-                    "401": {
-                        "description": "Unauthorized"
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     }
                 },
                 "summary": "register",
@@ -730,17 +910,17 @@
                     "200": {
                         "description": "OK"
                     },
-                    "201": {
-                        "description": "Created"
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     }
                 },
                 "summary": "resetPassword",
@@ -778,17 +958,17 @@
                     "200": {
                         "description": "OK"
                     },
-                    "201": {
-                        "description": "Created"
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     }
                 },
                 "summary": "sendForgotPassword",

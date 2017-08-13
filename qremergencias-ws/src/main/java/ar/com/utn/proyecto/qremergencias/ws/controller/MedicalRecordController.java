@@ -21,11 +21,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriTemplate;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -36,6 +38,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/medicalRecord")
 public class MedicalRecordController {
+
+    private static final String HAS_ROLE_MEDICO = "hasRole('MEDICO')";
 
     @Value("${qremergencias.baseUrl.file}")
     private UriTemplate fileUriTemplate;
@@ -48,31 +52,44 @@ public class MedicalRecordController {
     }
 
     @GetMapping
-    @PreAuthorize("isFullyAuthenticated()")
-    public Page<MedicalRecordDTO> list(@PageableDefault final Pageable page,
+    @PreAuthorize("hasRole('PACIENTE')")
+    public Page<MedicalRecordDTO> listMyRecords(@PageableDefault final Pageable page,
                                        @AuthenticationPrincipal final UserFront user) {
 
         final Page<MedicalRecord> domainPage = medicalRecordService.findByUser(user, page);
-        return domainPage.map(m -> new MedicalRecordDTO(m, fileUriTemplate));
+        return domainPage.map(m -> new MedicalRecordDTO(m, fileUriTemplate,
+                medicalRecordService.findGridFSFile()));
+    }
+
+    @GetMapping("/user")
+    @PreAuthorize(HAS_ROLE_MEDICO)
+    public Page<MedicalRecordDTO> listPatientRecords(@PageableDefault final Pageable page,
+                                       @RequestParam final String username) {
+
+        final Page<MedicalRecord> domainPage = medicalRecordService.findByUsername(username, page);
+        return domainPage.map(m -> new MedicalRecordDTO(m, fileUriTemplate,
+                medicalRecordService.findGridFSFile()));
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isFullyAuthenticated()")
     public MedicalRecordDTO findById(@PathVariable final String id) {
-        return new MedicalRecordDTO(medicalRecordService.findById(id), fileUriTemplate);
+        return new MedicalRecordDTO(medicalRecordService.findById(id), fileUriTemplate,
+                medicalRecordService.findGridFSFile());
     }
 
     @GetMapping("/file/{fileId}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isFullyAuthenticated()")
+    @ApiIgnore("URL is handled by the backend")
     public Resource findFileById(@PathVariable final String fileId) {
         return medicalRecordService.findFileById(fileId);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('MEDICO')")
+    @PreAuthorize(HAS_ROLE_MEDICO)
     public Map<String, String> create(@Valid final MedicalRecordDTO medicalRecord,
                              @RequestPart(required = false, name = "file") final MultipartFile file,
                              @AuthenticationPrincipal final UserFront user) {
@@ -87,7 +104,7 @@ public class MedicalRecordController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('MEDICO')")
+    @PreAuthorize(HAS_ROLE_MEDICO)
     public void update(@PathVariable final String id,
                        @Valid @RequestBody final MedicalRecordDTO medicalRecord,
                        @AuthenticationPrincipal final UserFront user) {
@@ -96,7 +113,7 @@ public class MedicalRecordController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('MEDICO')")
+    @PreAuthorize(HAS_ROLE_MEDICO)
     public void delete(@PathVariable final String id,
                        @AuthenticationPrincipal final UserFront user) {
         medicalRecordService.delete(id, user);
