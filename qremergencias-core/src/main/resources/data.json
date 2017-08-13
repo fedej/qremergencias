@@ -186,6 +186,25 @@
                       "reason":"Otro Infarto"
                     }
                   ]
+                ],
+                "surgeries" : [
+                  "java.util.List",
+                  [
+                    {
+                      "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Hospitalization",
+                      "type":"SURGERY",
+                      "institution":"San Camilo",
+                      "date":"2016-10-10",
+                      "reason":"Cambio de sexo"
+                    },
+                    {
+                      "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Hospitalization",
+                      "type":"SURGERY",
+                      "institution":"Hospital Publico 2",
+                      "date":"2016-10-10",
+                      "reason":"Cambio de sexo invertido"
+                    }
+                  ]
                 ]
               }
             }
