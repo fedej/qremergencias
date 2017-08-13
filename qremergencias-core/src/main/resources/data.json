@@ -155,6 +155,25 @@
                       "date":"2015-07-10"
                     }
                   ]
+                ],
+                "hospitalizations" : [
+                  "java.util.List",
+                  [
+                    {
+                      "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Hospitalization",
+                      "type":"ADMISSION",
+                      "institution":"San Camilo",
+                      "date":"2016-10-10",
+                      "reason":"Infartirigillo"
+                    },
+                    {
+                      "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Hospitalization",
+                      "type":"ADMISSION",
+                      "institution":"Hospital Publico 2",
+                      "date":"2016-10-10",
+                      "reason":"Otro Infarto"
+                    }
+                  ]
                 ]
               }
             }

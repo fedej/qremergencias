@@ -16,7 +16,6 @@ public class HospitalizationDTO {
                     .fields(Hospitalization::getInstitution, HospitalizationDTO::setInstitution)
                     .fields(Hospitalization::getType, HospitalizationDTO::setType, Type::valueOf)
                     .fields(Hospitalization::getDate, HospitalizationDTO::setDate)
-                    .fields(Hospitalization::getDate, HospitalizationDTO::setDate)
                     .fields(Hospitalization::getReason, HospitalizationDTO::setReason);
 
     private String institution;
