@@ -30,6 +30,8 @@ import java.lang.invoke.MethodType;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.addTimeConverter;
+import static java.time.LocalTime.MIDNIGHT;
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
 @RestController
@@ -51,16 +53,16 @@ public class ProfileController {
         final UserProfileDTO userProfileDTO = new UserProfileDTO();
         userProfileDTO.setFirstName(userFront.getName());
         userProfileDTO.setLastName(userFront.getLastname());
-        userProfileDTO.setBirthDate(userFront.getBirthdate());
+        userProfileDTO.setBirthDate(addTimeConverter(MIDNIGHT).apply(userFront.getBirthdate()));
         userProfileDTO.setIdNumber(userFront.getIdNumber());
         userProfileDTO.setSex(userFront.getSex());
 
         final List<UserContactDTO> contacts = new ArrayList<>();
         for (final UserEmergencyContact contact : userFront.getContacts()) {
             final UserContactDTO contactDTO = new UserContactDTO(
-                    contact.getFirstName(),
-                    contact.getLastName(),
-                    contact.getPhoneNumber());
+                contact.getFirstName(),
+                contact.getLastName(),
+                contact.getPhoneNumber());
             contacts.add(contactDTO);
         }
 

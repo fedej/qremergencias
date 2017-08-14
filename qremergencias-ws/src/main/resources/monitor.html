@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div id="sse">
+    <a href="javascript:WebSocketTest()">Connect to WebSocket</a>
+</div>
+<div>
+    <table id="myTable" style="width:100%">
+        <thead>
+        <tr>
+            <th>Actions</th>
+            <th>Request-Response</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    function WebSocketTest() {
+
+        var current = 1;
+
+        if ("WebSocket" in window) {
+            var ws = new WebSocket("ws://localhost:8083/echo");
+
+            ws.onopen = function () {
+                alert("Connected");
+            };
+
+            ws.onmessage = function (evt) {
+                var received_msg = evt.data;
+
+                var rowId = "r" + current++;
+
+                var tableRef = document.getElementById('myTable').getElementsByTagName('tbody')[0];
+                var newRow   = tableRef.insertRow(tableRef.rows.length);
+
+                var newCell0  = newRow.insertCell(0);
+                var btn = document.createElement("BUTTON");
+                var t = document.createTextNode("Show");
+                btn.appendChild(t);
+                btn.setAttribute('data-toggle', 'collapse');
+                btn.setAttribute('data-target', '#' + rowId);
+                btn.setAttribute('class', 'btn btn-info');
+                newCell0.appendChild(btn);
+
+                var newCell1  = newRow.insertCell(1);
+                var iDiv = document.createElement('pre');
+                iDiv.setAttribute('id', rowId);
+                iDiv.innerHTML = JSON.stringify(JSON.parse(received_msg), null, 2);
+                newCell1.appendChild(iDiv);
+            };
+
+            ws.onclose = function () {
+                alert("Connection is closed...");
+            };
+        }
+
+        else {
+            alert("WebSocket NOT supported by your Browser!");
+        }
+    }
+</script>
+</body>
+</html>

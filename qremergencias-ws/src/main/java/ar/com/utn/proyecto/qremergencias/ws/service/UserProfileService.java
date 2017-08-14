@@ -19,7 +19,7 @@ public class UserProfileService {
     private UserFrontRepository userFrontRepository;
 
     public void update(final UserFront userFront, final UserProfileDTO userProfileDTO) {
-        userFront.setBirthdate(userProfileDTO.getBirthDate());
+        userFront.setBirthdate(userProfileDTO.getBirthDate().toLocalDate());
         userFront.setIdNumber(userProfileDTO.getIdNumber());
         userFront.setName(userProfileDTO.getFirstName());
         userFront.setLastname(userProfileDTO.getLastName());

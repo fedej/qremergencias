@@ -55,6 +55,42 @@
             },
             "type": "object"
         },
+        "EmergencyDataDTO": {
+            "properties": {
+                "general": {
+                    "$ref": "#/definitions/GeneralDataDTO"
+                },
+                "hospitalizations": {
+                    "items": {
+                        "$ref": "#/definitions/HospitalizationDTO"
+                    },
+                    "type": "array"
+                },
+                "lastMedicalCheck": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "medications": {
+                    "items": {
+                        "$ref": "#/definitions/MedicationDTO"
+                    },
+                    "type": "array"
+                },
+                "pathologies": {
+                    "items": {
+                        "$ref": "#/definitions/PathologyDTO"
+                    },
+                    "type": "array"
+                },
+                "surgeries": {
+                    "items": {
+                        "$ref": "#/definitions/HospitalizationDTO"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "FileDTO": {
             "properties": {
                 "extension": {
@@ -64,6 +100,48 @@
                     "type": "string"
                 },
                 "url": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GeneralDataDTO": {
+            "properties": {
+                "allergic": {
+                    "type": "boolean"
+                },
+                "allergies": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "bloodType": {
+                    "type": "string"
+                },
+                "organDonor": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "HospitalizationDTO": {
+            "properties": {
+                "date": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "institution": {
+                    "type": "string"
+                },
+                "reason": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "SURGERY",
+                        "ADMISSION"
+                    ],
                     "type": "string"
                 }
             },
@@ -134,6 +212,29 @@
             },
             "type": "object"
         },
+        "MedicationDTO": {
+            "properties": {
+                "amount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "period": {
+                    "enum": [
+                        "DAILY",
+                        "WEEKLY",
+                        "MONTHLY"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "PageOfMedicalRecordDTO": {
             "properties": {
                 "content": {
@@ -174,6 +275,27 @@
             },
             "type": "object"
         },
+        "PathologyDTO": {
+            "properties": {
+                "date": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "ANATOMICAL",
+                        "CLINICAL",
+                        "MOLECULAR",
+                        "ORAL"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Sort": {
             "type": "object"
         },
@@ -194,7 +316,7 @@
         "UserProfileDTO": {
             "properties": {
                 "birthDate": {
-                    "format": "date",
+                    "format": "date-time",
                     "type": "string"
                 },
                 "contacts": {
@@ -228,6 +350,82 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/emergencyData": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "getEmergencyDataUsingGET",
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/EmergencyDataDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "getEmergencyData",
+                "tags": [
+                    "emergency-data-controller"
+                ]
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "updateEmergencyDataUsingPATCH",
+                "parameters": [
+                    {
+                        "description": "emergencyDataDTO",
+                        "in": "body",
+                        "name": "emergencyDataDTO",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/EmergencyDataDTO"
+                        }
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "updateEmergencyData",
+                "tags": [
+                    "emergency-data-controller"
+                ]
+            }
+        },
         "/api/login": {
             "post": {
                 "consumes": [
@@ -983,6 +1181,10 @@
     ],
     "swagger": "2.0",
     "tags": [
+        {
+            "description": "Emergency Data Controller",
+            "name": "emergency-data-controller"
+        },
         {
             "description": "Medical Record Controller",
             "name": "medical-record-controller"
