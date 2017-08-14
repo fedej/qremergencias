@@ -1,17 +1,16 @@
 package ar.com.utn.proyecto.qremergencias.ws.controller;
 
-import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
 import ar.com.utn.proyecto.qremergencias.ws.service.EmergencyDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,15 +30,16 @@ public class EmergencyDataController {
 
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('MEDICO')")
     public void updateEmergencyData(@Valid @RequestBody final EmergencyDataDTO emergencyDataDTO,
-                                    @AuthenticationPrincipal final UserFront user) {
-        service.createOrUpdate(user, emergencyDataDTO);
+                                    @RequestParam final String userId) {
+        service.createOrUpdate(userId, emergencyDataDTO);
     }
 
     @GetMapping
     @PreAuthorize("isFullyAuthenticated()")
-    public EmergencyDataDTO getEmergencyData(@AuthenticationPrincipal final UserFront user) {
-        final Optional<EmergencyData> emergencyData = service.findByUser(user);
+    public EmergencyDataDTO getEmergencyData(@RequestParam final String userId) {
+        final Optional<EmergencyData> emergencyData = service.findByUser(userId);
         return new EmergencyDataDTO(emergencyData.orElse(new EmergencyData()));
     }
 
