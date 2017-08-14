@@ -1,14 +1,13 @@
 package ar.com.utn.proyecto.qremergencias.ws.service;
 
-import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
 import ar.com.utn.proyecto.qremergencias.core.repository.EmergencyDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 import static ar.com.utn.proyecto.qremergencias.ws.service.DomainMappers.EMERGENCY_DATA_MAPPER;
 
@@ -22,23 +21,21 @@ public class EmergencyDataService {
         this.repository = repository;
     }
 
-    public void save(final UserFront user, final EmergencyDataDTO emergencyDataDTO) {
-        final EmergencyData emergencyData = EMERGENCY_DATA_MAPPER.apply(emergencyDataDTO);
-        emergencyData.setUser(user);
-        repository.save(emergencyData);
-    }
-
-    public Page<EmergencyData> findByUser(final User user, final Pageable page) {
-        return repository.findByUser(user, page);
-    }
-
-    public EmergencyData findByUser(final UserFront user) {
+    public Optional<EmergencyData> findByUser(final UserFront user) {
         return repository.findByUser(user);
     }
 
-    public void update(final UserFront user, final EmergencyDataDTO emergencyDataDTO) {
-        final EmergencyData oldData = repository.findByUser(user);
-        final EmergencyData emergencyData = EMERGENCY_DATA_MAPPER.apply(emergencyDataDTO, oldData);
-        repository.save(emergencyData);
+    public void createOrUpdate(final UserFront user, final EmergencyDataDTO emergencyDataDTO) {
+        final Optional<EmergencyData> oldData = repository.findByUser(user);
+
+        if (oldData.isPresent()) {
+            final EmergencyData emergencyData = EMERGENCY_DATA_MAPPER.apply(emergencyDataDTO, oldData.get());
+            repository.save(emergencyData);
+        } else {
+            final EmergencyData emergencyData = EMERGENCY_DATA_MAPPER.apply(emergencyDataDTO);
+            emergencyData.setUser(user);
+            repository.save(emergencyData);
+        }
+
     }
 }
