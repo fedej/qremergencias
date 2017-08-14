@@ -12,21 +12,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops","PMD.DataflowAnomalyAnalysis"})
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.DataflowAnomalyAnalysis"})
 public class UserProfileService {
 
     @Autowired
     private UserFrontRepository userFrontRepository;
 
     public void update(final UserFront userFront, final UserProfileDTO userProfileDTO) {
-        userFront.setBirthdate(userProfileDTO.getBirthDate());
-        userFront.setNumeroDocumento(userProfileDTO.getDocNumber());
+        userFront.setBirthdate(userProfileDTO.getBirthDate().toLocalDate());
+        userFront.setIdNumber(userProfileDTO.getIdNumber());
         userFront.setName(userProfileDTO.getFirstName());
         userFront.setLastname(userProfileDTO.getLastName());
-        final List<UserEmergencyContact> contacts = new ArrayList<>();
-        userFront.setContacts(contacts);
-        userFrontRepository.save(userFront);
+        userFront.setSex(userProfileDTO.getSex());
+
         if (userProfileDTO.getContacts() != null) {
+            final List<UserEmergencyContact> contacts = new ArrayList<>();
+
             for (final UserContactDTO contactDTO : userProfileDTO.getContacts()) {
                 final UserEmergencyContact contact = new UserEmergencyContact(
                         contactDTO.getFirstName(),

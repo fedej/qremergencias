@@ -9,8 +9,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDateTime;
+
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 public class UserProfileServiceTest {
@@ -31,7 +32,9 @@ public class UserProfileServiceTest {
 
     @Test
     public void testUpdate() {
-        service.update(user, new UserProfileDTO());
-        verify(repository, times(2)).save(eq(user));
+        final UserProfileDTO userProfileDTO = new UserProfileDTO();
+        userProfileDTO.setBirthDate(LocalDateTime.of(1990, 9, 18, 0,0,0));
+        service.update(user, userProfileDTO);
+        verify(repository).save(eq(user));
     }
 }
