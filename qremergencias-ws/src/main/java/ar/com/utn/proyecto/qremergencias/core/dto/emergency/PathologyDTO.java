@@ -5,7 +5,10 @@ import ar.com.utn.proyecto.qremergencias.core.mapper.Mapper;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.addTimeConverter;
+import static java.time.LocalTime.MIDNIGHT;
 
 @Data
 public class PathologyDTO {
@@ -16,7 +19,7 @@ public class PathologyDTO {
                     .constructor(PathologyDTO::new)
                     .fields(Pathology::getDescription, PathologyDTO::setDescription)
                     .fields(Pathology::getType, PathologyDTO::setType, PathologyDTO.Type::valueOf)
-                    .fields(Pathology::getDate, PathologyDTO::setDate);
+                    .fields(Pathology::getDate, PathologyDTO::setDate, addTimeConverter(MIDNIGHT));
 
     private Type type;
 
@@ -28,7 +31,7 @@ public class PathologyDTO {
     private String description;
 
     @NotNull
-    private LocalDate date;
+    private LocalDateTime date;
 
 
 

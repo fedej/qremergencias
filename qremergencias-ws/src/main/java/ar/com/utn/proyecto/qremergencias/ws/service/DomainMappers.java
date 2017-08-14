@@ -13,6 +13,7 @@ import ar.com.utn.proyecto.qremergencias.core.dto.emergency.PathologyDTO;
 import ar.com.utn.proyecto.qremergencias.core.mapper.Mapper;
 
 import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.listConverter;
+import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.localDateConverter;
 
 class DomainMappers {
 
@@ -28,8 +29,8 @@ class DomainMappers {
                     .constructor(Hospitalization::new)
                     .fields(HospitalizationDTO::getInstitution, Hospitalization::setInstitution)
                     .fields(HospitalizationDTO::getType, Hospitalization::setType, HospitalizationDTO.Type::name)
-                    .fields(HospitalizationDTO::getDate, Hospitalization::setDate)
-                    .fields(HospitalizationDTO::getDate, Hospitalization::setDate)
+                    .fields(HospitalizationDTO::getDate, Hospitalization::setDate, localDateConverter())
+                    .fields(HospitalizationDTO::getDate, Hospitalization::setDate, localDateConverter())
                     .fields(HospitalizationDTO::getReason, Hospitalization::setReason);
 
     private static final Mapper<MedicationDTO, Medication> MEDICATION_MAPPER =
@@ -45,7 +46,7 @@ class DomainMappers {
                     .constructor(Pathology::new)
                     .fields(PathologyDTO::getDescription, Pathology::setDescription)
                     .fields(PathologyDTO::getType, Pathology::setType, PathologyDTO.Type::name)
-                    .fields(PathologyDTO::getDate, Pathology::setDate);
+                    .fields(PathologyDTO::getDate, Pathology::setDate, localDateConverter());
 
     public static final Mapper<EmergencyDataDTO, EmergencyData> EMERGENCY_DATA_MAPPER =
             Mapper.mapping(EmergencyDataDTO.class, EmergencyData.class)
@@ -55,7 +56,8 @@ class DomainMappers {
                             listConverter(HOSPITALIZATION_MAPPER))
                     .fields(EmergencyDataDTO::getSurgeries, EmergencyData::setSurgeries,
                             listConverter(HOSPITALIZATION_MAPPER))
-                    .fields(EmergencyDataDTO::getLastMedicalCheck, EmergencyData::setLastMedicalCheck)
+                    .fields(EmergencyDataDTO::getLastMedicalCheck, EmergencyData::setLastMedicalCheck,
+                            localDateConverter())
                     .fields(EmergencyDataDTO::getMedications, EmergencyData::setMedications,
                             listConverter(MEDICATION_MAPPER))
                     .fields(EmergencyDataDTO::getPathologies, EmergencyData::setPathologies,
