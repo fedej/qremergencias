@@ -10,6 +10,7 @@ import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.StoredResponseHandler;
 import io.undertow.server.handlers.proxy.LoadBalancingProxyClient;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
+import io.undertow.util.AttachmentKey;
 import io.undertow.util.HeaderMap;
 import io.undertow.websockets.WebSocketProtocolHandshakeHandler;
 import io.undertow.websockets.core.AbstractReceiveListener;
@@ -23,9 +24,19 @@ import org.springframework.boot.autoconfigure.web.ServerPropertiesAutoConfigurat
 import org.springframework.boot.context.embedded.undertow.UndertowEmbeddedServletContainerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.xnio.IoUtils;
+import org.xnio.channels.StreamSinkChannel;
+import org.xnio.conduits.AbstractStreamSourceConduit;
+import org.xnio.conduits.ConduitReadableByteChannel;
+import org.xnio.conduits.StreamSourceConduit;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -108,7 +119,7 @@ public class ProxyConfig {
         }
 
         protected static MessagingEmitterHandler messagingEmitterHandler(final HttpHandler next,
-                                                                final WebSocketProtocolHandshakeHandler wsHandler) {
+                                                                 final WebSocketProtocolHandshakeHandler wsHandler) {
             return new MessagingEmitterHandler(next, wsHandler);
         }
 
@@ -141,12 +152,18 @@ public class ProxyConfig {
             request.put("scheme", exchange.getRequestScheme());
             request.put("serverPort", exchange.getDestinationAddress().getPort());
 
-            //exchange.getRequestReceiver().receiveFullString((HttpServerExchange e, String message) -> {
-            //            System.out.println("CACA: " + message);
-            //        }
-            //);
+            final AttachmentKey<RequestBodyStreamSourceConduit> key =
+                    AttachmentKey.create(RequestBodyStreamSourceConduit.class);
+            exchange.addRequestWrapper((factory, exchange12) -> {
+                final RequestBodyStreamSourceConduit requestBodyStreamSourceConduit =
+                        new RequestBodyStreamSourceConduit(factory.create());
+                exchange.putAttachment(key, requestBodyStreamSourceConduit);
+                return requestBodyStreamSourceConduit;
+            });
 
             exchange.addExchangeCompleteListener((exchange1, nextListener) -> {
+                final RequestBodyStreamSourceConduit attachment = exchange.getAttachment(key);
+                request.put("body", attachment.getBody());
                 addAuthentication(response, sc);
 
                 final HeaderMap responseHeaders = exchange.getResponseHeaders();
@@ -195,6 +212,56 @@ public class ProxyConfig {
             }
         }
 
+    }
+
+    static class RequestBodyStreamSourceConduit extends AbstractStreamSourceConduit<StreamSourceConduit> {
+
+        private final ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        RequestBodyStreamSourceConduit(final StreamSourceConduit next) {
+            super(next);
+        }
+
+        public long transferTo(final long position, final long count, final FileChannel target) throws IOException {
+            return target.transferFrom(new ConduitReadableByteChannel(this), position, count);
+        }
+
+        public long transferTo(final long count, final ByteBuffer throughBuffer, final StreamSinkChannel target)
+                throws IOException {
+            return IoUtils.transfer(new ConduitReadableByteChannel(this), count, throughBuffer, target);
+        }
+
+        @Override
+        public int read(final ByteBuffer dst) throws IOException {
+            int pos = dst.position();
+            int res = super.read(dst);
+            if (res > 0) {
+                byte[] data = new byte[res];
+                for (int i = 0; i < res; ++i) {
+                    data[i] = dst.get(i + pos);
+                }
+                out.write(data, pos, data.length);
+            }
+            return res;
+        }
+
+        @Override
+        public long read(final ByteBuffer[] dsts, final int offs, final int len) throws IOException {
+            for (int i = offs; i < len; ++i) {
+                if (dsts[i].hasRemaining()) {
+                    return read(dsts[i]);
+                }
+            }
+            return 0;
+        }
+
+        String getBody() {
+            try {
+                return out.toString("UTF-8");
+            } catch (final UnsupportedEncodingException exc) {
+                return null;
+            }
+        }
     }
 
 }
