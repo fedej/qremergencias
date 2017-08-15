@@ -9,6 +9,7 @@ import ar.com.utn.proyecto.qremergencias.ws.service.UserFrontService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = QREmergenciasWsApplication.class)
 @ActiveProfiles("test")
+@Ignore
 public class MedicalRecordControllerIT {
 
     private static final String REPORT_TEXT = "Informe del estudio";

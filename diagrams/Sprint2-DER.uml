@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>DATABASE</ID>
+  <OriginalElement>ccfcb316-9cfd-41ab-80c8-a72985764ea8.SCHEMA:test.public</OriginalElement>
+  <nodes>
+    <node x="271.25" y="716.0">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data_medications</node>
+    <node x="0.0" y="526.5">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.general_data_allergies</node>
+    <node x="2076.25" y="144.0">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.user_emergency_contact</node>
+    <node x="572.25" y="716.0">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data_pathologies</node>
+    <node x="1459.5" y="466.0">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.medical_record</node>
+    <node x="774.125" y="490.0">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data</node>
+    <node x="386.47265625" y="156.0">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.general_data</node>
+    <node x="1174.25" y="716.0">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data_hospitalizations</node>
+    <node x="1583.53515625" y="716.0">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.medical_record_changes</node>
+    <node x="230.0" y="490.0">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.medication</node>
+    <node x="1686.5" y="502.0">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.medical_record$medical_record_change</node>
+    <node x="1558.5" y="0.0">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.user</node>
+    <node x="2021.5" y="526.5">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.user_contacts</node>
+    <node x="1221.5" y="490.0">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.hospitalization</node>
+    <node x="531.0" y="502.0">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.pathology</node>
+    <node x="873.25" y="716.0">ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data_surgeries</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data_hospitalizations" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data">
+      <point x="-70.25" y="-39.5" />
+      <point x="1244.5" y="686.0" />
+      <point x="1011.25" y="686.0" />
+      <point x="101.625" y="76.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data_medications" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.medication">
+      <point x="-70.25" y="-39.5" />
+      <point x="0.0" y="76.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.user_contacts" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.user">
+      <point x="-59.75" y="-39.5" />
+      <point x="2081.25" y="436.0" />
+      <point x="1812.25" y="436.0" />
+      <point x="108.75" y="208.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data_surgeries" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data">
+      <point x="-70.25" y="-39.5" />
+      <point x="33.875" y="76.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.user">
+      <point x="67.75" y="-76.0" />
+      <point x="977.375" y="436.0" />
+      <point x="1594.75" y="436.0" />
+      <point x="-108.75" y="208.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.medical_record_changes" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.medical_record$medical_record_change">
+      <point x="68.0" y="-39.5" />
+      <point x="1787.53515625" y="696.0" />
+      <point x="1844.0" y="696.0" />
+      <point x="0.0" y="64.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data_pathologies" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data">
+      <point x="70.25" y="-39.5" />
+      <point x="783.0" y="696.0" />
+      <point x="875.75" y="696.0" />
+      <point x="-33.875" y="76.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data_pathologies" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.pathology">
+      <point x="-70.25" y="-39.5" />
+      <point x="0.0" y="64.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.general_data">
+      <point x="-67.75" y="-76.0" />
+      <point x="841.875" y="446.0" />
+      <point x="540.97265625" y="446.0" />
+      <point x="51.5" y="52.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.medical_record_changes" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.medical_record">
+      <point x="-68.0" y="-39.5" />
+      <point x="1651.53515625" y="696.0" />
+      <point x="1563.0" y="696.0" />
+      <point x="0.0" y="100.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data_hospitalizations" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.hospitalization">
+      <point x="70.25" y="-39.5" />
+      <point x="54.5" y="76.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.general_data_allergies" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.general_data">
+      <point x="0.0" y="-39.5" />
+      <point x="105.0" y="446.0" />
+      <point x="437.97265625" y="446.0" />
+      <point x="-51.5" y="52.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.medical_record" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.user">
+      <point x="0.0" y="-100.0" />
+      <point x="1563.0" y="446.0" />
+      <point x="1667.25" y="446.0" />
+      <point x="-36.25" y="208.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data_medications" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data">
+      <point x="70.25" y="-39.5" />
+      <point x="482.0" y="686.0" />
+      <point x="808.0" y="686.0" />
+      <point x="-101.625" y="76.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.user_contacts" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.user_emergency_contact">
+      <point x="59.75" y="-39.5" />
+      <point x="0.0" y="64.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.emergency_data_surgeries" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.hospitalization">
+      <point x="70.25" y="-39.5" />
+      <point x="1084.0" y="696.0" />
+      <point x="1276.0" y="696.0" />
+      <point x="-54.5" y="76.0" />
+    </edge>
+    <edge source="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.medical_record$medical_record_change" target="ccfcb316-9cfd-41ab-80c8-a72985764ea8.TABLE:test.public.user">
+      <point x="0.0" y="-64.0" />
+      <point x="1844.0" y="446.0" />
+      <point x="1739.75" y="446.0" />
+      <point x="36.25" y="208.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.5626598465473146" x="1163.0" y="397.5" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Columns</Category>
+    <Category>Key columns</Category>
+  </Categories>
+</Diagram>
+

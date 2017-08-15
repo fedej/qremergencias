@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.persistence.OneToMany;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,10 +22,12 @@ import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(of = "username")
+@javax.persistence.Entity
 @SuppressWarnings("PMD.ImmutableField")
 public class User implements Serializable, UserDetails {
 
     @Id
+    @javax.persistence.Id
     private String id;
 
     @Version
@@ -48,12 +51,17 @@ public class User implements Serializable, UserDetails {
 
     private String repassword;
 
+    @javax.persistence.ElementCollection
     private List<String> roles;
 
     @DBRef
+    @javax.persistence.ElementCollection
+    @OneToMany
     private List<PasswordChange> passwordChanges;
 
     @DBRef
+    @javax.persistence.ElementCollection
+    @OneToMany
     private List<ForgotPassword> forgotPasswords;
 
     public User() {

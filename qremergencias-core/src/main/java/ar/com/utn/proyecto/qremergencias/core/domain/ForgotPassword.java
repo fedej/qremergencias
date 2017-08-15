@@ -5,14 +5,17 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
+@javax.persistence.Entity
 public class ForgotPassword implements Serializable {
 
     @Id
+    @javax.persistence.Id
     private String id;
 
     @Version
@@ -27,6 +30,7 @@ public class ForgotPassword implements Serializable {
     private LocalDateTime expirationTime;
 
     @DBRef
+    @ManyToOne
     private User user;
 
 }

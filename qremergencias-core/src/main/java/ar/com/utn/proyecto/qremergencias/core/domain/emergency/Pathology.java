@@ -6,7 +6,11 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Data
+@javax.persistence.Entity
 public class Pathology {
+
+    @javax.persistence.Id
+    private Long id;
 
     @NotNull
     private String type;

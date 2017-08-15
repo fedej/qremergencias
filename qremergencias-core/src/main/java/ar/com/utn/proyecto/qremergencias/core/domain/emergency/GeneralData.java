@@ -8,12 +8,18 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
+@javax.persistence.Entity
 public class GeneralData {
+
+    @javax.persistence.Id
+    private Long id;
 
     @Length(min = 1, max = 3)
     private String bloodType;
 
     private boolean organDonor;
+
+    @javax.persistence.ElementCollection
     private List<String> allergies;
 
 }
