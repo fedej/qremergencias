@@ -4,6 +4,10 @@ plugins {
     id 'org.detoeuf.swagger-codegen' version '1.7.2'
 }
 
+springBoot {
+    executable = true
+}
+
 bootRepackage {
     mainClass = 'ar.com.utn.proyecto.qremergencias.QREmergenciasWsApplication'
 }
