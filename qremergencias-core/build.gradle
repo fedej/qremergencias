@@ -25,4 +25,6 @@ dependencies {
     compile('com.fasterxml.jackson.core:jackson-databind')
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
 
+    compile 'org.javers:javers-spring-boot-starter-mongo:3.5.0'
+
 }
