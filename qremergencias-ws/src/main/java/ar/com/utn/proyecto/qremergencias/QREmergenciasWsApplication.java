@@ -15,6 +15,10 @@ import org.javers.core.Javers;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.diff.changetype.container.ListChange;
+import org.javers.core.metamodel.object.GlobalId;
+import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryBuilder;
 import org.springframework.boot.SpringApplication;
@@ -46,10 +50,12 @@ public class QREmergenciasWsApplication {
         EmergencyData ed = run.getBean(EmergencyDataRepository.class).findByUser(rrrramundo).get();
         String id1 = ed.getId();
         List<ChangeInner> changesInner = new ArrayList<>();
-        changesInner.addAll(getFragmentChanges(run.getBean(Javers.class), "surgeries", id1, ed.getSurgeries()));
-        changesInner.addAll(getFragmentChanges(run.getBean(Javers.class), "hospitalizations", id1, ed.getHospitalizations()));
-        changesInner.addAll(getFragmentChanges(run.getBean(Javers.class), "medications", id1, ed.getMedications()));
-        changesInner.addAll(getFragmentChanges(run.getBean(Javers.class), "pathologies", id1, ed.getPathologies()));
+        QueryBuilder qbPathologies = QueryBuilder.byInstanceId(id1, EmergencyData.class).withChildValueObjects();
+        JqlQuery jqlPathologies = qbPathologies.build();
+        List<Change> changess = run.getBean(Javers.class).findChanges(jqlPathologies);
+        changesInner.addAll(changess.stream()
+                .filter(c -> !(c.getAffectedGlobalId() instanceof InstanceId))
+                .map(c -> new ChangeInner(c)).collect(toList()));
 
         final List<ChangesDTO> changes = new ArrayList<>();
         changesInner
@@ -61,7 +67,7 @@ public class QREmergenciasWsApplication {
                             .collect(toMap(Map.Entry::getKey,
                                     e -> e.getValue()
                                             .stream()
-                                            .map(ci -> new ChangeDTO(ci.property, ci.oldValue, ci.newValue))
+                                            .map(ci -> new ChangeDTO(ci.property, ci.oldValue, ci.newValue, ci.added, ci.removed))
                                             .collect(toList())
                             ));
                     changes.add(new ChangesDTO(k.id, k.date, k.author, copy));
@@ -87,6 +93,8 @@ public class QREmergenciasWsApplication {
         private final String property;
         private final Object oldValue;
         private final Object newValue;
+        private final List<String> added;
+        private final List<String> removed;
     }
 
     @Data
@@ -96,16 +104,55 @@ public class QREmergenciasWsApplication {
         private final String property;
         private final Object oldValue;
         private final Object newValue;
+        private final List<String> added;
+        private final List<String> removed;
 
-        public ChangeInner(Change cambio, String group) {
+        public ChangeInner(Change cambio) {
             CommitMetadata commitMetadata = cambio.getCommitMetadata().get();
             this.id = new ChangeDTOId(commitMetadata.getId().value(),
                     commitMetadata.getCommitDate(), commitMetadata.getAuthor());
-            ValueChange vc = (ValueChange) cambio;
-            this.group = group;
-            this.oldValue = vc.getLeft();
-            this.newValue = vc.getRight();
-            this.property = vc.getPropertyName();
+
+            if (cambio instanceof ValueChange && cambio.getAffectedGlobalId() instanceof ValueObjectId) {
+                final ValueObjectId globalId = (ValueObjectId) cambio.getAffectedGlobalId();
+                String fragment = globalId.getFragment();
+                boolean isList = fragment.contains("/");
+                int slash = fragment.lastIndexOf('/');
+                this.group = isList ? fragment.substring(0, slash) : fragment;
+
+                ValueChange vc = (ValueChange) cambio;
+                this.oldValue = vc.getLeft();
+                this.newValue = vc.getRight();
+                this.property = isList ? group
+                        + "["
+                        + fragment.substring(slash + 1, fragment.length())
+                        + "]."
+                        + vc.getPropertyName() : vc.getPropertyName();
+                this.added = null;
+                this.removed = null;
+            } else if (cambio instanceof ListChange && cambio.getAffectedGlobalId() instanceof ValueObjectId) {
+                final ValueObjectId globalId = (ValueObjectId) cambio.getAffectedGlobalId();
+                String fragment = globalId.getFragment();
+                boolean isList = fragment.contains("/");
+                int slash = fragment.lastIndexOf('/');
+                this.group = isList ? fragment.substring(0, slash) : fragment;
+
+                ListChange lc = (ListChange) cambio;
+
+                this.added = lc.getAddedValues().stream().map(Object::toString).collect(toList());
+                this.removed = lc.getRemovedValues().stream().map(Object::toString).collect(toList());
+
+                this.oldValue = null;
+                this.newValue = null;
+                this.property = lc.getPropertyName();
+            } else {
+                this.group = "";
+                this.property = "";
+                this.oldValue = "";
+                this.newValue = "";
+                this.added = null;
+                this.removed = null;
+            }
+
         }
     }
 
@@ -115,18 +162,6 @@ public class QREmergenciasWsApplication {
         private final LocalDateTime date;
         private final String author;
         private final Map<String, List<ChangeDTO>> changes;
-    }
-
-    private static List<ChangeInner> getFragmentChanges(Javers javers, final String fragment, String id1, List elements) {
-        List<ChangeInner> changeDTOS = new ArrayList<>();
-        for (int i = 0; i < elements.size(); i++) {
-            String fragmentId = fragment + "/" + i;
-            QueryBuilder qbPathologies = QueryBuilder.byValueObjectId(id1, EmergencyData.class, fragmentId);
-            JqlQuery jqlPathologies = qbPathologies.build();
-            List<Change> changes = javers.findChanges(jqlPathologies);
-            changeDTOS.addAll(changes.stream().map(c -> new ChangeInner(c, fragment)).collect(toList()));
-        }
-        return changeDTOS;
     }
 
 }
