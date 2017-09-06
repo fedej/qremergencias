@@ -1,5 +1,6 @@
 package ar.com.utn.proyecto.qremergencias;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -13,7 +14,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SuppressWarnings("PMD.UseUtilityClass")
 public class QREmergenciasWsApplication {
 
-    public static void main(final String... args) {
+    public static void main(final String... args) throws JsonProcessingException {
         SpringApplication.run(QREmergenciasWsApplication.class, args);
     }
+
+
 }
