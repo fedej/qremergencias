@@ -41,6 +41,56 @@
             },
             "type": "object"
         },
+        "ChangeDTO": {
+            "properties": {
+                "added": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "newValue": {
+                    "type": "object"
+                },
+                "oldValue": {
+                    "type": "object"
+                },
+                "property": {
+                    "type": "string"
+                },
+                "removed": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "ChangesDTO": {
+            "properties": {
+                "author": {
+                    "type": "string"
+                },
+                "changes": {
+                    "additionalProperties": {
+                        "items": {
+                            "$ref": "#/definitions/ChangeDTO"
+                        },
+                        "type": "array"
+                    },
+                    "type": "object"
+                },
+                "date": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "CreateUserDTO": {
             "properties": {
                 "email": {
@@ -231,6 +281,46 @@
                         "MONTHLY"
                     ],
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PageOfChangesDTO": {
+            "properties": {
+                "content": {
+                    "items": {
+                        "$ref": "#/definitions/ChangesDTO"
+                    },
+                    "type": "array"
+                },
+                "first": {
+                    "type": "boolean"
+                },
+                "last": {
+                    "type": "boolean"
+                },
+                "number": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "numberOfElements": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "size": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "sort": {
+                    "$ref": "#/definitions/Sort"
+                },
+                "totalElements": {
+                    "format": "int64",
+                    "type": "integer"
+                },
+                "totalPages": {
+                    "format": "int32",
+                    "type": "integer"
                 }
             },
             "type": "object"
@@ -437,6 +527,41 @@
                     }
                 },
                 "summary": "updateEmergencyData",
+                "tags": [
+                    "emergency-data-controller"
+                ]
+            }
+        },
+        "/api/emergencyData/changes": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "getChangesUsingGET",
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PageOfChangesDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "getChanges",
                 "tags": [
                     "emergency-data-controller"
                 ]

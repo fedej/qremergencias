@@ -14,7 +14,6 @@ import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.diff.changetype.container.ListChange;
-import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryBuilder;
@@ -22,16 +21,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static ar.com.utn.proyecto.qremergencias.ws.service.DomainMappers.EMERGENCY_DATA_MAPPER;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toConcurrentMap;
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class EmergencyDataService {
@@ -79,32 +77,31 @@ public class EmergencyDataService {
 
         final EmergencyData ed = optionalData.get();
         final String id1 = ed.getId();
-        final List<ChangeInner> changesInner = new ArrayList<>();
         final QueryBuilder qbPathologies = QueryBuilder.byInstanceId(id1, EmergencyData.class).withChildValueObjects();
         final JqlQuery jqlPathologies = qbPathologies.build();
-        final List<Change> changess = javers.findChanges(jqlPathologies);
-        changesInner.addAll(changess
-                .stream()
-                .filter(c -> !(c.getAffectedGlobalId() instanceof InstanceId))
-                .map(ChangeInner::new).collect(toList()));
 
-        final List<ChangesDTO> changes = new ArrayList<>();
-        changesInner
+        return new PageImpl<>(javers.findChanges(jqlPathologies)
                 .stream()
-                .collect(groupingBy(ChangeInner::getId, groupingBy(ChangeInner::getGroup)))
-                .forEach((key, value) -> {
-                    final Map<String, List<ChangeDTO>> copy = value.entrySet()
-                        .stream()
-                        .collect(toConcurrentMap(Map.Entry::getKey,
-                            e -> e.getValue().stream()
-                                .map(innerChange -> new ChangeDTO(innerChange.getProperty(), innerChange.getOldValue(),
-                                                innerChange.getNewValue(), innerChange.getAdded(),
-                                                innerChange.getRemoved()))
-                                .collect(toList())
-                        ));
-                    changes.add(new ChangesDTO(key.getId(), key.getDate(), key.getAuthor(), copy));
-                });
-        return new PageImpl<>(changes);
+                .filter(c -> (c instanceof ValueChange || c instanceof ListChange) && c.getAffectedGlobalId()
+                        instanceof ValueObjectId)
+                .map(ChangeInner::new)
+                .collect(groupingBy(ChangeInner::getId, groupingBy(ChangeInner::getGroup, mapping(
+                        this::mapChangeInnerToDTO,
+                        toList()
+                ))))
+                .entrySet()
+                .stream()
+                .map(entry -> {
+                    final ChangeDTOId key = entry.getKey();
+                    return new ChangesDTO(key.getId(), key.getDate(), key.getAuthor(), entry.getValue());
+                })
+                .sorted(comparing(ChangesDTO::getDate).reversed())
+                .collect(toList()));
+    }
+
+    private ChangeDTO mapChangeInnerToDTO(final ChangeInner changeInner) {
+        return new ChangeDTO(changeInner.getProperty(), changeInner.getOldValue(), changeInner.getNewValue(),
+                changeInner.getAdded(), changeInner.getRemoved());
     }
 
 
@@ -118,7 +115,7 @@ public class EmergencyDataService {
         private List<String> added;
         private List<String> removed;
 
-        public ChangeInner(final Change cambio) {
+        private ChangeInner(final Change cambio) {
             final CommitMetadata commitMetadata = cambio.getCommitMetadata().get();
             this.id = new ChangeDTOId(commitMetadata.getId().value(),
                     commitMetadata.getCommitDate(), commitMetadata.getAuthor());
