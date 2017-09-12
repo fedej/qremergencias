@@ -3,6 +3,7 @@ package ar.com.utn.proyecto.qremergencias.ws.controller;
 import ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.MedicalRecordDTO;
+import ar.com.utn.proyecto.qremergencias.ws.service.GridFsService;
 import ar.com.utn.proyecto.qremergencias.ws.service.MedicalRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,10 +46,13 @@ public class MedicalRecordController {
     private UriTemplate fileUriTemplate;
 
     private final MedicalRecordService medicalRecordService;
+    private final GridFsService gridFsService;
 
     @Autowired
-    public MedicalRecordController(final MedicalRecordService medicalRecordService) {
+    public MedicalRecordController(final MedicalRecordService medicalRecordService,
+                                   final GridFsService gridFsService) {
         this.medicalRecordService = medicalRecordService;
+        this.gridFsService = gridFsService;
     }
 
     @GetMapping
@@ -58,7 +62,7 @@ public class MedicalRecordController {
 
         final Page<MedicalRecord> domainPage = medicalRecordService.findByUser(user, page);
         return domainPage.map(m -> new MedicalRecordDTO(m, fileUriTemplate,
-                medicalRecordService.findGridFSFile()));
+                gridFsService.findGridFSFile()));
     }
 
     @GetMapping("/user")
@@ -68,7 +72,7 @@ public class MedicalRecordController {
 
         final Page<MedicalRecord> domainPage = medicalRecordService.findByUsername(username, page);
         return domainPage.map(m -> new MedicalRecordDTO(m, fileUriTemplate,
-                medicalRecordService.findGridFSFile()));
+                gridFsService.findGridFSFile()));
     }
 
     @GetMapping("/{id}")
@@ -76,7 +80,7 @@ public class MedicalRecordController {
     @PreAuthorize("isFullyAuthenticated()")
     public MedicalRecordDTO findById(@PathVariable final String id) {
         return new MedicalRecordDTO(medicalRecordService.findById(id), fileUriTemplate,
-                medicalRecordService.findGridFSFile());
+                gridFsService.findGridFSFile());
     }
 
     @GetMapping("/file/{fileId}")
@@ -84,7 +88,7 @@ public class MedicalRecordController {
     @PreAuthorize("isFullyAuthenticated()")
     @ApiIgnore("URL is handled by the backend")
     public Resource findFileById(@PathVariable final String fileId) {
-        return medicalRecordService.findFileById(fileId);
+        return gridFsService.findFileById(fileId);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

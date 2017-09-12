@@ -6,12 +6,14 @@ import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.changelog.ChangesDTO;
 import ar.com.utn.proyecto.qremergencias.ws.service.EmergencyDataService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,5 +54,18 @@ public class EmergencyDataController {
     public Page<ChangesDTO> getChanges(@AuthenticationPrincipal final UserFront user) {
         return service.getEmergencyDataChanges(user);
     }
+
+    @GetMapping("/qr")
+    @PreAuthorize("hasRole('PACIENTE')")
+    public Resource getQR(@AuthenticationPrincipal final UserFront user) {
+        return service.getUserQR(user);
+    }
+
+    @PostMapping("/qr")
+    @PreAuthorize("hasRole('PACIENTE')")
+    public void createQR(@AuthenticationPrincipal final UserFront user) {
+        service.createQR(user);
+    }
+
 
 }

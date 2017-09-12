@@ -21,4 +21,5 @@ public class UserFront extends User {
     private String idNumber;
     private char sex;
     private List<UserEmergencyContact> contacts = new ArrayList<>();
+    private String qr;
 }
