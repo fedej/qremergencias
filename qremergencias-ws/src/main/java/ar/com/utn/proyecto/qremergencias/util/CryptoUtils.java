@@ -1,66 +1,85 @@
 package ar.com.utn.proyecto.qremergencias.util;
 
 import com.google.common.io.ByteStreams;
-import org.springframework.core.io.Resource;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.KeyFactory;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 
 public final class CryptoUtils {
 
-    private static final Cipher CIPHER;
+    private static final String CHARSET_NAME = "ISO-8859-1";
+    private static final IvParameterSpec IV_PARAMETER_SPEC;
 
     static {
         try {
-            CIPHER = Cipher.getInstance("RSA");
-        } catch (final NoSuchAlgorithmException | NoSuchPaddingException e) {
+            IV_PARAMETER_SPEC = new IvParameterSpec("4e5Wa71fYoT7MFEX".getBytes(CHARSET_NAME));
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
 
+    private static Cipher ENCRYPTING_CIPHER;
+    private static Cipher DECRYPTING_CIPHER;
+
+    private static Cipher initCipher(final int mode) {
+        try {
+            final Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            final InputStream in = Thread.currentThread()
+                    .getContextClassLoader().getResourceAsStream("keyPair/privateKey");
+            final MessageDigest md = MessageDigest.getInstance("MD5");
+            final SecretKeySpec key = new SecretKeySpec(md.digest(ByteStreams.toByteArray(in)), "AES");
+            cipher.init(mode, key, IV_PARAMETER_SPEC);
+            return cipher;
+        } catch (final NoSuchAlgorithmException | NoSuchPaddingException
+                | InvalidKeyException | IOException | InvalidAlgorithmParameterException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void initDecryptingCipher() {
+        DECRYPTING_CIPHER = initCipher(Cipher.DECRYPT_MODE);
+    }
+
+    private static void initEncryptingCipher() {
+        ENCRYPTING_CIPHER = initCipher(Cipher.ENCRYPT_MODE);
+    }
+
     private CryptoUtils() {
-
     }
 
-    public static String encryptText(final byte[] msg, final PrivateKey key)
+    public static String encryptText(final byte[] msg)
             throws NoSuchAlgorithmException, NoSuchPaddingException,
-            UnsupportedEncodingException, IllegalBlockSizeException,
-            BadPaddingException, InvalidKeyException {
-        CIPHER.init(Cipher.ENCRYPT_MODE, key);
-        return new String(Base64.getEncoder().encode(CIPHER.doFinal(msg)), Charset.forName("UTF-8"));
+            IOException, IllegalBlockSizeException,
+            BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+
+        if (ENCRYPTING_CIPHER == null) {
+            initEncryptingCipher();
+        }
+
+        return new String(ENCRYPTING_CIPHER.doFinal(msg), CHARSET_NAME);
     }
 
-    public static String decryptText(final String msg, final PublicKey key)
-            throws InvalidKeyException, UnsupportedEncodingException,
-            IllegalBlockSizeException, BadPaddingException {
-        CIPHER.init(Cipher.DECRYPT_MODE, key);
-        return new String(CIPHER.doFinal(Base64.getDecoder().decode(msg)), "UTF-8");
-    }
+    public static byte[] decryptText(final String msg)
+            throws InvalidKeyException, IOException,
+            IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException,
+            InvalidAlgorithmParameterException {
 
-    public static PrivateKey getPrivate(final Resource file) throws IOException,
-            NoSuchAlgorithmException, InvalidKeySpecException {
-        final byte[] keyBytes = ByteStreams.toByteArray(file.getInputStream());
-        return KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(keyBytes));
-    }
+        if (DECRYPTING_CIPHER == null) {
+            initDecryptingCipher();
+        }
 
-    public static PublicKey getPublic(final Resource file) throws IOException,
-            NoSuchAlgorithmException, InvalidKeySpecException {
-        final byte[] keyBytes = ByteStreams.toByteArray(file.getInputStream());
-        return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(keyBytes));
+        return DECRYPTING_CIPHER.doFinal(msg.getBytes(CHARSET_NAME));
     }
 
 }

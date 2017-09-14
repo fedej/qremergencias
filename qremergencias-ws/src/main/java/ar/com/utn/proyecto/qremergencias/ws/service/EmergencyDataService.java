@@ -27,7 +27,6 @@ import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
@@ -36,18 +35,15 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Collections;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
-import static ar.com.utn.proyecto.qremergencias.util.CryptoUtils.getPrivate;
 import static ar.com.utn.proyecto.qremergencias.ws.service.DomainMappers.EMERGENCY_DATA_MAPPER;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
@@ -60,14 +56,12 @@ public class EmergencyDataService {
     private static final int WIDTH = 340;
     private static final int HEIGHT = 340;
     private static final int WHITE = 255 << 16 | 255 << 8 | 255;
+    private static final String CHARSET_NAME = "ISO-8859-1";
 
     private final EmergencyDataRepository repository;
     private final UserFrontRepository userFrontRepository;
     private final Javers javers;
     private final GridFsService gridFsService;
-
-    @Autowired
-    private ResourceLoader resourceLoader;
 
     @Autowired
     public EmergencyDataService(final EmergencyDataRepository repository,
@@ -153,14 +147,12 @@ public class EmergencyDataService {
                         .stream()
                         .mapToInt(s -> s.length() + 1).sum();
 
-
                 // Byte 0 a 2 Tipo de sangre
                 final String bloodType = general.getBloodType();
                 final byte[] message = new byte[4 + allergiesLength];
                 message[0] = (byte) bloodType.charAt(0);
                 message[1] = (byte) bloodType.charAt(1);
                 message[2] = bloodType.length() > 2 ? (byte) bloodType.charAt(2) : 0;
-
 
                 if (general.isOrganDonor()) {
                     // Byte 3 Donante de organos
@@ -169,17 +161,17 @@ public class EmergencyDataService {
 
                 int bufferPosition = 4;
                 for (final String allergy : general.getAllergies()) {
-                    final byte[] stringBytes = allergy.getBytes(Charset.forName("UTF-8"));
+                    final byte[] stringBytes = allergy.getBytes(CHARSET_NAME);
                     System.arraycopy(stringBytes, 0, message, bufferPosition, stringBytes.length);
                     bufferPosition += stringBytes.length;  // advance index
                     message[bufferPosition] = '\0';
                     bufferPosition++;
                 }
 
-                final PrivateKey privateKey = getPrivate(resourceLoader.getResource("classpath://keyPair/privateKey"));
-                final String encrypted = CryptoUtils.encryptText(message, privateKey);
+                final String encrypted = CryptoUtils.encryptText(message);
                 final Map<EncodeHintType, Object> hints = new ConcurrentHashMap<>(2);
                 hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
+                hints.put(EncodeHintType.CHARACTER_SET, CHARSET_NAME);
                 hints.put(EncodeHintType.MARGIN, 0);
                 final BitMatrix bitMatrix = new QRCodeWriter()
                         .encode(encrypted, BarcodeFormat.QR_CODE, WIDTH, HEIGHT, hints);
@@ -193,8 +185,8 @@ public class EmergencyDataService {
                 user.setQr(id.toString());
                 userFrontRepository.save(user);
             } catch (IOException | NoSuchAlgorithmException | WriterException | InvalidKeyException
-                    | BadPaddingException | NoSuchPaddingException | InvalidKeySpecException
-                    | IllegalBlockSizeException e) {
+                    | InvalidAlgorithmParameterException | BadPaddingException
+                    | NoSuchPaddingException | IllegalBlockSizeException e) {
                 throw new RuntimeException(e);
             }
         }
