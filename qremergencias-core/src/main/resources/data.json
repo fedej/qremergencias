@@ -31,6 +31,17 @@
                     "ROLE_PACIENTE",
                     "ROLE_USER"
                   ]
+                ],
+                "contacts": [
+                  "java.util.List",
+                  [
+                    {
+                      "@class": "ar.com.utn.proyecto.qremergencias.core.domain.UserEmergencyContact",
+                      "firstName": "Federico",
+                      "lastName": "Jaite",
+                      "phoneNumber": "1533323333"
+                    }
+                  ]
                 ]
               }
             },

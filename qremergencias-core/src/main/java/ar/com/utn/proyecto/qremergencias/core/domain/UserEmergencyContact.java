@@ -1,20 +1,21 @@
 package ar.com.utn.proyecto.qremergencias.core.domain;
 
-
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import java.io.Serializable;
 
 @Data
+@NoArgsConstructor
 public class UserEmergencyContact implements Serializable {
 
     @NotEmpty
-    private final String firstName;
+    private String firstName;
     @NotEmpty
-    private final String lastName;
+    private String lastName;
     @NotEmpty
-    private final String phoneNumber;
+    private String phoneNumber;
 
     public UserEmergencyContact(final String firstName,
                                 final String lastName,

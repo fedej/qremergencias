@@ -1,8 +1,10 @@
 package ar.com.utn.proyecto.qremergencias.ws.service;
 
+import ar.com.utn.proyecto.qremergencias.core.domain.UserEmergencyContact;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.GeneralData;
+import ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.changelog.ChangeDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.changelog.ChangeDTOId;
@@ -38,6 +40,7 @@ import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -134,7 +137,7 @@ public class EmergencyDataService {
         return gridFsService.findFileById(user.getQr());
     }
 
-    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    @SuppressWarnings("PMD")
     public void createQR(final UserFront user) {
         final Optional<EmergencyData> emergencyDataOptional = findByUser(user.getUsername());
 
@@ -142,35 +145,83 @@ public class EmergencyDataService {
             try {
                 final EmergencyData emergencyData = emergencyDataOptional.get();
                 final GeneralData general = emergencyData.getGeneral();
+                final List<String> patos = emergencyData.getPathologies()
+                        .stream().map(Pathology::getDescription).collect(toList());
 
-                final Integer allergiesLength = general.getAllergies()
-                        .stream()
-                        .mapToInt(s -> s.length() + 1).sum();
+                final Integer contactsLength = user.getContacts() != null && !user.getContacts().isEmpty()
+                        ? user.getContacts().get(0).getFirstName().length()
+                        + user.getContacts().get(0).getPhoneNumber().length() + 2
+                        : 0;
 
                 // Byte 0 a 2 Tipo de sangre
                 final String bloodType = general.getBloodType();
-                final byte[] message = new byte[4 + allergiesLength];
+                final StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < 64; i++) {
+                    sb.append(i);
+                }
+                final String url = "https://www.google.com.ar/search?q=" + sb.toString();
+
+                final byte[] message = new byte[7 + url.length() + 1 + contactsLength];
                 message[0] = (byte) bloodType.charAt(0);
                 message[1] = (byte) bloodType.charAt(1);
                 message[2] = bloodType.length() > 2 ? (byte) bloodType.charAt(2) : 0;
 
-                if (general.isOrganDonor()) {
-                    // Byte 3 Donante de organos
-                    message[3] = 1;
+                short year = (short) user.getBirthdate().getYear();
+                message[3] = (byte)(year & 0xff);
+                message[4] = (byte)((year >> 8) & 0xff);
+                message[5] = (byte) user.getSex();
+
+                // Byte 6 Alergias y patologias comunes
+                BitSet bitSet = BitSet.valueOf(message);
+                if (general.getAllergies().contains("Penicilina")) {
+                    bitSet.set(48);
+                }
+                if (general.getAllergies().contains("Insulina")) {
+                    bitSet.set(49);
+                }
+                if (general.getAllergies().contains("Rayos X con yodo")) {
+                    bitSet.set(50);
+                }
+                if (general.getAllergies().contains("Sulfamidas")) {
+                    bitSet.set(51);
+                }
+                if (patos.contains("Hipertension")) {
+                    bitSet.set(52);
+                }
+                if (patos.contains("Asma")) {
+                    bitSet.set(53);
+                }
+                if (patos.contains("Antecedentes Oncologicos")) {
+                    bitSet.set(54);
+                }
+                if (patos.contains("Insuficiencia Suprarrenal")) {
+                    bitSet.set(55);
                 }
 
-                int bufferPosition = 4;
-                for (final String allergy : general.getAllergies()) {
-                    final byte[] stringBytes = allergy.getBytes(CHARSET_NAME);
-                    System.arraycopy(stringBytes, 0, message, bufferPosition, stringBytes.length);
-                    bufferPosition += stringBytes.length;  // advance index
+                final byte[] urlBytes = url.getBytes(CHARSET_NAME);
+                int bufferPosition = 7;
+                System.arraycopy(urlBytes, 0, message, bufferPosition, urlBytes.length);
+                bufferPosition += urlBytes.length;
+                message[bufferPosition] = '\0';
+                bufferPosition++;
+
+                if (user.getContacts() != null && !user.getContacts().isEmpty()) {
+                    UserEmergencyContact contact = user.getContacts().get(0);
+                    final byte[] nameBytes = contact.getFirstName().getBytes(CHARSET_NAME);
+                    System.arraycopy(nameBytes, 0, message, bufferPosition, nameBytes.length);
+                    bufferPosition += nameBytes.length;
                     message[bufferPosition] = '\0';
                     bufferPosition++;
+
+                    final byte[] phoneBytes = contact.getPhoneNumber().getBytes(CHARSET_NAME);
+                    System.arraycopy(phoneBytes, 0, message, bufferPosition, phoneBytes.length);
+                    bufferPosition += phoneBytes.length;
+                    message[bufferPosition] = '\0';
                 }
 
                 final String encrypted = CryptoUtils.encryptText(message);
                 final Map<EncodeHintType, Object> hints = new ConcurrentHashMap<>(2);
-                hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
+                hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
                 hints.put(EncodeHintType.CHARACTER_SET, CHARSET_NAME);
                 hints.put(EncodeHintType.MARGIN, 0);
                 final BitMatrix bitMatrix = new QRCodeWriter()
