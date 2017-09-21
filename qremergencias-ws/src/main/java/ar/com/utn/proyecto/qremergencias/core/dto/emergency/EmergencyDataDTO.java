@@ -20,6 +20,7 @@ public class EmergencyDataDTO {
     private static final Mapper<EmergencyData, EmergencyDataDTO> EMERGENCY_DATA_DTO_MAPPER =
             Mapper.mapping(EmergencyData.class, EmergencyDataDTO.class)
                     .constructor((Supplier<EmergencyDataDTO>) EmergencyDataDTO::new)
+                    .fields(EmergencyData::getUuid, EmergencyDataDTO::setUuid)
                     .fields(EmergencyData::getGeneral, EmergencyDataDTO::setGeneral, GeneralDataDTO.GENERAL_DATA_DTO_MAPPER)
                     .fields(EmergencyData::getSurgeries, EmergencyDataDTO::setSurgeries, listConverter(HospitalizationDTO.HOSPITALIZATION_DTO_MAPPER))
                     .fields(EmergencyData::getHospitalizations, EmergencyDataDTO::setHospitalizations, listConverter(HospitalizationDTO.HOSPITALIZATION_DTO_MAPPER))
@@ -33,6 +34,7 @@ public class EmergencyDataDTO {
     private List<MedicationDTO> medications;
     private List<PathologyDTO> pathologies;
     private LocalDateTime lastMedicalCheck;
+    private String uuid;
 
     public EmergencyDataDTO(final EmergencyData emergencyData) {
         EMERGENCY_DATA_DTO_MAPPER.apply(emergencyData, this);
