@@ -17,6 +17,7 @@ dependencies {
     compile project(':qremergencias-core')
 
     compile group: 'com.google.zxing', name: 'core', version: '3.3.0'
+    compile 'com.google.apis:google-api-services-urlshortener:v1-rev48-1.22.0'
 
     if (profiles =~ ".*local.*") {
         compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'

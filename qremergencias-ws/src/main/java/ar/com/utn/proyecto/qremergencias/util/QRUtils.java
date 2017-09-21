@@ -1,0 +1,188 @@
+package ar.com.utn.proyecto.qremergencias.util;
+
+import ar.com.utn.proyecto.qremergencias.core.domain.UserEmergencyContact;
+import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
+import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
+import ar.com.utn.proyecto.qremergencias.core.domain.emergency.GeneralData;
+import ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.urlshortener.Urlshortener;
+import com.google.api.services.urlshortener.UrlshortenerRequestInitializer;
+import com.google.api.services.urlshortener.model.Url;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.security.GeneralSecurityException;
+import java.util.BitSet;
+import java.util.List;
+
+import static com.google.api.client.googleapis.javanet.GoogleNetHttpTransport.newTrustedTransport;
+import static java.util.stream.Collectors.toList;
+
+public final class QRUtils {
+
+    private static final String KEY = "AIzaSyAZgbBwwNH140oC8SfJkKhDU68Bdi1NxYk";
+    private static final String CHARSET_NAME = "ISO-8859-1";
+
+    private QRUtils() {
+
+    }
+
+    private static Urlshortener newUrlshortener() throws GeneralSecurityException, IOException {
+        final Urlshortener.Builder builder =
+                new Urlshortener.Builder(newTrustedTransport(), new JacksonFactory(), null);
+        builder.setUrlshortenerRequestInitializer(new UrlshortenerRequestInitializer(KEY));
+        return builder.build();
+    }
+
+    private static byte getSex(final char sex) {
+        switch (sex) {
+            case 'M':
+                return 0b00;
+            case 'F':
+                return 0b01;
+            default:
+                return 0b10;
+        }
+    }
+
+    private static byte getBlood(final String blood) {
+        switch (blood) {
+            case "0-":
+                return 0b000;
+            case "0+":
+                return 0b001;
+            case "A-":
+                return 0b010;
+            case "A+":
+                return 0b011;
+            case "B-":
+                return 0b100;
+            case "B+":
+                return 0b101;
+            case "AB-":
+                return 0b110;
+            case "AB+":
+                return 0b111;
+            default:
+                return 0;
+        }
+    }
+
+    @SuppressWarnings("PMD")
+    // TODO BORRAR
+    public static void main(String[] args) {
+
+        final ByteBuffer yearSexBloodBuffer = ByteBuffer.allocate(2).putShort((short) 1942);
+        byte sexo = QRUtils.getSex('M');
+        int sex = sexo << 3;
+        byte sangre = QRUtils.getBlood("B+");
+        int blood = sangre << 5;
+
+        System.out.println("Sexo Antes: " + sexo);
+        System.out.println("Sangre Antes: " + sangre);
+
+        yearSexBloodBuffer.put(0, (byte) (yearSexBloodBuffer.get(0) | sex | blood));
+        yearSexBloodBuffer.rewind();
+
+        sexo = (byte) ((yearSexBloodBuffer.get(0) & 0b00011000) >> 3);
+        sangre = (byte) ((yearSexBloodBuffer.get(0) & 0b11100000) >> 5);
+        System.out.println("Sexo Despues: " + sexo);
+        System.out.println("Sangre Despues: " + sangre);
+        short num = (short) (yearSexBloodBuffer.getShort() & 0b0000011111111111);
+        System.out.println(num);
+
+
+    }
+
+    @SuppressWarnings("PMD")
+    public static byte[] encode(final EmergencyData emergencyData) throws UnsupportedEncodingException {
+        final GeneralData general = emergencyData.getGeneral();
+        final List<String> patos = emergencyData.getPathologies()
+                .stream().map(Pathology::getDescription).collect(toList());
+
+        final UserFront user = emergencyData.getUser();
+
+        // Byte 0 y 1 Anio de nacimiento, sexo y sangre
+        final ByteBuffer yearSexBloodBuffer = ByteBuffer.allocate(2).putShort((short) user.getBirthdate().getYear());
+        int sex = QRUtils.getSex(user.getSex()) << 3;
+        int blood = QRUtils.getBlood(general.getBloodType()) << 5;
+        yearSexBloodBuffer.put(0, (byte) (yearSexBloodBuffer.get(0) | sex | blood));
+        yearSexBloodBuffer.rewind();
+
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 64; i++) {
+            sb.append(i);
+        }
+        final String url = "https://www.google.com.ar/search?q=" + sb.toString();
+        String mockUrl = "";
+        try {
+            Urlshortener shortener = QRUtils.newUrlshortener();
+            Url toInsert = new Url().setLongUrl(url);
+            Url shorturl = shortener.url().insert(toInsert).execute();
+            mockUrl = shorturl.getId();
+        } catch (final GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+        }
+
+        final byte[] message = new byte[3 + mockUrl.length() + 1];
+        System.arraycopy(yearSexBloodBuffer.array(), 0, message, 0, 2);
+
+        // Byte 2 Alergias y patologias comunes
+        BitSet bitSet = BitSet.valueOf(message);
+        if (general.getAllergies().contains("Penicilina")) {
+            bitSet.set(16);
+        }
+        if (general.getAllergies().contains("Insulina")) {
+            bitSet.set(17);
+        }
+        if (general.getAllergies().contains("Rayos X con yodo")) {
+            bitSet.set(18);
+        }
+        if (general.getAllergies().contains("Sulfamidas")) {
+            bitSet.set(19);
+        }
+        if (patos.contains("Hipertension")) {
+            bitSet.set(20);
+        }
+        if (patos.contains("Asma")) {
+            bitSet.set(21);
+        }
+        if (patos.contains("Antecedentes Oncologicos")) {
+            bitSet.set(22);
+        }
+        if (patos.contains("Insuficiencia Suprarrenal")) {
+            bitSet.set(23);
+        }
+
+
+
+        final byte[] urlBytes = mockUrl.getBytes(CHARSET_NAME);
+        message[3] = (byte) urlBytes.length;
+        System.arraycopy(urlBytes, 0, message, 4, urlBytes.length);
+
+        if (user.getContacts() != null && !user.getContacts().isEmpty()) {
+            UserEmergencyContact contact = user.getContacts().get(0);
+
+            final byte[] nameBytes = contact.getFirstName().getBytes(CHARSET_NAME);
+            final byte[] phoneBytes = contact.getPhoneNumber().getBytes(CHARSET_NAME);
+            byte[] contacts = new byte[nameBytes.length + phoneBytes.length];
+
+            contacts[0] = (byte) nameBytes.length;
+            System.arraycopy(nameBytes, 0, contacts, 1, nameBytes.length);
+
+            contacts[nameBytes.length + 2] = (byte) phoneBytes.length;
+            System.arraycopy(phoneBytes, 0, contacts, nameBytes.length + 3, phoneBytes.length);
+
+            byte[] result = new byte[message.length + contacts.length];
+            System.arraycopy(message, 0, result, 0, message.length);
+            System.arraycopy(contacts, 0, result, message.length + 1, contacts.length);
+            return result;
+        }
+
+
+        return message;
+    }
+
+}
