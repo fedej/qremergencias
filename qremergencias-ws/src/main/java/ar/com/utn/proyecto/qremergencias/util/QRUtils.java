@@ -110,17 +110,17 @@ public final class QRUtils {
 
             final byte[] nameBytes = contact.getFirstName().getBytes(CHARSET_NAME);
             final byte[] phoneBytes = contact.getPhoneNumber().getBytes(CHARSET_NAME);
-            final byte[] contacts = new byte[nameBytes.length + phoneBytes.length];
+            final byte[] contacts = new byte[nameBytes.length + phoneBytes.length + 2];
 
             contacts[0] = (byte) nameBytes.length;
             System.arraycopy(nameBytes, 0, contacts, 1, nameBytes.length);
 
-            contacts[nameBytes.length + 2] = (byte) phoneBytes.length;
-            System.arraycopy(phoneBytes, 0, contacts, nameBytes.length + 3, phoneBytes.length);
+            contacts[nameBytes.length + 1] = (byte) phoneBytes.length;
+            System.arraycopy(phoneBytes, 0, contacts, nameBytes.length + 2, phoneBytes.length);
 
             final byte[] result = new byte[message.length + contacts.length];
             System.arraycopy(message, 0, result, 0, message.length);
-            System.arraycopy(contacts, 0, result, message.length + 1, contacts.length);
+            System.arraycopy(contacts, 0, result, message.length, contacts.length);
             return result;
         }
 

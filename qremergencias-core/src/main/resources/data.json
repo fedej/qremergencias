@@ -139,13 +139,14 @@
               "data": {
                 "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData",
                 "version": 0,
+                "uuid": "7a5a6766-c04e-49d7-ecdb-5e5e5b16f5c3",
                 "general": {
                   "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.GeneralData",
                   "bloodType": "0+",
                   "allergies": [
                     "java.util.List",
                     [
-                      "Estudiar",
+                      "Penicilina",
                       "Pasear"
                     ]
                   ]
@@ -168,7 +169,7 @@
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology",
                       "type":"CLINICAL",
-                      "description":"Infarto",
+                      "description":"Hipertension",
                       "date":"2016-10-10"
                     },
                     {
