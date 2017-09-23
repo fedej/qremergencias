@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.UUID;
 
 import static ar.com.utn.proyecto.qremergencias.ws.service.DomainMappers.EMERGENCY_DATA_MAPPER;
 import static java.util.Comparator.comparing;
@@ -78,6 +79,10 @@ public class EmergencyDataService {
         return repository.findByUser(user);
     }
 
+    public Optional<EmergencyData> findByUuid(final String uuid) {
+        return repository.findByUuid(uuid);
+    }
+
     public void createOrUpdate(final String username, final EmergencyDataDTO emergencyDataDTO) {
         final UserFront user = userFrontRepository.findByUsername(username);
         final Optional<EmergencyData> oldData = repository.findByUser(user);
@@ -86,6 +91,7 @@ public class EmergencyDataService {
             final EmergencyData emergencyData = EMERGENCY_DATA_MAPPER.apply(emergencyDataDTO, oldData.get());
             repository.save(emergencyData);
         } else {
+            emergencyDataDTO.setUuid(UUID.randomUUID().toString());
             final EmergencyData emergencyData = EMERGENCY_DATA_MAPPER.apply(emergencyDataDTO);
             emergencyData.setUser(user);
             repository.save(emergencyData);

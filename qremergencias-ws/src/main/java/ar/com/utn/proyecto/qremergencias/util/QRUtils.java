@@ -5,35 +5,20 @@ import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.GeneralData;
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.services.urlshortener.Urlshortener;
-import com.google.api.services.urlshortener.UrlshortenerRequestInitializer;
-import com.google.api.services.urlshortener.model.Url;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.security.GeneralSecurityException;
 import java.util.BitSet;
 import java.util.List;
 
-import static com.google.api.client.googleapis.javanet.GoogleNetHttpTransport.newTrustedTransport;
 import static java.util.stream.Collectors.toList;
 
 public final class QRUtils {
 
-    private static final String KEY = "AIzaSyAZgbBwwNH140oC8SfJkKhDU68Bdi1NxYk";
     private static final String CHARSET_NAME = "ISO-8859-1";
 
     private QRUtils() {
 
-    }
-
-    private static Urlshortener newUrlshortener() throws GeneralSecurityException, IOException {
-        final Urlshortener.Builder builder =
-                new Urlshortener.Builder(newTrustedTransport(), new JacksonFactory(), null);
-        builder.setUrlshortenerRequestInitializer(new UrlshortenerRequestInitializer(KEY));
-        return builder.build();
     }
 
     private static byte getSex(final char sex) {
@@ -71,32 +56,6 @@ public final class QRUtils {
     }
 
     @SuppressWarnings("PMD")
-    // TODO BORRAR
-    public static void main(String[] args) {
-
-        final ByteBuffer yearSexBloodBuffer = ByteBuffer.allocate(2).putShort((short) 1942);
-        byte sexo = QRUtils.getSex('M');
-        int sex = sexo << 3;
-        byte sangre = QRUtils.getBlood("B+");
-        int blood = sangre << 5;
-
-        System.out.println("Sexo Antes: " + sexo);
-        System.out.println("Sangre Antes: " + sangre);
-
-        yearSexBloodBuffer.put(0, (byte) (yearSexBloodBuffer.get(0) | sex | blood));
-        yearSexBloodBuffer.rewind();
-
-        sexo = (byte) ((yearSexBloodBuffer.get(0) & 0b00011000) >> 3);
-        sangre = (byte) ((yearSexBloodBuffer.get(0) & 0b11100000) >> 5);
-        System.out.println("Sexo Despues: " + sexo);
-        System.out.println("Sangre Despues: " + sangre);
-        short num = (short) (yearSexBloodBuffer.getShort() & 0b0000011111111111);
-        System.out.println(num);
-
-
-    }
-
-    @SuppressWarnings("PMD")
     public static byte[] encode(final EmergencyData emergencyData) throws UnsupportedEncodingException {
         final GeneralData general = emergencyData.getGeneral();
         final List<String> patos = emergencyData.getPathologies()
@@ -111,26 +70,12 @@ public final class QRUtils {
         yearSexBloodBuffer.put(0, (byte) (yearSexBloodBuffer.get(0) | sex | blood));
         yearSexBloodBuffer.rewind();
 
-        final StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 64; i++) {
-            sb.append(i);
-        }
-        final String url = "https://www.google.com.ar/search?q=" + sb.toString();
-        String mockUrl = "";
-        try {
-            Urlshortener shortener = QRUtils.newUrlshortener();
-            Url toInsert = new Url().setLongUrl(url);
-            Url shorturl = shortener.url().insert(toInsert).execute();
-            mockUrl = shorturl.getId();
-        } catch (final GeneralSecurityException | IOException e) {
-            e.printStackTrace();
-        }
-
-        final byte[] message = new byte[3 + mockUrl.length() + 1];
+        final String url = emergencyData.getUuid();
+        final byte[] message = new byte[3 + url.length() + 1];
         System.arraycopy(yearSexBloodBuffer.array(), 0, message, 0, 2);
 
         // Byte 2 Alergias y patologias comunes
-        BitSet bitSet = BitSet.valueOf(message);
+        final BitSet bitSet = BitSet.valueOf(message);
         if (general.getAllergies().contains("Penicilina")) {
             bitSet.set(16);
         }
@@ -156,9 +101,7 @@ public final class QRUtils {
             bitSet.set(23);
         }
 
-
-
-        final byte[] urlBytes = mockUrl.getBytes(CHARSET_NAME);
+        final byte[] urlBytes = url.getBytes(CHARSET_NAME);
         message[3] = (byte) urlBytes.length;
         System.arraycopy(urlBytes, 0, message, 4, urlBytes.length);
 
@@ -167,7 +110,7 @@ public final class QRUtils {
 
             final byte[] nameBytes = contact.getFirstName().getBytes(CHARSET_NAME);
             final byte[] phoneBytes = contact.getPhoneNumber().getBytes(CHARSET_NAME);
-            byte[] contacts = new byte[nameBytes.length + phoneBytes.length];
+            final byte[] contacts = new byte[nameBytes.length + phoneBytes.length];
 
             contacts[0] = (byte) nameBytes.length;
             System.arraycopy(nameBytes, 0, contacts, 1, nameBytes.length);
@@ -175,7 +118,7 @@ public final class QRUtils {
             contacts[nameBytes.length + 2] = (byte) phoneBytes.length;
             System.arraycopy(phoneBytes, 0, contacts, nameBytes.length + 3, phoneBytes.length);
 
-            byte[] result = new byte[message.length + contacts.length];
+            final byte[] result = new byte[message.length + contacts.length];
             System.arraycopy(message, 0, result, 0, message.length);
             System.arraycopy(contacts, 0, result, message.length + 1, contacts.length);
             return result;

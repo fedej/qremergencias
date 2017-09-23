@@ -51,6 +51,7 @@ class DomainMappers {
     public static final Mapper<EmergencyDataDTO, EmergencyData> EMERGENCY_DATA_MAPPER =
             Mapper.mapping(EmergencyDataDTO.class, EmergencyData.class)
                     .constructor(EmergencyData::new)
+                    .fields(EmergencyDataDTO::getUuid, EmergencyData::setUuid)
                     .fields(EmergencyDataDTO::getGeneral, EmergencyData::setGeneral, GENERAL_DATA_MAPPER)
                     .fields(EmergencyDataDTO::getHospitalizations, EmergencyData::setHospitalizations,
                             listConverter(HOSPITALIZATION_MAPPER))
