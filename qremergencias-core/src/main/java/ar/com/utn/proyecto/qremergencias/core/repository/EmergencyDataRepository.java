@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface EmergencyDataRepository extends MongoRepository<EmergencyData, String> {
 
     Optional<EmergencyData> findByUser(UserFront user);
+
+    Optional<EmergencyData> findByUuid(String uuid);
 }

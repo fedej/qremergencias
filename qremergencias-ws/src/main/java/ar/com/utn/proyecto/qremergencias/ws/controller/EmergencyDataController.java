@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,6 +52,12 @@ public class EmergencyDataController {
     @PreAuthorize("hasRole('PACIENTE')")
     public Page<ChangesDTO> getChanges(@AuthenticationPrincipal final UserFront user) {
         return service.getEmergencyDataChanges(user);
+    }
+
+    @GetMapping("/{uuid}")
+    public EmergencyDataDTO getEmergencyDataByUuid(@PathVariable final String uuid) {
+        final Optional<EmergencyData> emergencyData = service.findByUuid(uuid);
+        return new EmergencyDataDTO(emergencyData.orElse(new EmergencyData()));
     }
 
 }

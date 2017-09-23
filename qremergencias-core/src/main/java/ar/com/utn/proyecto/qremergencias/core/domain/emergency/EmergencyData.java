@@ -26,6 +26,8 @@ public class EmergencyData {
     private List<Pathology> pathologies;
     private LocalDate lastMedicalCheck;
 
+    private String uuid;
+
     @DBRef
     private UserFront user;
 
