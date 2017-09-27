@@ -14,5 +14,6 @@ public class LoginUserDTO implements Serializable {
     private final String name;
     private final String lastName;
     private final List<String> roles;
+    private final String email;
 
 }

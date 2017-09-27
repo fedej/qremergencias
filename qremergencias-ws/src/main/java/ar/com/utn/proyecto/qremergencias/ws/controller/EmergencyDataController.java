@@ -63,15 +63,14 @@ public class EmergencyDataController {
     }
 
     @GetMapping("/qr")
-    @PreAuthorize("hasRole('PACIENTE')")
-    public Resource getQR(@AuthenticationPrincipal final UserFront user) {
+    public Resource getQR(@RequestParam(name = "user") final String user) {
         return service.getUserQR(user);
     }
 
     @PostMapping("/qr")
     @PreAuthorize("hasRole('PACIENTE')")
     public void createQR(@AuthenticationPrincipal final UserFront user) {
-        service.createQR(user);
+        service.createQR(user.getUsername());
     }
 
 

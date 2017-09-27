@@ -136,13 +136,14 @@ public class EmergencyDataService {
                 changeInner.getAdded(), changeInner.getRemoved());
     }
 
-    public Resource getUserQR(final UserFront user) {
-        return gridFsService.findFileById(user.getQr());
+    public Resource getUserQR(final String user) {
+        final UserFront userFront = userFrontRepository.findByUsername(user);
+        return gridFsService.findFileById(userFront.getQr());
     }
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-    public void createQR(final UserFront user) {
-        final Optional<EmergencyData> emergencyDataOptional = findByUser(user.getUsername());
+    public void createQR(final String user) {
+        final Optional<EmergencyData> emergencyDataOptional = findByUser(user);
 
         if (emergencyDataOptional.isPresent()) {
             try {
@@ -161,9 +162,11 @@ public class EmergencyDataService {
                         image.setRGB(i, j, bitMatrix.get(i, j) ? 0 : WHITE); // set pixel one by one
                     }
                 }
-                final Object id = gridFsService.saveQRImage(user, image);
-                user.setQr(id.toString());
-                userFrontRepository.save(user);
+
+                final UserFront userFront = userFrontRepository.findByUsername(user);
+                final Object id = gridFsService.saveQRImage(userFront, image);
+                userFront.setQr(id.toString());
+                userFrontRepository.save(userFront);
             } catch (IOException | NoSuchAlgorithmException | WriterException | InvalidKeyException
                     | InvalidAlgorithmParameterException | BadPaddingException
                     | NoSuchPaddingException | IllegalBlockSizeException e) {

@@ -80,7 +80,7 @@ public class AuthHandler implements AuthenticationSuccessHandler, Authentication
         final UserFront user = (UserFront) auth.getPrincipal();
 
         final LoginUserDTO dto =
-                new LoginUserDTO(user.getName(), user.getLastname(), user.getRoles());
+                new LoginUserDTO(user.getName(), user.getLastname(), user.getRoles(), user.getEmail());
 
         resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
         resp.getWriter().print(mapper.writeValueAsString(dto));
