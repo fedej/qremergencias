@@ -376,10 +376,11 @@
                 },
                 "type": {
                     "enum": [
-                        "ANATOMICAL",
-                        "CLINICAL",
-                        "MOLECULAR",
-                        "ORAL"
+                        "ASTHMA",
+                        "HYPERTENSION",
+                        "ONCOLOGICAL_BACKGROUND",
+                        "RENAL_INSUFFICIENCY",
+                        "OTHER"
                     ],
                     "type": "string"
                 }

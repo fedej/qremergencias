@@ -10,7 +10,6 @@ public class Pathology {
 
     @NotNull
     private String type;
-    @NotNull
     private String description;
     @NotNull
     private LocalDate date;

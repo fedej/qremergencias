@@ -168,13 +168,12 @@
                   [
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology",
-                      "type":"CLINICAL",
-                      "description":"Hipertension",
+                      "type":"ASTHMA",
                       "date":"2016-10-10"
                     },
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology",
-                      "type":"MOLECULAR",
+                      "type":"OTHER",
                       "description":"ADN",
                       "date":"2015-07-10"
                     }

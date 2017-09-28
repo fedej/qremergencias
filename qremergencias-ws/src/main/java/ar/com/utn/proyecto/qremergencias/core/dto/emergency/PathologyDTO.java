@@ -24,10 +24,9 @@ public class PathologyDTO {
     private Type type;
 
     public enum Type {
-        ANATOMICAL, CLINICAL, MOLECULAR, ORAL
+        ASTHMA, HYPERTENSION, ONCOLOGICAL_BACKGROUND, RENAL_INSUFFICIENCY, OTHER
     }
 
-    @NotNull
     private String description;
 
     @NotNull
