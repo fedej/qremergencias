@@ -31,7 +31,7 @@ public class HospitalizationDTO {
     private String reason;
 
     public enum Type {
-        SURGERY, ADMISSION
+        cirugia, admision
     }
 
 }

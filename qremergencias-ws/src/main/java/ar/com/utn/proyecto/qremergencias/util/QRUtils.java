@@ -8,6 +8,7 @@ import ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import static java.util.stream.Collectors.toList;
 public final class QRUtils {
 
     private static final String CHARSET_NAME = "ISO-8859-1";
+    public static final String TIPO_OTRO = "otro";
 
     private QRUtils() {
 
@@ -58,8 +60,14 @@ public final class QRUtils {
     @SuppressWarnings("PMD")
     public static byte[] encode(final EmergencyData emergencyData) throws UnsupportedEncodingException {
         final GeneralData general = emergencyData.getGeneral();
-        final List<String> patos = emergencyData.getPathologies()
-                .stream().map(Pathology::getDescription).collect(toList());
+        final List<String> patos= new ArrayList<>();
+        for (Pathology patho: emergencyData.getPathologies()) {
+            if(patho.getType().equals(TIPO_OTRO)){
+                patos.add(patho.getDescription());
+            }else{
+                patos.add(patho.getType());
+            }
+        }
 
         final UserFront user = emergencyData.getUser();
 
@@ -75,31 +83,34 @@ public final class QRUtils {
         System.arraycopy(yearSexBloodBuffer.array(), 0, message, 0, 2);
 
         // Byte 2 Alergias y patologias comunes
-        final BitSet bitSet = BitSet.valueOf(message);
-        if (general.getAllergies().contains("Penicilina")) {
-            bitSet.set(16);
+        final BitSet bitSet = new BitSet();
+        if (general.getAllergies().contains("penicilina")) {
+            bitSet.set(0);
         }
-        if (general.getAllergies().contains("Insulina")) {
-            bitSet.set(17);
+        if (general.getAllergies().contains("insulina")) {
+            bitSet.set(1);
         }
-        if (general.getAllergies().contains("Rayos X con yodo")) {
-            bitSet.set(18);
+        if (general.getAllergies().contains("rayos_x_con_yodo")) {
+            bitSet.set(2);
         }
-        if (general.getAllergies().contains("Sulfamidas")) {
-            bitSet.set(19);
+        if (general.getAllergies().contains("sulfamidas")) {
+            bitSet.set(3);
         }
-        if (patos.contains("Hipertension")) {
-            bitSet.set(20);
+        if (patos.contains("hipertension")) {
+            bitSet.set(4);
         }
-        if (patos.contains("Asma")) {
-            bitSet.set(21);
+        if (patos.contains("asma")) {
+            bitSet.set(5);
         }
-        if (patos.contains("Antecedentes Oncologicos")) {
-            bitSet.set(22);
+        if (patos.contains("antecedentes_oncologicos")) {
+            bitSet.set(6);
         }
-        if (patos.contains("Insuficiencia Suprarrenal")) {
-            bitSet.set(23);
+        if (patos.contains("insuficiencia_suprarrenal")) {
+            bitSet.set(7);
         }
+        final ByteBuffer allergiesAndPathosBuffer = ByteBuffer.allocate(1).put(bitSet.toByteArray());
+        System.arraycopy(allergiesAndPathosBuffer.array(), 0, message, 2, 1);
+
 
         final byte[] urlBytes = url.getBytes(CHARSET_NAME);
         message[3] = (byte) urlBytes.length;
