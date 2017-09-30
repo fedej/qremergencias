@@ -24,7 +24,7 @@ public class PathologyDTO {
     private Type type;
 
     public enum Type {
-        ASTHMA, HYPERTENSION, ONCOLOGICAL_BACKGROUND, RENAL_INSUFFICIENCY, OTHER
+        asma, hipertension, antecedentes_oncologicos, insuficiencia_suprarrenal, otro
     }
 
     private String description;

@@ -109,8 +109,8 @@
               "data": {
                 "@class": "ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord",
                 "version": 0,
-                "name": "Colonoscopia",
-                "text": "Salio muy bien",
+                "name": "colonoscopia",
+                "text": "salio muy bien",
                 "performed": "2017-07-16T03:00:00Z",
                 "changes": [
                   "java.util.Set",
@@ -148,8 +148,8 @@
                   "allergies": [
                     "java.util.List",
                     [
-                      "Penicilina",
-                      "Pasear"
+                      "penicilina",
+                      "pasear"
                     ]
                   ]
                 },
@@ -158,10 +158,10 @@
                   [
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Medication",
-                      "name":"Cafe Veloz",
+                      "name":"cafe veloz",
                       "description":"La que toma Maradona",
                       "amount":3,
-                      "period":"WEEKLY"
+                      "period":"semanalmente"
                     }
                   ]
                 ],
@@ -170,13 +170,13 @@
                   [
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology",
-                      "type":"ASTHMA",
+                      "type":"asma",
                       "date":"2016-10-10"
                     },
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology",
-                      "type":"OTHER",
-                      "description":"ADN",
+                      "type":"otro",
+                      "description":"adn",
                       "date":"2015-07-10"
                     }
                   ]
@@ -186,17 +186,17 @@
                   [
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Hospitalization",
-                      "type":"ADMISSION",
-                      "institution":"San Camilo",
+                      "type":"admision",
+                      "institution":"san camilo",
                       "date":"2016-10-10",
-                      "reason":"Infartirigillo"
+                      "reason":"infartirigillo"
                     },
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Hospitalization",
-                      "type":"ADMISSION",
-                      "institution":"Hospital Publico 2",
+                      "type":"admision",
+                      "institution":"hospital publico 2",
                       "date":"2016-10-10",
-                      "reason":"Otro Infarto"
+                      "reason":"otro infarto"
                     }
                   ]
                 ],
@@ -205,17 +205,17 @@
                   [
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Hospitalization",
-                      "type":"SURGERY",
-                      "institution":"San Camilo",
+                      "type":"cirugia",
+                      "institution":"san camilo",
                       "date":"2016-10-10",
-                      "reason":"Cambio de sexo"
+                      "reason":"cambio de sexo"
                     },
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Hospitalization",
-                      "type":"SURGERY",
-                      "institution":"Hospital Publico 2",
+                      "type":"cirugia",
+                      "institution":"hospital publico 2",
                       "date":"2016-10-10",
-                      "reason":"Cambio de sexo invertido"
+                      "reason":"cambio de sexo invertido"
                     }
                   ]
                 ]

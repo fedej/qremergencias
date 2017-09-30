@@ -24,7 +24,7 @@ public class MedicationDTO {
     private Period period;
 
     public enum Period {
-        DAILY, WEEKLY, MONTHLY
+        diariamente, semanalmente, mensualmente
     }
 
 }
