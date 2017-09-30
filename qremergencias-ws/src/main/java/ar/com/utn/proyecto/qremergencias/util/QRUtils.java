@@ -60,11 +60,11 @@ public final class QRUtils {
     @SuppressWarnings("PMD")
     public static byte[] encode(final EmergencyData emergencyData) throws UnsupportedEncodingException {
         final GeneralData general = emergencyData.getGeneral();
-        final List<String> patos= new ArrayList<>();
+        final List<String> patos = new ArrayList<>();
         for (Pathology patho: emergencyData.getPathologies()) {
-            if(patho.getType().equals(TIPO_OTRO)){
+            if (patho.getType().equals(TIPO_OTRO)) {
                 patos.add(patho.getDescription());
-            }else{
+            } else {
                 patos.add(patho.getType());
             }
         }
