@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 public final class QRUtils {
 
     private static final String CHARSET_NAME = "ISO-8859-1";
