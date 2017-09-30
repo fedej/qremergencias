@@ -148,6 +148,8 @@ public class EmergencyDataService {
         if (emergencyDataOptional.isPresent()) {
             try {
                 final EmergencyData emergencyData = emergencyDataOptional.get();
+                emergencyData.setUuid(UUID.randomUUID().toString());
+                repository.save(emergencyData);
                 final byte[] message = QRUtils.encode(emergencyData);
                 final String encrypted = CryptoUtils.encryptText(message);
                 final Map<EncodeHintType, Object> hints = new ConcurrentHashMap<>(2);
