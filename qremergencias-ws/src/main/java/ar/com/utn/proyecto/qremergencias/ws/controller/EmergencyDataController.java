@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -63,14 +65,21 @@ public class EmergencyDataController {
     }
 
     @GetMapping("/qr")
-    public Resource getQR(@RequestParam(name = "user") final String user) {
-        return service.getUserQR(user);
+    public ResponseEntity<Resource> getQR(@RequestParam(name = "user") final String user) {
+        final Resource userQR = service.getUserQR(user);
+        return userQR == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(userQR);
     }
 
     @PostMapping("/qr")
     @PreAuthorize("hasRole('PACIENTE')")
     public void createQR(@AuthenticationPrincipal final UserFront user) {
         service.createQR(user.getUsername());
+    }
+
+    @DeleteMapping("/qr")
+    @PreAuthorize("hasRole('PACIENTE')")
+    public void deleteQR(@AuthenticationPrincipal final UserFront user) {
+        service.deleteQR(user.getUsername());
     }
 
 

@@ -138,7 +138,7 @@ public class EmergencyDataService {
 
     public Resource getUserQR(final String user) {
         final UserFront userFront = userFrontRepository.findByUsername(user);
-        return gridFsService.findFileById(userFront.getQr());
+        return userFront.getQr() == null ? null : gridFsService.findFileById(userFront.getQr());
     }
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
@@ -176,6 +176,13 @@ public class EmergencyDataService {
             }
         }
 
+    }
+
+    public void deleteQR(final String username) {
+        final UserFront userFront = userFrontRepository.findByUsername(username);
+        gridFsService.deleteQR(userFront);
+        userFront.setQr(null);
+        userFrontRepository.save(userFront);
     }
 
     @Data

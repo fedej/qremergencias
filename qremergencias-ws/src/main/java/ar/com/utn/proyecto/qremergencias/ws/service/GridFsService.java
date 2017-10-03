@@ -47,6 +47,11 @@ public class GridFsService {
     }
 
     public Object saveQRImage(final UserFront user, final BufferedImage image) {
+
+        if (user.getQr() != null) {
+            deleteQR(user);
+        }
+
         try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             ImageIO.write(image, "jpeg", os);
             try (final InputStream is = new ByteArrayInputStream(os.toByteArray())) {
@@ -56,5 +61,9 @@ public class GridFsService {
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void deleteQR(final UserFront userFront) {
+        gridFsTemplate.delete(new Query(where("_id").is(userFront.getQr())));
     }
 }
