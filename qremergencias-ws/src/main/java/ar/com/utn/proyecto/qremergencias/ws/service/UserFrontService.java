@@ -1,11 +1,15 @@
 package ar.com.utn.proyecto.qremergencias.ws.service;
 
+import ar.com.utn.proyecto.qremergencias.core.domain.DoctorFront;
+import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.CreateUserDTO;
+import ar.com.utn.proyecto.qremergencias.core.dto.emergency.CreateDoctorDTO;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserFrontRepository;
 import ar.com.utn.proyecto.qremergencias.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -19,17 +23,42 @@ public class UserFrontService extends UserService {
         if (createUserDTO == null) {
             return null;
         }
+        final UserFront user = createUserFront(createUserDTO);
+        final UserFront userFront = save(user);
+        final String token = UUID.randomUUID().toString();
+        createVerificationToken(userFront,token);
+        return userFront;
+    }
+
+    private UserFront createUserFront(final CreateUserDTO createUserDTO) {
         final UserFront user = new UserFront();
         user.setUsername(createUserDTO.getEmail());
         user.setEmail(createUserDTO.getEmail());
         user.setPassword(createUserDTO.getPassword());
         user.getRoles().add(createUserDTO.getRole());
         user.getRoles().add("ROLE_USER");
-        final UserFront userFront = save(user);
-        final String token = UUID.randomUUID().toString();
-        createVerificationToken(userFront,token);
-        return userFront;
+        return user;
+    }
 
+    private DoctorFront createDoctorFront(CreateDoctorDTO model, MultipartFile evidence) {
+        final DoctorFront doctor = new DoctorFront();
+        doctor.setUsername(model.getEmail());
+        doctor.setEmail(model.getEmail());
+        doctor.setPassword(model.getPassword());
+        doctor.getRoles().add(model.getRole());
+        doctor.getRoles().add("ROLE_USER");
+        doctor.setRegistrationNumber(model.getRegistrationNumber());
+        doctor.setEvidenceFile(evidence);
+        return doctor;
+    }
+
+    public DoctorFront createDoctor(final CreateDoctorDTO createDoctorDTO, final MultipartFile file) {
+        if (createDoctorDTO == null) {
+            return null;
+        }
+        final DoctorFront doctorFront = createDoctorFront(createDoctorDTO,file);
+        final DoctorFront createdDoctor = save(doctorFront);
+        return createdDoctor;
     }
 
     public UserFront findByUsername(final String username) {
