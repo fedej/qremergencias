@@ -4,7 +4,10 @@ import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.changelog.ChangesDTO;
+import ar.com.utn.proyecto.qremergencias.util.CryptoUtils;
+import ar.com.utn.proyecto.qremergencias.ws.exceptions.PequeniaLisaException;
 import ar.com.utn.proyecto.qremergencias.ws.service.EmergencyDataService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Optional;
 
 @RestController
@@ -31,6 +35,10 @@ import java.util.Optional;
 public class EmergencyDataController {
 
     private final EmergencyDataService service;
+    private static final String CHARSET_NAME = "ISO-8859-1";
+
+    @Autowired
+    private ObjectMapper oMapper;
 
     @Autowired
     public EmergencyDataController(final EmergencyDataService service) {
@@ -59,9 +67,15 @@ public class EmergencyDataController {
     }
 
     @GetMapping("/{uuid}")
-    public EmergencyDataDTO getEmergencyDataByUuid(@PathVariable final String uuid) {
+    public String getEmergencyDataByUuid(@PathVariable final String uuid) throws PequeniaLisaException {
         final Optional<EmergencyData> emergencyData = service.findByUuid(uuid);
-        return new EmergencyDataDTO(emergencyData.orElse(new EmergencyData()));
+        EmergencyDataDTO emergencyDataDTO = new EmergencyDataDTO(emergencyData.orElse(new EmergencyData()));
+        try {
+            String emergencyDTOString = oMapper.writeValueAsString(emergencyDataDTO);
+            return CryptoUtils.encryptText(emergencyDTOString.getBytes(CHARSET_NAME)) ;
+        }catch (Exception e) {
+            throw new PequeniaLisaException(e);
+        }
     }
 
     @GetMapping("/qr")
