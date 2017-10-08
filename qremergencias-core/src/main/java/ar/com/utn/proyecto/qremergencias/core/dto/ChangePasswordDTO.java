@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @SuppressWarnings("PMD.UnusedPrivateField")
 public class ChangePasswordDTO {
 
-    @NotNull
+
     private String id;
 
     @NotEmpty
@@ -23,7 +23,7 @@ public class ChangePasswordDTO {
     @Password
     private String confirmPassword;
 
-    @Captcha
+
     private String recaptchaResponse;
 
 }
