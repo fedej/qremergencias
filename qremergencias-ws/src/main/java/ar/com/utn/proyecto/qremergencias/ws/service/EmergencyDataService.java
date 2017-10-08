@@ -86,7 +86,6 @@ public class EmergencyDataService {
     public void createOrUpdate(final String username, final EmergencyDataDTO emergencyDataDTO) {
         final UserFront user = userFrontRepository.findByUsername(username);
         final Optional<EmergencyData> oldData = repository.findByUser(user);
-
         if (oldData.isPresent()) {
             final EmergencyData emergencyData = EMERGENCY_DATA_MAPPER.apply(emergencyDataDTO, oldData.get());
             repository.save(emergencyData);
@@ -96,7 +95,6 @@ public class EmergencyDataService {
             emergencyData.setUser(user);
             repository.save(emergencyData);
         }
-
     }
 
     @SuppressWarnings("PMD.UseConcurrentHashMap")
