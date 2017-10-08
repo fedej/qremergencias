@@ -393,6 +393,14 @@
             },
             "type": "object"
         },
+        "PublicKeyDTO": {
+            "properties": {
+                "publicKey": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Sort": {
             "type": "object"
         },
@@ -432,6 +440,17 @@
                     "type": "string"
                 },
                 "sex": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "VerificationDTO": {
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "signature": {
                     "type": "string"
                 }
             },
@@ -1111,6 +1130,95 @@
                 ]
             }
         },
+        "/api/mobile/upload": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "uploadPublicKeyUsingPUT",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PublicKeyDTO"
+                        }
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "uploadPublicKey",
+                "tags": [
+                    "mobile-test-controller"
+                ]
+            }
+        },
+        "/api/mobile/verify": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "verifySignatureUsingPOST",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/VerificationDTO"
+                        }
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "verifySignature",
+                "tags": [
+                    "mobile-test-controller"
+                ]
+            }
+        },
         "/api/profile": {
             "get": {
                 "consumes": [
@@ -1484,6 +1592,10 @@
         {
             "description": "Medical Record Controller",
             "name": "medical-record-controller"
+        },
+        {
+            "description": "Mobile Test Controller",
+            "name": "mobile-test-controller"
         },
         {
             "description": "Profile Controller",
