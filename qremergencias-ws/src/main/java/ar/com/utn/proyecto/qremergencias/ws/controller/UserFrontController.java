@@ -99,7 +99,7 @@ public class UserFrontController {
         }
     }
 
-    @PostMapping(value = "/register/doctor" ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/register/doctor", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public void registerDoctor(@Valid final CreateDoctorDTO model,
                       @RequestPart(required = true, name = "file") final MultipartFile file) {
@@ -190,7 +190,7 @@ public class UserFrontController {
     }
 
     private void sendMailInformation(final DoctorFront doctor) {
-        if(!StringUtils.isEmpty(doctor.getEmail())) {
+        if (!StringUtils.isEmpty(doctor.getEmail())) {
             final Locale locale = LocaleContextHolder.getLocale();
             final Context ctx = new Context(locale);
             ctx.setVariable("username", doctor.getUsername());
