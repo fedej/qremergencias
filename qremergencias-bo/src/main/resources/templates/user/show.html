@@ -11,7 +11,7 @@
             <div class="col-lg-12 custom-container">
                 <div class="panel panel-default">
 
-                    <div th:replace="fragments/main :: breadcrum(#{user.breadcrum.label})" />
+                    <div th:replace="fragments/main :: breadcrum(#{user.breadcrum.label})"></div>
 
                     <div class="panel-body">
                         <div class="row">
@@ -23,20 +23,20 @@
                                             <label th:inline="text" class="control-label col-sm-3 col-sm-offset-3">
                                                 [[#{user.username.label}]]
                                             </label>
-								            <span th:text="${user.username}" class="property-value col-sm-3" aria-labelledby="username-label"></span>
+                                            <span th:text="${user.username}" class="property-value col-sm-3" aria-labelledby="username-label"></span>
                                         </div>
                                         <div class="row" id="myRow">
                                             <label th:inline="text" class="control-label col-sm-3 col-sm-offset-3">
                                                 [[#{user.email.label}]]
                                             </label>
-								            <span th:text="${user.email}" class="property-value col-sm-3" aria-labelledby="email-label"></span>
+								                            <span th:text="${user.email}" class="property-value col-sm-3" aria-labelledby="email-label"></span>
                                         </div>
                                         <div class="row" id="myRow">
                                             <label th:inline="text" class="control-label col-sm-3 col-sm-offset-3">
                                                 [[#{user.accountNonLocked.label}]]
                                             </label>
                                             <div class="col-sm-3">
-                                                <div th:class="${user.accountNonLocked}? 'glyphicon glyphicon-ok' : 'glyphicon glyphicon-remove'" />
+                                                <div th:class="${user.accountNonLocked}? 'glyphicon glyphicon-ok' : 'glyphicon glyphicon-remove'"></div>
                                             </div>
                                         </div>
                                         <div class="row" id="myRow">
@@ -44,7 +44,7 @@
                                                 [[#{user.credentialsNonExpired.label}]]
                                             </label>
                                             <div class="col-sm-3">
-                                                <div th:class="${user.credentialsNonExpired}? 'glyphicon glyphicon-ok' : 'glyphicon glyphicon-remove'" />
+                                                <div th:class="${user.credentialsNonExpired}? 'glyphicon glyphicon-ok' : 'glyphicon glyphicon-remove'"></div>
                                             </div>
                                         </div>
                                         <div class="row" id="myRow">
@@ -52,7 +52,7 @@
                                                 [[#{user.enabled.label}]]
                                             </label>
                                             <div class="col-sm-3">
-                                                <div th:class="${user.enabled}? 'glyphicon glyphicon-ok' : 'glyphicon glyphicon-remove'" />
+                                                <div th:class="${user.enabled}? 'glyphicon glyphicon-ok' : 'glyphicon glyphicon-remove'"></div>
                                             </div>
                                         </div>
                                         <div class="row" id="myRow">
