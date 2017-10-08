@@ -89,6 +89,7 @@ public class PasswordChangeServiceTest {
 
     @Test
     public void testChangePassword() {
+        when(userRepository.findByUsername(anyString())).thenReturn(user);
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(passwordChangeRepository.save(any(PasswordChange.class))).thenReturn(null);
         when(passwordEncoder.encode(anyString())).thenReturn("claveEncodeada");

@@ -1,17 +1,10 @@
 package ar.com.utn.proyecto.qremergencias;
 
-import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
-import ar.com.utn.proyecto.qremergencias.core.repository.UserFrontRepository;
-import ar.com.utn.proyecto.qremergencias.ws.controller.MobileTestController;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableAsync;
-
-import java.security.*;
-import java.util.Base64;
 
 @SpringBootApplication(scanBasePackages = "ar.com.utn.proyecto.qremergencias")
 @EnableCaching
@@ -20,10 +13,10 @@ import java.util.Base64;
 @SuppressWarnings("PMD.UseUtilityClass")
 public class QREmergenciasWsApplication {
 
-    public static void main(final String... args) throws Exception {
-        ConfigurableApplicationContext run = SpringApplication.run(QREmergenciasWsApplication.class, args);
+    public static void main(final String... args) {
+        SpringApplication.run(QREmergenciasWsApplication.class, args);
 
-  /*
+        /*
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(1024);
         KeyPair pair = keyGen.generateKeyPair();
@@ -54,7 +47,7 @@ public class QREmergenciasWsApplication {
         body2.setSignature(Base64.getEncoder().encodeToString(dsa.sign()));
         boolean b2 = bean.verifySignature(body2);
         System.out.println(b2);
-  */
+        */
 
     }
 

@@ -12,13 +12,24 @@ import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.Signature;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Optional;
@@ -66,19 +77,19 @@ public class MobileTestController {
 
     @PostMapping("/verify")
     @PreAuthorize("hasRole('MEDICO')")
-    public String verifySignature(@RequestBody final VerificationDTO body)
-            throws Exception {
-        boolean verified = verifySignature(body.getMessage(), Base64.getDecoder().decode(body.getSignature()));
-        return verified ?
-                emergencyDataService.findByUuid(body.getMessage()).get().getUser().getUsername() :
-                null;
+    public String verifyDataSignature(@RequestBody final VerificationDTO body)
+            throws InvalidKeySpecException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
+            UnsupportedEncodingException {
+        final boolean verified = verifySignature(body.getMessage(), Base64.getDecoder().decode(body.getSignature()));
+        return verified
+                ? emergencyDataService.findByUuid(body.getMessage()).get().getUser().getUsername() :
+                "";
     }
 
     @PutMapping("/tempCode/{uuid}")
     @PreAuthorize("hasRole('MEDICO')")
-    public Integer createTempCode(@PathVariable final String uuid)
-            throws Exception {
-        Optional<EmergencyData> byUuid = emergencyDataService.findByUuid(uuid);
+    public Integer createTempCode(@PathVariable final String uuid) {
+        final Optional<EmergencyData> byUuid = emergencyDataService.findByUuid(uuid);
         final String username = byUuid.get().getUser().getUsername();
         final int tempCode = (int) (100000 + random.nextDouble() * 900000);
         tempCodeCache.put(tempCode, username);
@@ -87,23 +98,24 @@ public class MobileTestController {
 
     @GetMapping("/tempCode/verify/{tempCode}")
     @PreAuthorize("hasRole('MEDICO')")
-    public String verifyTempCode(@PathVariable final Integer tempCode)
-            throws Exception {
+    public String verifyTempCode(@PathVariable final Integer tempCode) {
         return tempCodeCache.get(tempCode, String.class);
     }
 
-    private boolean verifySignature(String data, byte[] signature) throws Exception {
+    private boolean verifySignature(final String data, final byte[] signature)
+            throws NoSuchAlgorithmException, InvalidKeySpecException,
+            UnsupportedEncodingException, SignatureException, InvalidKeyException {
         final Signature sig = Signature.getInstance("SHA256withRSA");
         sig.initVerify(getPublic(data));
-        sig.update(data.getBytes());
+        sig.update(data.getBytes("ISO-8859-1"));
         return sig.verify(signature);
     }
 
-    private PublicKey getPublic(String key) throws Exception {
+    private PublicKey getPublic(final String key) throws InvalidKeySpecException, NoSuchAlgorithmException {
         final byte[] keyBytes = publicKeyCache.get(key, byte[].class);
         final X509EncodedKeySpec spec =
                 new X509EncodedKeySpec(keyBytes);
-        KeyFactory kf = KeyFactory.getInstance("RSA");
+        final KeyFactory kf = KeyFactory.getInstance("RSA");
         return kf.generatePublic(spec);
     }
 
