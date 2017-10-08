@@ -1130,6 +1130,96 @@
                 ]
             }
         },
+        "/api/mobile/tempCode/verify/{tempCode}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "verifyTempCodeUsingGET",
+                "parameters": [
+                    {
+                        "description": "tempCode",
+                        "format": "int32",
+                        "in": "path",
+                        "name": "tempCode",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "verifyTempCode",
+                "tags": [
+                    "mobile-test-controller"
+                ]
+            }
+        },
+        "/api/mobile/tempCode/{uuid}": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "createTempCodeUsingPUT",
+                "parameters": [
+                    {
+                        "description": "uuid",
+                        "in": "path",
+                        "name": "uuid",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "format": "int32",
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "createTempCode",
+                "tags": [
+                    "mobile-test-controller"
+                ]
+            }
+        },
         "/api/mobile/upload": {
             "put": {
                 "consumes": [
@@ -1197,7 +1287,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "boolean"
+                            "type": "string"
                         }
                     },
                     "400": {

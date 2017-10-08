@@ -92,7 +92,7 @@ public class PasswordChangeServiceTest {
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(passwordChangeRepository.save(any(PasswordChange.class))).thenReturn(null);
         when(passwordEncoder.encode(anyString())).thenReturn("claveEncodeada");
-        service.changePassword(user, NEW_PASSWORD);
+        service.changePassword("", NEW_PASSWORD);
         verify(userRepository).save(user);
         verify(passwordChangeRepository).save(any(PasswordChange.class));
     }
