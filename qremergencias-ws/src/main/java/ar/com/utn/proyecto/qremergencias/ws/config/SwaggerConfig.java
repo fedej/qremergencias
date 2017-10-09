@@ -14,6 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.builders.OperationBuilder;
 import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.ResponseMessageBuilder;
@@ -42,12 +43,14 @@ import static com.google.common.base.Predicates.not;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static springfox.documentation.builders.PathSelectors.regex;
+import static springfox.documentation.schema.AlternateTypeRules.newRule;
 import static springfox.documentation.service.ApiInfo.DEFAULT_CONTACT;
 
 @EnableSwagger2
 @Configuration
 @Profile("!prod")
 @ComponentScan(basePackages = "ar.com.utn.proyecto.qremergencias.ws.controller")
+@SuppressWarnings("PMD.TooManyStaticImports")
 public class SwaggerConfig {
 
     private final TypeResolver typeResolver;
@@ -81,6 +84,9 @@ public class SwaggerConfig {
                 .protocols(Collections.singleton("http"))
                 .ignoredParameterTypes(AuthenticationPrincipal.class, Resource.class,
                         Pageable.class)
+                .alternateTypeRules(
+                        newRule(typeResolver.resolve(Resource.class),
+                                typeResolver.resolve(MultipartFile.class)))
                 .forCodeGeneration(true)
                 .apiInfo(new ApiInfo("QR Emergencias WS", "API Rest QR Emergencias",
                         "1.0.0", "", DEFAULT_CONTACT, "", "", Collections.emptyList()))
