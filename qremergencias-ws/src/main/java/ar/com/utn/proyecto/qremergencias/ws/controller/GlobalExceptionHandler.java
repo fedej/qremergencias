@@ -1,5 +1,7 @@
 package ar.com.utn.proyecto.qremergencias.ws.controller;
 
+import ar.com.utn.proyecto.qremergencias.ws.exceptions.PequeniaLisaException;
+import com.mongodb.util.JSON;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -37,12 +40,17 @@ public class GlobalExceptionHandler extends BasicErrorController {
     public static final String BAD_INPUT = "Dato erroneo";
     public static final int BAD_INPUT_CODE = HttpStatus.BAD_REQUEST.value();
 
+    public static final String JSON_PARSE_ERROR = "Error de parseo de JSON";
+    public static final int JSON_PARSE_ERROR_CODE = HttpStatus.INTERNAL_SERVER_ERROR.value();
+
     private static final ApiError INTERNAL_SERVER_ERROR = new ApiError(UNEXPECTED_ERROR,
             1000, UNEXPECTED_ERROR_CODE);
 
     private static final ApiError BAD_REQUEST = new ApiError(BAD_INPUT, 1001, BAD_INPUT_CODE);
 
     private static final ApiError MVC_ERROR = new ApiError("Error FWK", 1002, 0);
+
+    private static final ApiError JSON_PARSE = new ApiError(JSON_PARSE_ERROR, 1003, JSON_PARSE_ERROR_CODE);
 
     @Autowired
     public GlobalExceptionHandler(final ErrorAttributes errorAttributes,
@@ -64,6 +72,12 @@ public class GlobalExceptionHandler extends BasicErrorController {
     public ResponseEntity<ApiError> error(final Throwable exception) {
         log.error(exception.toString());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(PequeniaLisaException.class)
+    public ResponseEntity<ApiError> error(final PequeniaLisaException exception) {
+        log.error(exception.toString());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(JSON_PARSE);
     }
 
     @ExceptionHandler({IllegalArgumentException.class,

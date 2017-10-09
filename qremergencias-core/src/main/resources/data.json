@@ -142,6 +142,7 @@
                 "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData",
                 "version": 0,
                 "uuid": "7a5a6766-c04e-49d7-ecdb-5e5e5b16f5c3",
+                "lastMedicalCheck":"2016-10-10",
                 "general": {
                   "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.GeneralData",
                   "bloodType": "0+",
