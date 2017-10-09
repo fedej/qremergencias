@@ -27,22 +27,21 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/emergencyData")
 public class EmergencyDataController {
 
-    private final EmergencyDataService service;
     private static final String CHARSET_NAME = "ISO-8859-1";
 
-    @Autowired
-    private ObjectMapper oMapper;
+    private final EmergencyDataService service;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public EmergencyDataController(final EmergencyDataService service) {
+    public EmergencyDataController(final EmergencyDataService service, final ObjectMapper objectMapper) {
         this.service = service;
+        this.objectMapper = objectMapper;
     }
 
     @PatchMapping
@@ -69,12 +68,12 @@ public class EmergencyDataController {
     @GetMapping("/{uuid}")
     public String getEmergencyDataByUuid(@PathVariable final String uuid) throws PequeniaLisaException {
         final Optional<EmergencyData> emergencyData = service.findByUuid(uuid);
-        EmergencyDataDTO emergencyDataDTO = new EmergencyDataDTO(emergencyData.orElse(new EmergencyData()));
+        final EmergencyDataDTO emergencyDataDTO = new EmergencyDataDTO(emergencyData.orElse(new EmergencyData()));
         try {
-            String emergencyDTOString = oMapper.writeValueAsString(emergencyDataDTO);
-            return CryptoUtils.encryptText(emergencyDTOString.getBytes(CHARSET_NAME)) ;
-        }catch (Exception e) {
-            throw new PequeniaLisaException(e);
+            final String emergencyDTOString = objectMapper.writeValueAsString(emergencyDataDTO);
+            return CryptoUtils.encryptText(emergencyDTOString.getBytes(CHARSET_NAME));
+        } catch (final Exception exception) {
+            throw new PequeniaLisaException(exception);
         }
     }
 
