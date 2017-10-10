@@ -5,12 +5,16 @@ import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.CreateUserDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.CreateDoctorDTO;
+import ar.com.utn.proyecto.qremergencias.core.repository.MedicalRecordRepository;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserFrontRepository;
 import ar.com.utn.proyecto.qremergencias.core.service.UserService;
+import com.mongodb.gridfs.GridFSFile;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @Service
@@ -18,6 +22,10 @@ public class UserFrontService extends UserService {
 
     @Autowired
     private UserFrontRepository userFrontRepository;
+
+    @Autowired
+    private GridFsTemplate gridFsTemplate;
+
 
     public UserFront create(final CreateUserDTO createUserDTO) {
         if (createUserDTO == null) {
@@ -48,7 +56,16 @@ public class UserFrontService extends UserService {
         doctor.getRoles().add(model.getRole());
         doctor.getRoles().add("ROLE_USER");
         doctor.setRegistrationNumber(model.getRegistrationNumber());
-        doctor.setEvidenceFile(evidence);
+        if (evidence != null) {
+            try {
+                final GridFSFile stored = gridFsTemplate.store(evidence.getInputStream(),
+                        evidence.getOriginalFilename(),
+                        evidence.getContentType());
+                doctor.setEvidenceFile(stored);
+            } catch (final IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         return doctor;
     }
 

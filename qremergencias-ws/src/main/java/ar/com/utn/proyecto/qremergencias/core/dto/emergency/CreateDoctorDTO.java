@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.NotEmpty;
 
 @Data
+@EqualsAndHashCode
+@SuppressWarnings("PMD.UnusedPrivateField")
 public class CreateDoctorDTO extends CreateUserDTO{
     @NotEmpty
     private String registrationNumber;
