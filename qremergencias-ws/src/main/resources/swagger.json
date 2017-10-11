@@ -639,7 +639,7 @@
                     }
                 ],
                 "produces": [
-                    "*/*"
+                    "image/png"
                 ],
                 "responses": {
                     "200": {
@@ -719,7 +719,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/EmergencyDataDTO"
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -1171,7 +1171,7 @@
                 },
                 "summary": "verifyTempCode",
                 "tags": [
-                    "mobile-test-controller"
+                    "temp-code-controller"
                 ]
             }
         },
@@ -1216,7 +1216,7 @@
                 },
                 "summary": "createTempCode",
                 "tags": [
-                    "mobile-test-controller"
+                    "temp-code-controller"
                 ]
             }
         },
@@ -1259,7 +1259,7 @@
                 },
                 "summary": "uploadPublicKey",
                 "tags": [
-                    "mobile-test-controller"
+                    "temp-code-controller"
                 ]
             }
         },
@@ -1268,7 +1268,7 @@
                 "consumes": [
                     "application/json"
                 ],
-                "operationId": "verifySignatureUsingPOST",
+                "operationId": "verifyDataSignatureUsingPOST",
                 "parameters": [
                     {
                         "description": "body",
@@ -1303,9 +1303,9 @@
                         }
                     }
                 },
-                "summary": "verifySignature",
+                "summary": "verifyDataSignature",
                 "tags": [
-                    "mobile-test-controller"
+                    "temp-code-controller"
                 ]
             }
         },
@@ -1749,12 +1749,12 @@
             "name": "medical-record-controller"
         },
         {
-            "description": "Mobile Test Controller",
-            "name": "mobile-test-controller"
-        },
-        {
             "description": "Profile Controller",
             "name": "profile-controller"
+        },
+        {
+            "description": "Temp Code Controller",
+            "name": "temp-code-controller"
         },
         {
             "description": "User Front Controller",

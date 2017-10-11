@@ -93,7 +93,7 @@ public class TempCodeController {
                 "";
     }
 
-    @GetMapping("/tempCode/{uuid}")
+    @PutMapping("/tempCode/{uuid}")
     @PreAuthorize("hasRole('MEDICO')")
     public Integer createTempCode(@PathVariable final String uuid) {
         final Optional<EmergencyData> byUuid = emergencyDataService.findByUuid(uuid);
