@@ -1563,6 +1563,71 @@
                 ]
             }
         },
+        "/api/userFront/register/doctor": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "operationId": "registerDoctorUsingPOST",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "password",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "email",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "role",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "registrationNumber",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "file",
+                        "in": "formData",
+                        "name": "file",
+                        "required": true,
+                        "type": "file"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "registerDoctor",
+                "tags": [
+                    "user-front-controller"
+                ]
+            }
+        },
         "/api/userFront/resetPassword": {
             "post": {
                 "consumes": [
