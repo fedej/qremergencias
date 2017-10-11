@@ -1,11 +1,9 @@
 package ar.com.utn.proyecto.qremergencias.ws.service;
 
 import ar.com.utn.proyecto.qremergencias.core.domain.DoctorFront;
-import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.CreateUserDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.CreateDoctorDTO;
-import ar.com.utn.proyecto.qremergencias.core.repository.MedicalRecordRepository;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserFrontRepository;
 import ar.com.utn.proyecto.qremergencias.core.service.UserService;
 import com.mongodb.gridfs.GridFSFile;
@@ -48,7 +46,7 @@ public class UserFrontService extends UserService {
         return user;
     }
 
-    private DoctorFront createDoctorFront(CreateDoctorDTO model, MultipartFile evidence) {
+    private DoctorFront createDoctorFront(final CreateDoctorDTO model, final MultipartFile evidence) {
         final DoctorFront doctor = new DoctorFront();
         doctor.setUsername(model.getEmail());
         doctor.setEmail(model.getEmail());
@@ -74,8 +72,7 @@ public class UserFrontService extends UserService {
             return null;
         }
         final DoctorFront doctorFront = createDoctorFront(createDoctorDTO,file);
-        final DoctorFront createdDoctor = save(doctorFront);
-        return createdDoctor;
+        return save(doctorFront);
     }
 
     public UserFront findByUsername(final String username) {
