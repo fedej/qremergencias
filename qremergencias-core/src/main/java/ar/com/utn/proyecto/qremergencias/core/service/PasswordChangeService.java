@@ -40,7 +40,7 @@ public class PasswordChangeService {
         }
 
         final Page<PasswordChange> changesPage = passwordChangeRepository
-                .findByUser(user, new PageRequest(0, 10, Sort.Direction.DESC, "changeDate"));
+                .findByUser(user, new PageRequest(0, 1, Sort.Direction.DESC, "changeDate"));
         
         for (final PasswordChange passwordChange : changesPage.getContent()) {
             if (passwordEncoder.matches(password,passwordChange.getPassword())) {
@@ -53,8 +53,8 @@ public class PasswordChangeService {
     }
 
     @Transactional
-    public void changePassword(final User user, final String newPassword) {
-
+    public void changePassword(final String username, final String newPassword) {
+        final User user = userRepository.findByUsername(username);
         final PasswordChange pc = new PasswordChange();
         pc.setChangeDate(LocalDateTime.now());
         pc.setPassword(user.getPassword());

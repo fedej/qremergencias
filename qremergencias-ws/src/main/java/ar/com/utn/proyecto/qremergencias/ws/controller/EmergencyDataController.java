@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,23 +26,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/emergencyData")
 public class EmergencyDataController {
 
-    private final EmergencyDataService service;
     private static final String CHARSET_NAME = "ISO-8859-1";
 
-    @Autowired
-    private ObjectMapper oMapper;
+    private final EmergencyDataService service;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public EmergencyDataController(final EmergencyDataService service) {
+    public EmergencyDataController(final EmergencyDataService service, final ObjectMapper objectMapper) {
         this.service = service;
+        this.objectMapper = objectMapper;
     }
 
     @PatchMapping
@@ -69,19 +69,25 @@ public class EmergencyDataController {
     @GetMapping("/{uuid}")
     public String getEmergencyDataByUuid(@PathVariable final String uuid) throws PequeniaLisaException {
         final Optional<EmergencyData> emergencyData = service.findByUuid(uuid);
-        EmergencyDataDTO emergencyDataDTO = new EmergencyDataDTO(emergencyData.orElse(new EmergencyData()));
+        final EmergencyDataDTO emergencyDataDTO = new EmergencyDataDTO(emergencyData.orElse(new EmergencyData()));
         try {
-            String emergencyDTOString = oMapper.writeValueAsString(emergencyDataDTO);
-            return CryptoUtils.encryptText(emergencyDTOString.getBytes(CHARSET_NAME)) ;
-        }catch (Exception e) {
-            throw new PequeniaLisaException(e);
+            final String emergencyDTOString = objectMapper.writeValueAsString(emergencyDataDTO);
+            return CryptoUtils.encryptText(emergencyDTOString.getBytes(CHARSET_NAME));
+        } catch (final Exception exception) {
+            throw new PequeniaLisaException(exception);
         }
     }
 
-    @GetMapping("/qr")
-    public ResponseEntity<Resource> getQR(@RequestParam(name = "user") final String user) {
+    @GetMapping(value = "/qr", produces = MediaType.IMAGE_PNG_VALUE)
+    public Resource getQR(@RequestParam(name = "user") final String user, final HttpServletResponse response) {
         final Resource userQR = service.getUserQR(user);
-        return userQR == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(userQR);
+
+        if (userQR == null) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return null;
+        }
+
+        return userQR;
     }
 
     @PostMapping("/qr")

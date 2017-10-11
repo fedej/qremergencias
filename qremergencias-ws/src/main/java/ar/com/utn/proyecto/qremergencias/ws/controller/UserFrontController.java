@@ -172,7 +172,7 @@ public class UserFrontController {
             throw new RuntimeException(INVALID_PASSWORD);
         }
 
-        passwordChangeService.changePassword(user, changePassword.getNewPassword());
+        passwordChangeService.changePassword(user.getUsername(), changePassword.getNewPassword());
     }
 
     private void sendMailConfirmation(final UserFront user) {

@@ -72,7 +72,7 @@ public class ForgotPasswordService {
         final User user = forgotPassword.getUser();
         forgotPassword.setExpired(true);
 
-        passwordChangeService.changePassword(user, newPassword);
+        passwordChangeService.changePassword(user.getUsername(), newPassword);
 
         repository.save(forgotPassword);
 

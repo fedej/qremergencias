@@ -1,17 +1,14 @@
 package ar.com.utn.proyecto.qremergencias.core.dto;
 
-import ar.com.utn.proyecto.qremergencias.core.validation.Captcha;
 import ar.com.utn.proyecto.qremergencias.core.validation.Password;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotEmpty;
-
-import javax.validation.constraints.NotNull;
 
 @Data
 @SuppressWarnings("PMD.UnusedPrivateField")
 public class ChangePasswordDTO {
 
-    @NotNull
+
     private String id;
 
     @NotEmpty
@@ -23,7 +20,7 @@ public class ChangePasswordDTO {
     @Password
     private String confirmPassword;
 
-    @Captcha
+
     private String recaptchaResponse;
 
 }

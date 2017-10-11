@@ -91,7 +91,7 @@ public class UserController {
             return USER_CHANGE_PASSWORD;
         }
 
-        passwordChangeService.changePassword(user, changePassword.getNewPassword());
+        passwordChangeService.changePassword(user.getUsername(), changePassword.getNewPassword());
         model.addAttribute(USER, user);
         return USER_SHOW;
     }

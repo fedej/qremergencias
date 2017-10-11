@@ -140,7 +140,7 @@ public class ForgotPasswordServiceTest {
 
         assertTrue(forgotPassword.isExpired());
 
-        verify(passwordChangeService).changePassword(eq(user), eq(NEW_PASSWORD));
+        verify(passwordChangeService).changePassword(eq(user.getUsername()), eq(NEW_PASSWORD));
         verify(repository).save(forgotPassword);
 
     }
