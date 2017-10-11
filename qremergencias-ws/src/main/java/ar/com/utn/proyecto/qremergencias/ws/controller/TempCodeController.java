@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,17 +36,20 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/mobile")
-public class MobileTestController {
+public class TempCodeController {
 
     private final CacheManager cacheManager;
     private final EmergencyDataService emergencyDataService;
-    private final Random random = new Random(17923);
+    private final RedisTemplate<String, String> redisTemplate;
+    private final Random random = new Random();
 
     private Cache publicKeyCache;
-    private Cache tempCodeCache;
+    private HashOperations<String, Object, Object> tempCodeCache;
+
 
     @Value("${qremergencias.tempCode.publicKey.cache}")
     private String publicKeyCacheName;
@@ -53,16 +58,18 @@ public class MobileTestController {
     private String tempCodeCacheName;
 
     @Autowired
-    public MobileTestController(final CacheManager cacheManager,
-                                final EmergencyDataService emergencyDataService) {
+    public TempCodeController(final CacheManager cacheManager,
+                              final EmergencyDataService emergencyDataService,
+                              final RedisTemplate<String, String> redisTemplate) {
         this.cacheManager = cacheManager;
         this.emergencyDataService = emergencyDataService;
+        this.redisTemplate = redisTemplate;
     }
 
     @PostConstruct
     public void init() {
         publicKeyCache = cacheManager.getCache(publicKeyCacheName);
-        tempCodeCache = cacheManager.getCache(tempCodeCacheName);
+        tempCodeCache = redisTemplate.opsForHash();
     }
 
     @PutMapping("/upload")
@@ -86,20 +93,22 @@ public class MobileTestController {
                 "";
     }
 
-    @PutMapping("/tempCode/{uuid}")
+    @GetMapping("/tempCode/{uuid}")
     @PreAuthorize("hasRole('MEDICO')")
     public Integer createTempCode(@PathVariable final String uuid) {
         final Optional<EmergencyData> byUuid = emergencyDataService.findByUuid(uuid);
         final String username = byUuid.get().getUser().getUsername();
         final int tempCode = (int) (100000 + random.nextDouble() * 900000);
-        tempCodeCache.put(tempCode, username);
+        tempCodeCache.put(tempCodeCacheName + tempCode, String.valueOf(tempCode), username);
+        redisTemplate.expire(tempCodeCacheName + tempCode, 1, TimeUnit.MINUTES);
         return tempCode;
     }
 
     @GetMapping("/tempCode/verify/{tempCode}")
     @PreAuthorize("hasRole('MEDICO')")
     public String verifyTempCode(@PathVariable final Integer tempCode) {
-        return tempCodeCache.get(tempCode, String.class);
+        final Object cached = tempCodeCache.get(tempCodeCacheName + tempCode, String.valueOf(tempCode));
+        return cached == null ? "" : cached.toString();
     }
 
     private boolean verifySignature(final String data, final byte[] signature)
