@@ -1,5 +1,6 @@
 package ar.com.utn.proyecto.qremergencias.core.repository;
 
+import ar.com.utn.proyecto.qremergencias.core.domain.DoctorFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,6 @@ public interface UserFrontRepository extends MongoRepository<UserFront, String> 
 
     UserFront findByUsername(String username);
 
-    Page<UserFront> findByRolesContaining(@Param("role") String role, Pageable page);
+    Page<DoctorFront> findByRolesContaining(@Param("role") String role, Pageable page);
 
 }

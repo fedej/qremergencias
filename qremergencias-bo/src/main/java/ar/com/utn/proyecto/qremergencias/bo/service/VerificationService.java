@@ -1,11 +1,14 @@
 package ar.com.utn.proyecto.qremergencias.bo.service;
 
+import ar.com.utn.proyecto.qremergencias.core.domain.DoctorFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserVerificationToken;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserFrontRepository;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserVerificationTokenRepository;
 import ar.com.utn.proyecto.qremergencias.core.service.MailService;
+import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.gridfs.GridFSFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -14,6 +17,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.thymeleaf.context.Context;
@@ -35,6 +41,7 @@ public class VerificationService {
 
     private final UserVerificationTokenRepository userTokenRepository;
 
+
     @Autowired
     private MailService mailService;
 
@@ -45,13 +52,18 @@ public class VerificationService {
     private ResourceLoader resourceLoader;
 
     @Autowired
+    private final GridFsTemplate gridFsTemplate;
+
+    @Autowired
     public VerificationService(final UserFrontRepository userFrontRepository,
-                               final UserVerificationTokenRepository userTokenRepository) {
+                               final UserVerificationTokenRepository userTokenRepository,
+                               GridFsTemplate gridFsTemplate) {
         this.userFrontRepository = userFrontRepository;
         this.userTokenRepository = userTokenRepository;
+        this.gridFsTemplate = gridFsTemplate;
     }
 
-    public Page<UserFront> findMedicos(final Pageable page) {
+    public Page<DoctorFront> findMedicos(final Pageable page) {
         return userFrontRepository.findByRolesContaining(MEDICO, page);
     }
 
@@ -103,4 +115,12 @@ public class VerificationService {
         }
     }
 
+    public GridFSDBFile downloadEvidenceFile(String id) {
+        final DoctorFront doctor = (DoctorFront) userFrontRepository.findOne(id);
+        Object evidence = doctor.getEvidenceFile();
+        if (evidence != null) {
+            return gridFsTemplate.findOne(new Query(Criteria.where("_id").is(evidence.toString())));
+        }
+        return null;
+    }
 }
