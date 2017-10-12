@@ -69,28 +69,27 @@ public class VerificationController {
 
     @PostMapping("/download")
     @ResponseBody
-    public void downloadEvidenceFile(@RequestParam final String id, HttpServletResponse response) {
-        GridFSDBFile file = verificationService.downloadEvidenceFile(id);
+    public void downloadEvidenceFile(@RequestParam final String id, final HttpServletResponse response) {
+        final GridFSDBFile file = verificationService.downloadEvidenceFile(id);
         if (file != null) {
             try {
                 response.setContentType(file.getContentType());
-                response.setContentLength(new Integer(String.valueOf(file.getLength())));
-                //response.setContentLength(Integer.valueOf(String.valueOf(file.getLength())));
+                response.setContentLengthLong(file.getLength());
                 response.setHeader("Content-Disposition", "attachment; filename=" + file.getFilename());
                 copyStream(file.getInputStream(), response.getOutputStream());
-            } catch (IOException ex) {
-                throw new RuntimeException("IOError writing file to output stream");
+            } catch (final IOException ex) {
+                throw new RuntimeException("IOError writing file to output stream", ex);
             }
         }
         log.info("Download Evidence File...");
     }
 
-    public static long copyStream(InputStream input, OutputStream output) throws IOException {
+    public static long copyStream(final InputStream input, final OutputStream output) throws IOException {
         try (
-                ReadableByteChannel inputChannel = Channels.newChannel(input);
-                WritableByteChannel outputChannel = Channels.newChannel(output);
+                final ReadableByteChannel inputChannel = Channels.newChannel(input);
+                final WritableByteChannel outputChannel = Channels.newChannel(output);
         ) {
-            ByteBuffer buffer = ByteBuffer.allocateDirect(10240);
+            final ByteBuffer buffer = ByteBuffer.allocateDirect(10240);
             long size = 0;
 
             while (inputChannel.read(buffer) != -1) {

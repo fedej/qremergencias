@@ -8,7 +8,6 @@ import ar.com.utn.proyecto.qremergencias.core.repository.UserFrontRepository;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserVerificationTokenRepository;
 import ar.com.utn.proyecto.qremergencias.core.service.MailService;
 import com.mongodb.gridfs.GridFSDBFile;
-import com.mongodb.gridfs.GridFSFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -57,7 +56,7 @@ public class VerificationService {
     @Autowired
     public VerificationService(final UserFrontRepository userFrontRepository,
                                final UserVerificationTokenRepository userTokenRepository,
-                               GridFsTemplate gridFsTemplate) {
+                               final GridFsTemplate gridFsTemplate) {
         this.userFrontRepository = userFrontRepository;
         this.userTokenRepository = userTokenRepository;
         this.gridFsTemplate = gridFsTemplate;
@@ -115,9 +114,9 @@ public class VerificationService {
         }
     }
 
-    public GridFSDBFile downloadEvidenceFile(String id) {
+    public GridFSDBFile downloadEvidenceFile(final String id) {
         final DoctorFront doctor = (DoctorFront) userFrontRepository.findOne(id);
-        Object evidence = doctor.getEvidenceFile();
+        final Object evidence = doctor.getEvidenceFile();
         if (evidence != null) {
             return gridFsTemplate.findOne(new Query(Criteria.where("_id").is(evidence.toString())));
         }
