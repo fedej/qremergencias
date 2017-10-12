@@ -1,5 +1,6 @@
 package ar.com.utn.proyecto.qremergencias.ws.controller;
 
+import ar.com.utn.proyecto.qremergencias.ws.exceptions.InvalidTokenException;
 import ar.com.utn.proyecto.qremergencias.ws.exceptions.PequeniaLisaException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @ControllerAdvice
 @Slf4j
+@SuppressWarnings("PMD.TooManyMethods")
 public class GlobalExceptionHandler extends BasicErrorController {
 
     public static final String UNEXPECTED_ERROR = "Error inesperado";
@@ -56,6 +58,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
     private static final ApiError JSON_PARSE = new ApiError(JSON_PARSE_ERROR, 1003, JSON_PARSE_ERROR_CODE);
     private static final ApiError LOGIN_ERROR = new ApiError(UNAUTHORIZED_ERROR, 1004, UNAUTHORIZED_ERROR_CODE);
     private static final ApiError DUPLICATE_USER = new ApiError(DUPLICATE_USER_ERROR, 1005, BAD_INPUT_CODE);
+    private static final ApiError INVALID_TOKEN_ERROR = new ApiError("Token invalido", 1006, BAD_INPUT_CODE);
 
     @Autowired
     public GlobalExceptionHandler(final ErrorAttributes errorAttributes,
@@ -128,6 +131,12 @@ public class GlobalExceptionHandler extends BasicErrorController {
     public ResponseEntity<ApiError> error(final Exception exception) {
         log.error(exception.toString());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ApiError> error(final InvalidTokenException exception) {
+        log.error(exception.toString());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(INVALID_TOKEN_ERROR);
     }
 
     @Data

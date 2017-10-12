@@ -13,6 +13,7 @@ import ar.com.utn.proyecto.qremergencias.core.service.CaptchaService;
 import ar.com.utn.proyecto.qremergencias.core.service.ForgotPasswordService;
 import ar.com.utn.proyecto.qremergencias.core.service.MailService;
 import ar.com.utn.proyecto.qremergencias.core.service.PasswordChangeService;
+import ar.com.utn.proyecto.qremergencias.ws.exceptions.InvalidTokenException;
 import ar.com.utn.proyecto.qremergencias.ws.service.UserFrontService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,8 +54,6 @@ public class UserFrontController {
     private static final String SUBJECT = "default.forgot.email.subject";
     private static final String GREETING_SUBJECT = "default.greeting.email.subject";
     private static final String INVALID_PASSWORD = "Invalid password";
-    private static final String INVALID_TOKEN = "Invalid token";
-    private static final String TOKEN_NOT_FOUND = "Token not found";
     private static final String USER_NOT_FOUND = "User not found";
 
     @Value("${qremergencias.front.resetPasswordUrl}")
@@ -241,12 +240,12 @@ public class UserFrontController {
                 .getUserVerificationByToken(request.getToken());
 
         if (userVerificationToken == null) {
-            throw new RuntimeException(TOKEN_NOT_FOUND);
+            throw new InvalidTokenException();
         }
 
         if (userVerificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             userFrontService.deleteVerificationToken(userVerificationToken);
-            throw new RuntimeException(INVALID_TOKEN);
+            throw new InvalidTokenException();
         }
 
         final User user = userVerificationToken.getUser();
