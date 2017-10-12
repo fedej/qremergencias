@@ -3,6 +3,7 @@ package ar.com.utn.proyecto.qremergencias.ws.config;
 import ar.com.utn.proyecto.qremergencias.core.dto.LoginUserDTO;
 import ar.com.utn.proyecto.qremergencias.ws.controller.GlobalExceptionHandler.ApiError;
 import com.fasterxml.classmate.TypeResolver;
+import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -38,6 +39,8 @@ import static ar.com.utn.proyecto.qremergencias.ws.controller.GlobalExceptionHan
 import static ar.com.utn.proyecto.qremergencias.ws.controller.GlobalExceptionHandler.BAD_INPUT_CODE;
 import static ar.com.utn.proyecto.qremergencias.ws.controller.GlobalExceptionHandler.UNEXPECTED_ERROR;
 import static ar.com.utn.proyecto.qremergencias.ws.controller.GlobalExceptionHandler.UNEXPECTED_ERROR_CODE;
+import static ar.com.utn.proyecto.qremergencias.ws.controller.GlobalExceptionHandler.UNAUTHORIZED_ERROR;
+import static ar.com.utn.proyecto.qremergencias.ws.controller.GlobalExceptionHandler.UNAUTHORIZED_ERROR_CODE;
 import static com.google.common.base.Predicates.and;
 import static com.google.common.base.Predicates.not;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
@@ -123,11 +126,16 @@ public class SwaggerConfig {
                             .consumes(Collections.singleton(APPLICATION_FORM_URLENCODED_VALUE))
                             .method(HttpMethod.POST)
                             .produces(Collections.singleton(APPLICATION_JSON_UTF8_VALUE))
-                            .responseMessages(Collections.singleton(
+                            .responseMessages(Sets.newHashSet(
                                     new ResponseMessageBuilder()
                                             .code(HttpStatus.OK.value())
                                             .message(HttpStatus.OK.name())
                                             .responseModel(new ModelRef("LoginUserDTO"))
+                                            .build(),
+                                    new ResponseMessageBuilder()
+                                            .code(UNAUTHORIZED_ERROR_CODE)
+                                            .message(UNAUTHORIZED_ERROR)
+                                            .responseModel(new ModelRef(ApiError.class.getSimpleName()))
                                             .build()
                             ))
                             .tags(Collections.singleton("user-front-controller"))
