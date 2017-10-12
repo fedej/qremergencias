@@ -52,7 +52,9 @@
                                         <tr>
                                             <th th:replace="fragments/main :: sortableColumn('username', '/verification/index', #{verification.username.label})">USERNAME</th>
                                             <th th:replace="fragments/main :: sortableColumn('email', '/verification/index', #{verification.email.label})">EMAIL</th>
+                                            <th>Matrícula</th>
                                             <th th:text="#{verification.enabled.label}">ENABLED</th>
+                                            <th>Documentación presentada</th>
                                             <th>Acciones</th>
                                         </tr>
                                         <tr th:each="user : ${page}">
@@ -60,10 +62,16 @@
                                                 <a href="#" th:text="${user.username}" th:href="@{/verification/show(id=${user.id})}">user</a>
                                             </td>
                                             <td th:text="${user.email}">email</td>
+                                            <td th:text="${user.registrationNumber}">matricula</td>
                                             <td>
                                                 <div class="col-sm-offset-5">
                                                     <div th:class="${user.enabled}? 'glyphicon glyphicon-ok' : 'glyphicon glyphicon-remove'" />
                                                 </div>
+                                            </td>                                      
+                                            <td>
+                                                <form method="post" th:action="@{/verification/download(id=${user.id})}">
+                                                    <input class="btn btn-primary" type="submit" value="Descargar" />
+                                                </form>
                                             </td>
                                             <td>
                                                 <div class="col-sm-offset-2">
