@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.BasicErrorController;
 import org.springframework.boot.autoconfigure.web.ErrorAttributes;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -22,11 +24,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.stream.Collectors.toList;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @ControllerAdvice
 @Slf4j
@@ -38,17 +42,20 @@ public class GlobalExceptionHandler extends BasicErrorController {
     public static final String BAD_INPUT = "Dato erroneo";
     public static final int BAD_INPUT_CODE = HttpStatus.BAD_REQUEST.value();
 
-    public static final String JSON_PARSE_ERROR = "Error de parseo de JSON";
-    public static final int JSON_PARSE_ERROR_CODE = HttpStatus.INTERNAL_SERVER_ERROR.value();
+    private static final String JSON_PARSE_ERROR = "Error de parseo de JSON";
+    private static final int JSON_PARSE_ERROR_CODE = HttpStatus.INTERNAL_SERVER_ERROR.value();
 
-    private static final ApiError INTERNAL_SERVER_ERROR = new ApiError(UNEXPECTED_ERROR,
-            1000, UNEXPECTED_ERROR_CODE);
+    public static final String UNAUTHORIZED_ERROR = "Error al loguearse";
+    public static final int UNAUTHORIZED_ERROR_CODE = HttpStatus.UNAUTHORIZED.value();
 
+    private static final String DUPLICATE_USER_ERROR = "Usuario ya registrado";
+
+    private static final ApiError INTERNAL_SERVER_ERROR = new ApiError(UNEXPECTED_ERROR, 1000, UNEXPECTED_ERROR_CODE);
     private static final ApiError BAD_REQUEST = new ApiError(BAD_INPUT, 1001, BAD_INPUT_CODE);
-
     private static final ApiError MVC_ERROR = new ApiError("Error FWK", 1002, 0);
-
     private static final ApiError JSON_PARSE = new ApiError(JSON_PARSE_ERROR, 1003, JSON_PARSE_ERROR_CODE);
+    private static final ApiError LOGIN_ERROR = new ApiError(UNAUTHORIZED_ERROR, 1004, UNAUTHORIZED_ERROR_CODE);
+    private static final ApiError DUPLICATE_USER = new ApiError(DUPLICATE_USER_ERROR, 1005, BAD_INPUT_CODE);
 
     @Autowired
     public GlobalExceptionHandler(final ErrorAttributes errorAttributes,
@@ -66,6 +73,12 @@ public class GlobalExceptionHandler extends BasicErrorController {
         return ResponseEntity.status(getStatus(request)).body(ApiError.toMap(MVC_ERROR));
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiError> error(final AuthenticationException exception) {
+        log.error(exception.toString());
+        return ResponseEntity.status(UNAUTHORIZED).body(LOGIN_ERROR);
+    }
+
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<ApiError> error(final Throwable exception) {
         log.error(exception.toString());
@@ -78,11 +91,22 @@ public class GlobalExceptionHandler extends BasicErrorController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(JSON_PARSE);
     }
 
-    @ExceptionHandler({IllegalArgumentException.class,
-            MissingServletRequestParameterException.class})
-    public ResponseEntity<ApiError> error(final Exception exception) {
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiError> error(final IllegalArgumentException exception) {
         log.error(exception.toString());
         return ResponseEntity.badRequest().body(BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiError> error(final MissingServletRequestParameterException exception) {
+        log.error(exception.toString());
+        return ResponseEntity.badRequest().body(BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<ApiError> error(final DuplicateKeyException exception) {
+        log.error(exception.toString());
+        return ResponseEntity.badRequest().body(DUPLICATE_USER);
     }
 
     @ExceptionHandler(BindException.class)
@@ -101,7 +125,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> mvcError(final Exception exception) {
+    public ResponseEntity<ApiError> error(final Exception exception) {
         log.error(exception.toString());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(INTERNAL_SERVER_ERROR);
     }
@@ -114,7 +138,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
         private final int code;
         private final LocalDateTime timestamp = LocalDateTime.now();
         private final int status;
-        private List<ApiFieldError> errors;
+        private List<ApiFieldError> errors = new ArrayList<>();
 
         public ApiError withFieldErrors(final List<FieldError> errors) {
             final ApiError apiError = new ApiError(message, code, status);

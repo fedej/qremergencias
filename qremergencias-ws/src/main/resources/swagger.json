@@ -776,6 +776,12 @@
                         "schema": {
                             "$ref": "#/definitions/LoginUserDTO"
                         }
+                    },
+                    "401": {
+                        "description": "Error al loguearse",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
                     }
                 },
                 "tags": [
