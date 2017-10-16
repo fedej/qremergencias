@@ -65,11 +65,11 @@ public class EmergencyDataService {
     public void createOrUpdate(final String username, final EmergencyDataDTO emergencyDataDTO) {
         final UserFront user = userFrontRepository.findByUsername(username);
         final Optional<EmergencyData> oldData = repository.findByUser(user);
+        emergencyDataDTO.setUuid(UUID.randomUUID().toString());
         if (oldData.isPresent()) {
             final EmergencyData emergencyData = EMERGENCY_DATA_MAPPER.apply(emergencyDataDTO, oldData.get());
             repository.save(emergencyData);
         } else {
-            emergencyDataDTO.setUuid(UUID.randomUUID().toString());
             final EmergencyData emergencyData = EMERGENCY_DATA_MAPPER.apply(emergencyDataDTO);
             emergencyData.setUser(user);
             repository.save(emergencyData);
