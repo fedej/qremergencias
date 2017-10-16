@@ -35,23 +35,23 @@ public final class QRUtils {
     private static byte getBlood(final String blood) {
         switch (blood) {
             case "0-":
-                return 0b000;
+                return 0b0000;
             case "0+":
-                return 0b001;
+                return 0b0001;
             case "A-":
-                return 0b010;
+                return 0b0010;
             case "A+":
-                return 0b011;
+                return 0b0011;
             case "B-":
-                return 0b100;
+                return 0b0100;
             case "B+":
-                return 0b101;
+                return 0b0101;
             case "AB-":
-                return 0b110;
+                return 0b0110;
             case "AB+":
-                return 0b111;
+                return 0b0111;
             default:
-                return 0;
+                return 0b1000;
         }
     }
 
@@ -59,11 +59,13 @@ public final class QRUtils {
     public static byte[] encode(final EmergencyData emergencyData) throws UnsupportedEncodingException {
         final GeneralData general = emergencyData.getGeneral();
         final List<String> patos = new ArrayList<>();
-        for (Pathology patho: emergencyData.getPathologies()) {
-            if (patho.getType().equals(TIPO_OTRO)) {
-                patos.add(patho.getDescription());
-            } else {
-                patos.add(patho.getType());
+        if (emergencyData.getPathologies() != null) {
+            for (Pathology patho : emergencyData.getPathologies()) {
+                if (patho.getType().equals(TIPO_OTRO)) {
+                    patos.add(patho.getDescription());
+                } else {
+                    patos.add(patho.getType());
+                }
             }
         }
 
@@ -72,8 +74,12 @@ public final class QRUtils {
         // Byte 0 y 1 Anio de nacimiento, sexo y sangre
         final ByteBuffer yearSexBloodBuffer = ByteBuffer.allocate(2).putShort((short) user.getBirthdate().getYear());
         int sex = QRUtils.getSex(user.getSex()) << 3;
-        int blood = QRUtils.getBlood(general.getBloodType()) << 5;
-        yearSexBloodBuffer.put(0, (byte) (yearSexBloodBuffer.get(0) | sex | blood));
+        int blood = getBlood("U");
+        if (general != null) {
+            blood = QRUtils.getBlood(general.getBloodType()) << 6;
+        }
+        int yearSexBloodByte = yearSexBloodBuffer.get(0) | sex | blood;
+        yearSexBloodBuffer.put(0, (byte) (yearSexBloodByte));
         yearSexBloodBuffer.rewind();
 
         final String url = emergencyData.getUuid();
@@ -82,30 +88,35 @@ public final class QRUtils {
 
         // Byte 2 Alergias y patologias comunes
         final BitSet bitSet = new BitSet();
-        if (general.getAllergies().contains("penicilina")) {
-            bitSet.set(0);
+        if (general != null && general.getAllergies() != null) {
+            if (general.getAllergies().contains("penicilina")) {
+                bitSet.set(0);
+            }
+            if (general.getAllergies().contains("insulina")) {
+                bitSet.set(1);
+            }
+            if (general.getAllergies().contains("rayos_x_con_yodo")) {
+                bitSet.set(2);
+            }
+            if (general.getAllergies().contains("sulfamidas")) {
+                bitSet.set(3);
+            }
         }
-        if (general.getAllergies().contains("insulina")) {
-            bitSet.set(1);
+        if (patos != null) {
+            if (patos.contains("hipertension")) {
+                bitSet.set(4);
+            }
+            if (patos.contains("asma")) {
+                bitSet.set(5);
+            }
+            if (patos.contains("antecedentes_oncologicos")) {
+                bitSet.set(6);
+            }
+            if (patos.contains("insuficiencia_suprarrenal")) {
+                bitSet.set(7);
+            }
         }
-        if (general.getAllergies().contains("rayos_x_con_yodo")) {
-            bitSet.set(2);
-        }
-        if (general.getAllergies().contains("sulfamidas")) {
-            bitSet.set(3);
-        }
-        if (patos.contains("hipertension")) {
-            bitSet.set(4);
-        }
-        if (patos.contains("asma")) {
-            bitSet.set(5);
-        }
-        if (patos.contains("antecedentes_oncologicos")) {
-            bitSet.set(6);
-        }
-        if (patos.contains("insuficiencia_suprarrenal")) {
-            bitSet.set(7);
-        }
+
         final ByteBuffer allergiesAndPathosBuffer = ByteBuffer.allocate(1).put(bitSet.toByteArray());
         System.arraycopy(allergiesAndPathosBuffer.array(), 0, message, 2, 1);
 
