@@ -116,10 +116,6 @@
                     },
                     "type": "array"
                 },
-                "lastMedicalCheck": {
-                    "format": "date-time",
-                    "type": "string"
-                },
                 "medications": {
                     "items": {
                         "$ref": "#/definitions/MedicationDTO"
@@ -172,6 +168,10 @@
                 "bloodType": {
                     "type": "string"
                 },
+                "lastMedicalCheck": {
+                    "format": "date-time",
+                    "type": "string"
+                },
                 "organDonor": {
                     "type": "boolean"
                 }
@@ -198,6 +198,9 @@
                     "type": "string"
                 }
             },
+            "type": "object"
+        },
+        "InputStream": {
             "type": "object"
         },
         "LoginUserDTO": {

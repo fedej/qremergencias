@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -15,5 +16,7 @@ public class GeneralData {
 
     private boolean organDonor;
     private List<String> allergies;
+
+    private LocalDate lastMedicalCheck;
 
 }

@@ -24,7 +24,8 @@ class DomainMappers {
                     .constructor(GeneralData::new)
                     .fields(GeneralDataDTO::getBloodType, GeneralData::setBloodType)
                     .fields(GeneralDataDTO::isOrganDonor, GeneralData::setOrganDonor)
-                    .fields(GeneralDataDTO::getAllergies, GeneralData::setAllergies);
+                    .fields(GeneralDataDTO::getAllergies, GeneralData::setAllergies)
+                    .fields((d) -> LocalDate.now(), GeneralData::setLastMedicalCheck);
 
     private static final Mapper<HospitalizationDTO, Hospitalization> HOSPITALIZATION_MAPPER =
             Mapper.mapping(HospitalizationDTO.class, Hospitalization.class)
@@ -59,7 +60,6 @@ class DomainMappers {
                             listConverter(HOSPITALIZATION_MAPPER))
                     .fields(EmergencyDataDTO::getSurgeries, EmergencyData::setSurgeries,
                             listConverter(HOSPITALIZATION_MAPPER))
-                    .fields((d) -> LocalDate.now(), EmergencyData::setLastMedicalCheck)
                     .fields(EmergencyDataDTO::getMedications, EmergencyData::setMedications,
                             listConverter(MEDICATION_MAPPER))
                     .fields(EmergencyDataDTO::getPathologies, EmergencyData::setPathologies,
