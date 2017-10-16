@@ -42,6 +42,8 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/api/mobile")
 public class TempCodeController {
 
+    private static final String PACIENTE_RRRAMUNDO_COM_AR = "paciente@rrramundo.com.ar";
+    private static final int INT = 666;
     private final CacheManager cacheManager;
     private final EmergencyDataService emergencyDataService;
     private final RedisTemplate<String, String> redisTemplate;
@@ -107,8 +109,8 @@ public class TempCodeController {
     @GetMapping("/tempCode/verify/{tempCode}")
     @PreAuthorize("hasRole('MEDICO')")
     public String verifyTempCode(@PathVariable final Integer tempCode) {
-        if (tempCode == 666) {
-            return "paciente@rrramundo.com.ar";
+        if (tempCode == INT) {
+            return PACIENTE_RRRAMUNDO_COM_AR;
         }
         final Object cached = tempCodeCache.get(tempCodeCacheName + tempCode, String.valueOf(tempCode));
         return cached == null ? "" : cached.toString();
