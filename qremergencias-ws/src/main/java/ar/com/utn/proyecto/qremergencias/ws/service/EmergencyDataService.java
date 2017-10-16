@@ -1,10 +1,12 @@
 package ar.com.utn.proyecto.qremergencias.ws.service;
 
+import ar.com.utn.proyecto.qremergencias.core.domain.DoctorFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
 import ar.com.utn.proyecto.qremergencias.core.repository.EmergencyDataRepository;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserFrontRepository;
+import ar.com.utn.proyecto.qremergencias.core.service.MailService;
 import ar.com.utn.proyecto.qremergencias.util.CryptoUtils;
 import ar.com.utn.proyecto.qremergencias.util.QRUtils;
 import com.google.zxing.BarcodeFormat;
@@ -14,8 +16,14 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.thymeleaf.context.Context;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -25,6 +33,8 @@ import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,18 +49,28 @@ public class EmergencyDataService {
     private static final int HEIGHT = 340;
     private static final int WHITE = 255 << 16 | 255 << 8 | 255;
     private static final String CHARSET_NAME = "ISO-8859-1";
+    private static final String DATA_CHANGE_SUBJECT = "default.datachange.email.subject";
 
     private final EmergencyDataRepository repository;
     private final UserFrontRepository userFrontRepository;
     private final GridFsService gridFsService;
+    private final MailService mailService;
+    private final MessageSource messageSource;
+    private final ResourceLoader resourceLoader;
 
     @Autowired
     public EmergencyDataService(final EmergencyDataRepository repository,
                                 final UserFrontRepository userFrontRepository,
-                                final GridFsService gridFsService) {
+                                final GridFsService gridFsService,
+                                final MailService mailService,
+                                final MessageSource messageSource,
+                                final ResourceLoader resourceLoader) {
         this.repository = repository;
         this.userFrontRepository = userFrontRepository;
         this.gridFsService = gridFsService;
+        this.mailService = mailService;
+        this.messageSource = messageSource;
+        this.resourceLoader = resourceLoader;
     }
 
     public Optional<EmergencyData> findByUser(final String username) {
@@ -74,6 +94,7 @@ public class EmergencyDataService {
             emergencyData.setUser(user);
             repository.save(emergencyData);
         }
+        sendDataChangeMail(user);
     }
 
     public Resource getUserQR(final String user) {
@@ -123,6 +144,23 @@ public class EmergencyDataService {
         gridFsService.deleteQR(userFront);
         userFront.setQr(null);
         userFrontRepository.save(userFront);
+    }
+
+    private void sendDataChangeMail(final UserFront user) {
+        if (!StringUtils.isEmpty(user.getEmail())) {
+            final Locale locale = LocaleContextHolder.getLocale();
+            final Context ctx = new Context(locale);
+            ctx.setVariable("username", user.getUsername());
+            final Resource header = resourceLoader
+                    .getResource("classpath:static/images/mail/header-mail.jpg");
+            final Resource footer = resourceLoader
+                    .getResource("classpath:static/images/mail/logo-footer.png");
+
+            mailService.sendMail(user.getEmail(),
+                    messageSource.getMessage(DATA_CHANGE_SUBJECT, null, locale), "mail/datachange", ctx,
+                    Arrays.asList(header, footer));
+
+        }
     }
 
 }
