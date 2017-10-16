@@ -6,6 +6,7 @@ import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.changelog.ChangesDTO;
 import ar.com.utn.proyecto.qremergencias.util.CryptoUtils;
 import ar.com.utn.proyecto.qremergencias.ws.exceptions.PequeniaLisaException;
+import ar.com.utn.proyecto.qremergencias.ws.service.ChangesService;
 import ar.com.utn.proyecto.qremergencias.ws.service.EmergencyDataService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +39,14 @@ public class EmergencyDataController {
 
     private final EmergencyDataService service;
     private final ObjectMapper objectMapper;
+    private final ChangesService changesService;
 
     @Autowired
-    public EmergencyDataController(final EmergencyDataService service, final ObjectMapper objectMapper) {
+    public EmergencyDataController(final EmergencyDataService service, final ObjectMapper objectMapper,
+                                   final ChangesService changesService) {
         this.service = service;
         this.objectMapper = objectMapper;
+        this.changesService = changesService;
     }
 
     @PatchMapping
@@ -63,7 +67,7 @@ public class EmergencyDataController {
     @GetMapping("/changes")
     @PreAuthorize("hasRole('PACIENTE')")
     public Page<ChangesDTO> getChanges(@AuthenticationPrincipal final UserFront user) {
-        return service.getEmergencyDataChanges(user);
+        return changesService.getEmergencyDataChanges(user);
     }
 
     @GetMapping("/{uuid}")
