@@ -6,7 +6,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -24,7 +23,6 @@ public class EmergencyData {
     private List<Hospitalization> hospitalizations;
     private List<Medication> medications;
     private List<Pathology> pathologies;
-    private LocalDate lastMedicalCheck;
 
     private String uuid;
 
