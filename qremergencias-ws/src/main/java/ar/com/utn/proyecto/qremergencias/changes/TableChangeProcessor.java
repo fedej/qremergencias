@@ -20,6 +20,8 @@ import org.javers.core.metamodel.object.InstanceId;
 import org.javers.core.metamodel.object.ValueObjectId;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,6 +31,9 @@ import static java.util.stream.Collectors.toList;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class TableChangeProcessor implements ChangeProcessor<List<ChangesDTO>> {
+
+    private static final Comparator<ChangesDTO> CHANGES_DTO_COMPARATOR =
+            Comparator.comparing(ChangesDTO::getId).thenComparing(ChangesDTO::getDate).reversed();
 
     private final Map<String, ChangesDTO> changesMap = new ConcurrentHashMap<>();
 
@@ -115,7 +120,18 @@ public class TableChangeProcessor implements ChangeProcessor<List<ChangesDTO>> {
 
     @Override
     public void onContainerChange(final ContainerChange containerChange) {
+        final Optional<CommitMetadata> commitMetadata = containerChange.getCommitMetadata();
+        commitMetadata.ifPresent(cmd -> {
+            final ChangesDTO changesDTO = changesMap.get(cmd.getId().value());
 
+            containerChange.getValueRemovedChanges().forEach(valueRemoved -> {
+                final String section = containerChange.getPropertyName() + "[" + valueRemoved.getIndex() + "]";
+                final ChangeDTO changeDTO = new ChangeDTO("", null, null, null, null);
+                changesDTO.getChanges().put(section + ".deleted", Collections.singletonList(changeDTO));
+
+            });
+
+        });
     }
 
     @Override
@@ -178,6 +194,13 @@ public class TableChangeProcessor implements ChangeProcessor<List<ChangesDTO>> {
 
     @Override
     public List<ChangesDTO> result() {
-        return new ArrayList<>(changesMap.values());
+        changesMap.forEach((k, v) -> {
+            if (v.getChanges().isEmpty()) {
+                changesMap.remove(k);
+            }
+        });
+        final List<ChangesDTO> changes = new ArrayList<>(changesMap.values());
+        changes.sort(CHANGES_DTO_COMPARATOR);
+        return changes;
     }
 }
