@@ -72,19 +72,18 @@ public final class QRUtils {
         final UserFront user = emergencyData.getUser();
 
         // Byte 0 y 1 Anio de nacimiento, sexo y sangre
-        final ByteBuffer yearSexBloodBuffer = ByteBuffer.allocate(2).putShort((short) user.getBirthdate().getYear());
-        int sex = QRUtils.getSex(user.getSex()) << 3;
+        int sex = QRUtils.getSex(user.getSex()) << 2;
         int blood = getBlood("U");
         if (general != null) {
-            blood = QRUtils.getBlood(general.getBloodType()) << 6;
+            blood = QRUtils.getBlood(general.getBloodType());
         }
-        int yearSexBloodByte = yearSexBloodBuffer.get(0) | sex | blood;
-        yearSexBloodBuffer.put(0, (byte) (yearSexBloodByte));
-        yearSexBloodBuffer.rewind();
+        blood = blood << 4;
+        byte sexBloodByte = (byte) (sex | blood);
 
         final String url = emergencyData.getUuid();
         final byte[] message = new byte[3 + url.length() + 1];
-        System.arraycopy(yearSexBloodBuffer.array(), 0, message, 0, 2);
+        message[0] = sexBloodByte;
+        message[1] = (byte) (user.getBirthdate().getYear() - 1900);
 
         // Byte 2 Alergias y patologias comunes
         final BitSet bitSet = new BitSet();
@@ -102,19 +101,17 @@ public final class QRUtils {
                 bitSet.set(3);
             }
         }
-        if (patos != null) {
-            if (patos.contains("hipertension")) {
-                bitSet.set(4);
-            }
-            if (patos.contains("asma")) {
-                bitSet.set(5);
-            }
-            if (patos.contains("antecedentes_oncologicos")) {
-                bitSet.set(6);
-            }
-            if (patos.contains("insuficiencia_suprarrenal")) {
-                bitSet.set(7);
-            }
+        if (patos.contains("hipertension")) {
+            bitSet.set(4);
+        }
+        if (patos.contains("asma")) {
+            bitSet.set(5);
+        }
+        if (patos.contains("antecedentes_oncologicos")) {
+            bitSet.set(6);
+        }
+        if (patos.contains("insuficiencia_suprarrenal")) {
+            bitSet.set(7);
         }
 
         final ByteBuffer allergiesAndPathosBuffer = ByteBuffer.allocate(1).put(bitSet.toByteArray());
