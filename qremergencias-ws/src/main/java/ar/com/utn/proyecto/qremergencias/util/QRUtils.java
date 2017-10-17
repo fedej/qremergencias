@@ -15,7 +15,8 @@ import java.util.List;
 public final class QRUtils {
 
     private static final String CHARSET_NAME = "ISO-8859-1";
-    public static final String TIPO_OTRO = "otro";
+    private static final String TIPO_OTRO = "otro";
+    private static final int CRC = 1 << 6;
 
     private QRUtils() {
 
@@ -72,13 +73,13 @@ public final class QRUtils {
         final UserFront user = emergencyData.getUser();
 
         // Byte 0 y 1 Anio de nacimiento, sexo y sangre
-        int sex = QRUtils.getSex(user.getSex()) << 2;
+        int sex = QRUtils.getSex(user.getSex());
         int blood = getBlood("U");
         if (general != null) {
             blood = QRUtils.getBlood(general.getBloodType());
         }
-        blood = blood << 4;
-        byte sexBloodByte = (byte) (sex | blood);
+        blood = blood << 2;
+        byte sexBloodByte = (byte) (CRC | sex | blood);
 
         final String url = emergencyData.getUuid();
         final byte[] message = new byte[3 + url.length() + 1];
