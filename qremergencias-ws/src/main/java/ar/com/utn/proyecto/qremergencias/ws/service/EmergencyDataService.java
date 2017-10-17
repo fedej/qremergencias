@@ -103,36 +103,34 @@ public class EmergencyDataService {
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public void createQR(final String user) {
         final Optional<EmergencyData> emergencyDataOptional = findByUser(user);
-
-        if (emergencyDataOptional.isPresent()) {
-            try {
-                final EmergencyData emergencyData = emergencyDataOptional.get();
-                emergencyData.setUuid(UUID.randomUUID().toString());
-                repository.save(emergencyData);
-                final byte[] message = QRUtils.encode(emergencyData);
-                final String encrypted = CryptoUtils.encryptText(message);
-                final Map<EncodeHintType, Object> hints = new ConcurrentHashMap<>(2);
-                hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
-                hints.put(EncodeHintType.CHARACTER_SET, CHARSET_NAME);
-                hints.put(EncodeHintType.MARGIN, 0);
-                final BitMatrix bitMatrix = new QRCodeWriter()
-                        .encode(encrypted, BarcodeFormat.QR_CODE, WIDTH, HEIGHT, hints);
-                final BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-                for (int i = 0; i < WIDTH; i++) {
-                    for (int j = 0; j < HEIGHT; j++) {
-                        image.setRGB(i, j, bitMatrix.get(i, j) ? 0 : WHITE); // set pixel one by one
-                    }
+        final UserFront userFront = userFrontRepository.findByUsername(user);
+        try {
+            final EmergencyData emergencyData = emergencyDataOptional.orElse(new EmergencyData());
+            emergencyData.setUuid(UUID.randomUUID().toString());
+            emergencyData.setUser(userFront);
+            repository.save(emergencyData);
+            final byte[] message = QRUtils.encode(emergencyData);
+            final String encrypted = CryptoUtils.encryptText(message);
+            final Map<EncodeHintType, Object> hints = new ConcurrentHashMap<>(2);
+            hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
+            hints.put(EncodeHintType.CHARACTER_SET, CHARSET_NAME);
+            hints.put(EncodeHintType.MARGIN, 0);
+            final BitMatrix bitMatrix = new QRCodeWriter()
+                    .encode(encrypted, BarcodeFormat.QR_CODE, WIDTH, HEIGHT, hints);
+            final BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+            for (int i = 0; i < WIDTH; i++) {
+                for (int j = 0; j < HEIGHT; j++) {
+                    image.setRGB(i, j, bitMatrix.get(i, j) ? 0 : WHITE); // set pixel one by one
                 }
-
-                final UserFront userFront = userFrontRepository.findByUsername(user);
-                final Object id = gridFsService.saveQRImage(userFront, image);
-                userFront.setQr(id.toString());
-                userFrontRepository.save(userFront);
-            } catch (IOException | NoSuchAlgorithmException | WriterException | InvalidKeyException
-                    | InvalidAlgorithmParameterException | BadPaddingException
-                    | NoSuchPaddingException | IllegalBlockSizeException e) {
-                throw new RuntimeException(e);
             }
+
+            final Object id = gridFsService.saveQRImage(userFront, image);
+            userFront.setQr(id.toString());
+            userFrontRepository.save(userFront);
+        } catch (IOException | NoSuchAlgorithmException | WriterException | InvalidKeyException
+                | InvalidAlgorithmParameterException | BadPaddingException
+                | NoSuchPaddingException | IllegalBlockSizeException e) {
+            throw new RuntimeException(e);
         }
 
     }
