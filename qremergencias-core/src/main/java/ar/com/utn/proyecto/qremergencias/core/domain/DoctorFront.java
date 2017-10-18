@@ -9,5 +9,6 @@ public class DoctorFront extends UserFront {
 
     private String registrationNumber;
     private Object evidenceFile;
+    private boolean verified;
 
 }

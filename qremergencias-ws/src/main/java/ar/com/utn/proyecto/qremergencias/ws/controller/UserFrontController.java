@@ -261,10 +261,7 @@ public class UserFrontController {
             userFront = userFrontService.findByUsername(user.getUsername());
         }
 
-        if (!user.getRoles().contains("ROLE_MEDICO")) {
-            userFront.setEnabled(true);
-        }
-
+        userFront.setEnabled(true);
         userFront.setBirthdate(request.getBirthDate());
         userFront.setName(request.getName());
         userFront.setLastname(request.getLastName());

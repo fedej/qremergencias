@@ -65,7 +65,7 @@
                                             <td th:text="${user.registrationNumber}">matricula</td>
                                             <td>
                                                 <div class="col-sm-offset-5">
-                                                    <div th:class="${user.enabled}? 'glyphicon glyphicon-ok' : 'glyphicon glyphicon-remove'" />
+                                                    <div th:class="${user.verified}? 'glyphicon glyphicon-ok' : 'glyphicon glyphicon-remove'" />
                                                 </div>
                                             </td>                                      
                                             <td>
@@ -75,10 +75,10 @@
                                             </td>
                                             <td>
                                                 <div class="col-sm-offset-2">
-                                                    <form method="post" th:if="${!user.enabled}" th:action="@{/verification/verify(id=${user.id})}">
+                                                    <form method="post" th:if="${!user.verified}" th:action="@{/verification/verify(id=${user.id})}">
                                                         <input class="btn btn-primary" type="submit" value="Verificar" />
                                                     </form>
-                                                    <form method="post" th:if="${user.enabled}" th:action="@{/verification/unverify(id=${user.id})}">
+                                                    <form method="post" th:if="${user.verified}" th:action="@{/verification/unverify(id=${user.id})}">
                                                         <input class="btn btn-primary" type="submit" value="Desverificar" />
                                                     </form>
                                                 </div>
