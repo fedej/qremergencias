@@ -4,6 +4,7 @@ import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
 import ar.com.utn.proyecto.qremergencias.core.dto.PublicKeyDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.VerificationDTO;
+import ar.com.utn.proyecto.qremergencias.ws.exceptions.InvalidQRException;
 import ar.com.utn.proyecto.qremergencias.ws.service.EmergencyDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -97,22 +98,33 @@ public class TempCodeController {
 
     @PutMapping("/tempCode/{uuid}")
     @PreAuthorize("hasRole('MEDICO')")
-    public Integer createTempCode(@PathVariable final String uuid) {
+    public Integer createTempCode(@PathVariable final String uuid,
+                                  @AuthenticationPrincipal final UserFront user) {
         final Optional<EmergencyData> byUuid = emergencyDataService.findByUuid(uuid);
-        final String username = byUuid.get().getUser().getUsername();
-        final int tempCode = (int) (100000 + random.nextDouble() * 900000);
-        tempCodeCache.put(tempCodeCacheName + tempCode, String.valueOf(tempCode), username);
-        redisTemplate.expire(tempCodeCacheName + tempCode, 1, TimeUnit.MINUTES);
-        return tempCode;
+
+        if (byUuid.isPresent()) {
+            final String username = byUuid.get().getUser().getUsername();
+            final int tempCode = (int) (100000 + random.nextDouble() * 900000);
+            final String key = user.getUsername() + tempCodeCacheName + tempCode;
+            tempCodeCache.put(key, String.valueOf(tempCode), username);
+            redisTemplate.expire(key, 1, TimeUnit.MINUTES);
+            return tempCode;
+        } else {
+            throw new InvalidQRException();
+        }
+
     }
 
     @GetMapping("/tempCode/verify/{tempCode}")
     @PreAuthorize("hasRole('MEDICO')")
-    public String verifyTempCode(@PathVariable final Integer tempCode) {
+    public String verifyTempCode(@PathVariable final Integer tempCode,
+                                 @AuthenticationPrincipal final UserFront user) {
         if (tempCode == INT) {
             return PACIENTE_RRRAMUNDO_COM_AR;
         }
-        final Object cached = tempCodeCache.get(tempCodeCacheName + tempCode, String.valueOf(tempCode));
+
+        final String key = user.getUsername() + tempCodeCacheName + tempCode;
+        final Object cached = tempCodeCache.get(key, String.valueOf(tempCode));
         return cached == null ? "" : cached.toString();
     }
 

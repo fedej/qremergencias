@@ -1,5 +1,6 @@
 package ar.com.utn.proyecto.qremergencias.ws.controller;
 
+import ar.com.utn.proyecto.qremergencias.ws.exceptions.InvalidQRException;
 import ar.com.utn.proyecto.qremergencias.ws.exceptions.InvalidTokenException;
 import ar.com.utn.proyecto.qremergencias.ws.exceptions.PequeniaLisaException;
 import lombok.Data;
@@ -59,6 +60,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
     private static final ApiError LOGIN_ERROR = new ApiError(UNAUTHORIZED_ERROR, 1004, UNAUTHORIZED_ERROR_CODE);
     private static final ApiError DUPLICATE_USER = new ApiError(DUPLICATE_USER_ERROR, 1005, BAD_INPUT_CODE);
     private static final ApiError INVALID_TOKEN_ERROR = new ApiError("Token invalido", 1006, BAD_INPUT_CODE);
+    private static final ApiError INVALID_QR_ERROR = new ApiError("QR invalido", 1007, BAD_INPUT_CODE);
 
     @Autowired
     public GlobalExceptionHandler(final ErrorAttributes errorAttributes,
@@ -110,6 +112,12 @@ public class GlobalExceptionHandler extends BasicErrorController {
     public ResponseEntity<ApiError> error(final DuplicateKeyException exception) {
         log.error(exception.toString());
         return ResponseEntity.badRequest().body(DUPLICATE_USER);
+    }
+
+    @ExceptionHandler(InvalidQRException.class)
+    public ResponseEntity<ApiError> error(final InvalidQRException exception) {
+        log.error(exception.toString());
+        return ResponseEntity.badRequest().body(INVALID_QR_ERROR);
     }
 
     @ExceptionHandler(BindException.class)
