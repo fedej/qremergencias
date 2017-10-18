@@ -59,7 +59,8 @@ public class MedicalRecordService {
         if (files != null) {
             files.stream().map(f -> {
                 try {
-                    return gridFsTemplate.store(f.getInputStream(), f.getOriginalFilename(),
+                    return gridFsTemplate.store(f.getInputStream(),
+                            f.getOriginalFilename().replace(' ', '_'),
                             f.getContentType());
                 } catch (final IOException e) {
                     throw new RuntimeException(e);

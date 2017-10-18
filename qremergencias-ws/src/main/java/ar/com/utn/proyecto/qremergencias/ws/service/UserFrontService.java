@@ -57,7 +57,7 @@ public class UserFrontService extends UserService {
         if (evidence != null) {
             try {
                 final GridFSFile stored = gridFsTemplate.store(evidence.getInputStream(),
-                        evidence.getOriginalFilename(),
+                        evidence.getOriginalFilename().replace(' ', '_'),
                         evidence.getContentType());
                 doctor.setEvidenceFile(stored.getId());
             } catch (final IOException e) {
