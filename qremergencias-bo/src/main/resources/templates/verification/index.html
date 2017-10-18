@@ -61,7 +61,7 @@
                                             <td>
                                                 <a href="#" th:text="${user.username}" th:href="@{/verification/show(id=${user.id})}">user</a>
                                             </td>
-                                            <td th:text="${user.email}">email</td>
+                                            <td><a th:href="'mailto:' + ${user.email} + '?subject=' + ${subject}" th:text="${user.email}"></a></td>
                                             <td th:text="${user.registrationNumber}">matricula</td>
                                             <td>
                                                 <div class="col-sm-offset-5">
