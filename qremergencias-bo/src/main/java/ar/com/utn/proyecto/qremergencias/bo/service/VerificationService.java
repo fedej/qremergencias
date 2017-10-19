@@ -67,10 +67,12 @@ public class VerificationService {
     }
 
     public void verify(final String id) {
-        UserFront savedUser = modifyMedico(id, true);
-        final String token = UUID.randomUUID().toString();
-        createVerificationToken(savedUser, token);
-        sendMailConfirmation(savedUser);
+        final UserFront savedUser = modifyMedico(id, true);
+        if (!savedUser.isEnabled()) {
+            final String token = UUID.randomUUID().toString();
+            createVerificationToken(savedUser, token);
+            sendMailConfirmation(savedUser);
+        }
     }
 
     public UserFront unverify(final String id) {

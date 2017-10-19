@@ -11,4 +11,8 @@ public class DoctorFront extends UserFront {
     private Object evidenceFile;
     private boolean verified;
 
+    @Override
+    public boolean isEnabled() {
+        return super.isEnabled() & this.isVerified();
+    }
 }
