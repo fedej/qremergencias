@@ -74,7 +74,7 @@ public class EmergencyDataController {
     @GetMapping("/{uuid}")
     public String getEmergencyDataByUuid(@PathVariable final String uuid) throws PequeniaLisaException {
         final Optional<EmergencyData> emergencyData = service.findByUuid(uuid);
-        if (emergencyData.isPresent()){
+        if (emergencyData.isPresent()) {
             final EmergencyDataDTO emergencyDataDTO = new EmergencyDataDTO(emergencyData.get());
             try {
                 final String emergencyDTOString = objectMapper.writeValueAsString(emergencyDataDTO);
