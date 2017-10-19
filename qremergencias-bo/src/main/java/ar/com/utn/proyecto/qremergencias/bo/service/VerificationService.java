@@ -67,20 +67,23 @@ public class VerificationService {
     }
 
     public void verify(final String id) {
-        modifyMedico(id, true);
+        final UserFront savedUser = modifyMedico(id, true);
+        if (!savedUser.isEnabled()) {
+            final String token = UUID.randomUUID().toString();
+            createVerificationToken(savedUser, token);
+            sendMailConfirmation(savedUser);
+        }
     }
 
-    public void unverify(final String id) {
-        modifyMedico(id, false);
+    public UserFront unverify(final String id) {
+        return modifyMedico(id, false);
     }
 
-    private void modifyMedico(final String id, final boolean verified) {
-        final UserFront medico = userFrontRepository.findOne(id);
-        medico.setEnabled(verified);
+    private UserFront modifyMedico(final String id, final boolean verified) {
+        final DoctorFront medico = (DoctorFront) userFrontRepository.findOne(id);
+        medico.setVerified(verified);
         final UserFront savedUser = userFrontRepository.save(medico);
-        final String token = UUID.randomUUID().toString();
-        createVerificationToken(savedUser, token);
-        sendMailConfirmation(savedUser);
+        return savedUser;
     }
 
     public void createVerificationToken(final User user, final String token) {
