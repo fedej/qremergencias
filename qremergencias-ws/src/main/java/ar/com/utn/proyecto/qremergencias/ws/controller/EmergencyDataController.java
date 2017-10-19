@@ -5,6 +5,7 @@ import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.changelog.ChangesDTO;
 import ar.com.utn.proyecto.qremergencias.util.CryptoUtils;
+import ar.com.utn.proyecto.qremergencias.ws.exceptions.InvalidQRException;
 import ar.com.utn.proyecto.qremergencias.ws.exceptions.PequeniaLisaException;
 import ar.com.utn.proyecto.qremergencias.ws.service.ChangesService;
 import ar.com.utn.proyecto.qremergencias.ws.service.EmergencyDataService;
@@ -73,12 +74,16 @@ public class EmergencyDataController {
     @GetMapping("/{uuid}")
     public String getEmergencyDataByUuid(@PathVariable final String uuid) throws PequeniaLisaException {
         final Optional<EmergencyData> emergencyData = service.findByUuid(uuid);
-        final EmergencyDataDTO emergencyDataDTO = new EmergencyDataDTO(emergencyData.orElse(new EmergencyData()));
-        try {
-            final String emergencyDTOString = objectMapper.writeValueAsString(emergencyDataDTO);
-            return CryptoUtils.encryptText(emergencyDTOString.getBytes(CHARSET_NAME));
-        } catch (final Exception exception) {
-            throw new PequeniaLisaException(exception);
+        if (emergencyData.isPresent()){
+            final EmergencyDataDTO emergencyDataDTO = new EmergencyDataDTO(emergencyData.get());
+            try {
+                final String emergencyDTOString = objectMapper.writeValueAsString(emergencyDataDTO);
+                return CryptoUtils.encryptText(emergencyDTOString.getBytes(CHARSET_NAME));
+            } catch (final Exception exception) {
+                throw new PequeniaLisaException(exception);
+            }
+        } else {
+            throw new InvalidQRException();
         }
     }
 
