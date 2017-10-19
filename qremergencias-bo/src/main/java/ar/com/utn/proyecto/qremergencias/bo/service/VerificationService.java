@@ -82,8 +82,7 @@ public class VerificationService {
     private UserFront modifyMedico(final String id, final boolean verified) {
         final DoctorFront medico = (DoctorFront) userFrontRepository.findOne(id);
         medico.setVerified(verified);
-        final UserFront savedUser = userFrontRepository.save(medico);
-        return savedUser;
+        return userFrontRepository.save(medico);
     }
 
     public void createVerificationToken(final User user, final String token) {

@@ -13,6 +13,6 @@ public class DoctorFront extends UserFront {
 
     @Override
     public boolean isEnabled() {
-        return super.isEnabled() & this.isVerified();
+        return super.isEnabled() && this.isVerified();
     }
 }
