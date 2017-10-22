@@ -17,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,15 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -76,24 +66,25 @@ public class TempCodeController {
     }
 
     @PutMapping("/upload")
-    @PreAuthorize("hasRole('PACIENTE')")
+    //@PreAuthorize("hasRole('PACIENTE')")
     @ResponseStatus(HttpStatus.OK)
     public void uploadPublicKey(@RequestBody final PublicKeyDTO body,
                                 @AuthenticationPrincipal
                                 final UserFront user)
             throws UnsupportedEncodingException {
-        publicKeyCache.put(user.getId(), Base64.getDecoder().decode(body.getPublicKey()));
+        publicKeyCache.put(user.getUsername(), body.getPublicKey());
     }
 
-    @PostMapping("/verify")
+    @GetMapping("/pk")
     @PreAuthorize("hasRole('MEDICO')")
-    public String verifyDataSignature(@RequestBody final VerificationDTO body)
-            throws InvalidKeySpecException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
-            UnsupportedEncodingException {
-        final boolean verified = verifySignature(body.getMessage(), Base64.getDecoder().decode(body.getSignature()));
-        return verified
-                ? emergencyDataService.findByUuid(body.getMessage()).get().getUser().getUsername() :
-                "";
+    @ResponseStatus(HttpStatus.OK)
+    public VerificationDTO getPublicKey(final String user)
+            throws UnsupportedEncodingException {
+        final Optional<EmergencyData> emergencyData = emergencyDataService.findByUser(user);
+        if (emergencyData.isPresent()) {
+            return new VerificationDTO(emergencyData.get().getUuid(), publicKeyCache.get(user, String.class));
+        }
+        throw new InvalidQRException();
     }
 
     @PutMapping("/tempCode/{uuid}")
@@ -126,23 +117,6 @@ public class TempCodeController {
         final String key = user.getUsername() + tempCodeCacheName + tempCode;
         final Object cached = tempCodeCache.get(key, String.valueOf(tempCode));
         return cached == null ? "" : cached.toString();
-    }
-
-    private boolean verifySignature(final String data, final byte[] signature)
-            throws NoSuchAlgorithmException, InvalidKeySpecException,
-            UnsupportedEncodingException, SignatureException, InvalidKeyException {
-        final Signature sig = Signature.getInstance("SHA256withRSA");
-        sig.initVerify(getPublic(data));
-        sig.update(data.getBytes("ISO-8859-1"));
-        return sig.verify(signature);
-    }
-
-    private PublicKey getPublic(final String key) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        final byte[] keyBytes = publicKeyCache.get(key, byte[].class);
-        final X509EncodedKeySpec spec =
-                new X509EncodedKeySpec(keyBytes);
-        final KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePublic(spec);
     }
 
 }

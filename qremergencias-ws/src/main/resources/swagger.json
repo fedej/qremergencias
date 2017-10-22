@@ -450,10 +450,10 @@
         },
         "VerificationDTO": {
             "properties": {
-                "message": {
+                "publicKey": {
                     "type": "string"
                 },
-                "signature": {
+                "uuid": {
                     "type": "string"
                 }
             },
@@ -1139,6 +1139,50 @@
                 ]
             }
         },
+        "/api/mobile/pk": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "getPublicKeyUsingGET",
+                "parameters": [
+                    {
+                        "description": "user",
+                        "in": "query",
+                        "name": "user",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/VerificationDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "getPublicKey",
+                "tags": [
+                    "temp-code-controller"
+                ]
+            }
+        },
         "/api/mobile/tempCode/verify/{tempCode}": {
             "get": {
                 "consumes": [
@@ -1267,52 +1311,6 @@
                     }
                 },
                 "summary": "uploadPublicKey",
-                "tags": [
-                    "temp-code-controller"
-                ]
-            }
-        },
-        "/api/mobile/verify": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "operationId": "verifyDataSignatureUsingPOST",
-                "parameters": [
-                    {
-                        "description": "body",
-                        "in": "body",
-                        "name": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/VerificationDTO"
-                        }
-                    }
-                ],
-                "produces": [
-                    "*/*"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Dato erroneo",
-                        "schema": {
-                            "$ref": "#/definitions/ApiError"
-                        }
-                    },
-                    "500": {
-                        "description": "Error inesperado",
-                        "schema": {
-                            "$ref": "#/definitions/ApiError"
-                        }
-                    }
-                },
-                "summary": "verifyDataSignature",
                 "tags": [
                     "temp-code-controller"
                 ]
