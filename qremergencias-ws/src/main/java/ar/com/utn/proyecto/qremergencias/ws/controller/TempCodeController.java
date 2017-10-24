@@ -66,7 +66,7 @@ public class TempCodeController {
     }
 
     @PutMapping("/upload")
-    //@PreAuthorize("hasRole('PACIENTE')")
+    @PreAuthorize("hasRole('PACIENTE')")
     @ResponseStatus(HttpStatus.OK)
     public void uploadPublicKey(@RequestBody final PublicKeyDTO body,
                                 @AuthenticationPrincipal
