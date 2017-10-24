@@ -3,12 +3,14 @@ package ar.com.utn.proyecto.qremergencias.ws.config;
 import ar.com.utn.proyecto.qremergencias.core.dto.LoginUserDTO;
 import ar.com.utn.proyecto.qremergencias.ws.controller.GlobalExceptionHandler.ApiError;
 import com.fasterxml.classmate.TypeResolver;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
@@ -57,16 +59,19 @@ import static springfox.documentation.service.ApiInfo.DEFAULT_CONTACT;
 public class SwaggerConfig {
 
     private final TypeResolver typeResolver;
+    private final Environment environment;
 
     @Autowired
-    public SwaggerConfig(final TypeResolver typeResolver) {
+    public SwaggerConfig(final TypeResolver typeResolver, final Environment environment) {
         this.typeResolver = typeResolver;
+        this.environment = environment;
     }
 
     @Bean
     // To access the generated swagger
     // http://localhost:8082/qremergencias/v2/api-docs
     // Then it must be copied to src/main/resources/swagger.json
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public Docket swaggerSpringMvcPlugin() {
 
         final List<ResponseMessage> responseMessageList = new ArrayList<>();
@@ -82,6 +87,11 @@ public class SwaggerConfig {
                         .message(UNEXPECTED_ERROR)
                         .responseModel(new ModelRef(ApiError.class.getSimpleName()))
                         .build());
+
+        Predicate<String> androidRegex = regex("/mobile/.*");
+        if (!environment.acceptsProfiles("android")) {
+            androidRegex = not(androidRegex);
+        }
 
         return new Docket(DocumentationType.SWAGGER_2)
                 .protocols(Collections.singleton("http"))
@@ -101,7 +111,7 @@ public class SwaggerConfig {
                 .additionalModels(typeResolver.resolve(ApiError.class),
                         typeResolver.resolve(LoginUserDTO.class))
                 .select()
-                .paths(and(not(regex("/error.*")), regex("/.*")))
+                .paths(and(not(regex("/error.*")), not(regex("/oauth.*")), regex("/.*"), androidRegex))
                 .build();
     }
 
