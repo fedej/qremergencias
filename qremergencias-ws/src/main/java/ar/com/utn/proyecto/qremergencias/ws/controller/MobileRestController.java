@@ -5,6 +5,7 @@ import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
 import ar.com.utn.proyecto.qremergencias.core.dto.LoginUserDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.PublicKeyDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.VerificationDTO;
+import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
 import ar.com.utn.proyecto.qremergencias.ws.exceptions.InvalidQRException;
 import ar.com.utn.proyecto.qremergencias.ws.exceptions.PequeniaLisaException;
 import ar.com.utn.proyecto.qremergencias.ws.service.EmergencyDataService;
@@ -29,7 +30,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/mobile")
+@RequestMapping("/api/mobile")
 public class MobileRestController {
 
     private final EmergencyDataController emergencyDataController;
@@ -61,6 +62,11 @@ public class MobileRestController {
     @GetMapping("/emergencyData/{uuid}")
     public String getEmergencyDataByUuid(@PathVariable final String uuid) throws PequeniaLisaException {
         return emergencyDataController.getEmergencyDataByUuid(uuid);
+    }
+
+    @GetMapping("/emergencyData")
+    public EmergencyDataDTO getEmergencyData() {
+        return new EmergencyDataDTO();
     }
 
     @GetMapping("/tempCode/pk")
@@ -95,7 +101,6 @@ public class MobileRestController {
     @PreAuthorize("hasAnyRole('MEDICO', 'PACIENTE')")
     public LoginUserDTO getUserInfo(@AuthenticationPrincipal final UserFront user) {
         return new LoginUserDTO(user.getName(), user.getLastname(), user.getRoles(), user.getEmail());
-
     }
 
 }

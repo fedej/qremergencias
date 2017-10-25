@@ -88,7 +88,7 @@ public class SwaggerConfig {
                         .responseModel(new ModelRef(ApiError.class.getSimpleName()))
                         .build());
 
-        Predicate<String> androidRegex = regex("/mobile/.*");
+        Predicate<String> androidRegex = regex("/api/mobile/.*");
         if (!environment.acceptsProfiles("android")) {
             androidRegex = not(androidRegex);
         }
