@@ -4,9 +4,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.authserver.AuthorizationServerProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.authserver.OAuth2AuthorizationServerConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -18,7 +16,6 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 import org.springframework.security.oauth2.provider.client.BaseClientDetails;
 import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 
 @Configuration
 public class OAuth2Config {
@@ -48,24 +45,19 @@ public class OAuth2Config {
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     protected static class OAuth2ServerConfig extends OAuth2AuthorizationServerConfiguration {
 
-        private final RedisConnectionFactory redisConnectionFactory;
+        private final TokenStore tokenStore;
         private final AuthenticationManager authenticationManager;
 
         @Autowired
         public OAuth2ServerConfig(final BaseClientDetails details,
-                                  final ObjectProvider<TokenStore> tokenStore,
+                                  final ObjectProvider<TokenStore> tokenStoreObjectProvider,
                                   final ObjectProvider<AccessTokenConverter> tokenConverter,
                                   final AuthorizationServerProperties properties,
-                                  final RedisConnectionFactory redisConnectionFactory,
+                                  final TokenStore tokenStore,
                                   final AuthenticationManager authenticationManager) {
-            super(details, authenticationManager, tokenStore, tokenConverter, properties);
-            this.redisConnectionFactory = redisConnectionFactory;
+            super(details, authenticationManager, tokenStoreObjectProvider, tokenConverter, properties);
+            this.tokenStore = tokenStore;
             this.authenticationManager = authenticationManager;
-        }
-
-        @Bean
-        public TokenStore tokenStore() {
-            return new RedisTokenStore(redisConnectionFactory);
         }
 
         @Override
@@ -78,7 +70,7 @@ public class OAuth2Config {
         public void configure(final AuthorizationServerEndpointsConfigurer endpoints) {
             endpoints
                     .authenticationManager(authenticationManager)
-                    .tokenStore(tokenStore())
+                    .tokenStore(tokenStore)
                     .approvalStoreDisabled();
         }
 
