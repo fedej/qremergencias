@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriTemplate;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,8 +90,15 @@ public class MedicalRecordController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isFullyAuthenticated()")
     @ApiIgnore("URL is handled by the backend")
-    public Resource findFileById(@PathVariable final String fileId) {
-        return gridFsService.findFileById(fileId);
+    public Resource findFileById(@PathVariable final String fileId, final HttpServletResponse response) {
+        final GridFsResource fileById = gridFsService.findFileById(fileId);
+
+        if (!fileById.getContentType().matches(".*pdf.*|.*image.*")) {
+            response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileById.getFilename());
+            response.addHeader(HttpHeaders.CONTENT_TYPE, fileById.getContentType());
+        }
+
+        return fileById;
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

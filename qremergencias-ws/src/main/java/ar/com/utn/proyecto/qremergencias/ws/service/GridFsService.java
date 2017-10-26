@@ -4,9 +4,8 @@ import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import com.mongodb.gridfs.GridFSDBFile;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
@@ -31,11 +30,11 @@ public class GridFsService {
         this.gridFsTemplate = gridFsTemplate;
     }
 
-    public Resource findFileById(final String fileId) {
+    public GridFsResource findFileById(final String fileId) {
         final GridFSDBFile file = findGridFSFile().apply(fileId);
 
         if (file != null) {
-            return new InputStreamResource(file.getInputStream());
+            return new GridFsResource(file);
         }
 
         return null;
