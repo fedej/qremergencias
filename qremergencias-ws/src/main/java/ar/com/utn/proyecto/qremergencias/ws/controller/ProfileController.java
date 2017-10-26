@@ -96,8 +96,8 @@ public class ProfileController {
     public void update(@RequestBody final UserProfileDTO userProfileDTO,
                        @AuthenticationPrincipal final UserFront user) {
         log.info("In ProfileController.update()");
-        userProfileService.update(user, userProfileDTO);
-        updateSession(user);
+        final UserFront updated = userProfileService.update(user, userProfileDTO);
+        updateSession(updated);
     }
 
 }

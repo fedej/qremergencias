@@ -18,12 +18,13 @@ public class UserProfileService {
     @Autowired
     private UserFrontRepository userFrontRepository;
 
-    public void update(final UserFront userFront, final UserProfileDTO userProfileDTO) {
-        userFront.setBirthdate(userProfileDTO.getBirthDate().toLocalDate());
-        userFront.setIdNumber(userProfileDTO.getIdNumber());
-        userFront.setName(userProfileDTO.getFirstName());
-        userFront.setLastname(userProfileDTO.getLastName());
-        userFront.setSex(userProfileDTO.getSex());
+    public UserFront update(final UserFront userFront, final UserProfileDTO userProfileDTO) {
+        final UserFront toUpdate = userFrontRepository.findByUsername(userFront.getUsername());
+        toUpdate.setBirthdate(userProfileDTO.getBirthDate().toLocalDate());
+        toUpdate.setIdNumber(userProfileDTO.getIdNumber());
+        toUpdate.setName(userProfileDTO.getFirstName());
+        toUpdate.setLastname(userProfileDTO.getLastName());
+        toUpdate.setSex(userProfileDTO.getSex());
 
         if (userProfileDTO.getContacts() != null) {
             final List<UserEmergencyContact> contacts = new ArrayList<>();
@@ -35,8 +36,8 @@ public class UserProfileService {
                         contactDTO.getPhoneNumber());
                 contacts.add(contact);
             }
-            userFront.setContacts(contacts);
+            toUpdate.setContacts(contacts);
         }
-        userFrontRepository.save(userFront);
+        return userFrontRepository.save(toUpdate);
     }
 }
