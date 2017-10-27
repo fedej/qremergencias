@@ -1,12 +1,10 @@
 package ar.com.utn.proyecto.qremergencias.ws.controller;
 
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
-import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
 import ar.com.utn.proyecto.qremergencias.core.dto.LoginUserDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.PublicKeyDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.VerificationDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
-import ar.com.utn.proyecto.qremergencias.ws.exceptions.InvalidQRException;
 import ar.com.utn.proyecto.qremergencias.ws.exceptions.PequeniaLisaException;
 import ar.com.utn.proyecto.qremergencias.ws.service.EmergencyDataService;
 import ar.com.utn.proyecto.qremergencias.ws.service.TempCodeService;
@@ -27,7 +25,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import java.io.UnsupportedEncodingException;
-import java.util.Optional;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
+import static ar.com.utn.proyecto.qremergencias.util.CryptoUtils.verifySignature;
 
 @RestController
 @RequestMapping("/api/mobile")
@@ -73,11 +74,35 @@ public class MobileRestController {
     @PreAuthorize("hasRole('MEDICO')")
     @ResponseStatus(HttpStatus.OK)
     public VerificationDTO getPublicKey(final String user) throws UnsupportedEncodingException {
-        final Optional<EmergencyData> emergencyData = emergencyDataService.findByUser(user);
-        if (emergencyData.isPresent()) {
-            return new VerificationDTO(emergencyData.get().getUuid(), publicKeyCache.get(user, String.class));
+
+        final Instant timestamp = getTimestamp(user);
+        if (timestamp.isBefore(Instant.now().plus(3, ChronoUnit.HOURS))) {
+            final String username = getUser(user);
+            if (verifySignature(publicKeyCache.get(username, String.class), user)) {
+                return emergencyDataService.findByUser(username)
+                        .map(emergencyData1 -> new VerificationDTO(emergencyData1.getUuid(), null))
+                        .orElseGet(() -> new VerificationDTO(null, "Datos insuficientes"));
+            } else {
+                return new VerificationDTO(null, "Firma invalida");
+            }
+        } else {
+            return new VerificationDTO(null, "QR Expirado");
         }
-        throw new InvalidQRException();
+
+    }
+
+    private Instant getTimestamp(final String qr) {
+        final Long timestamp = Long.valueOf(getTimestampAndUser(qr)[1]);
+        return Instant.ofEpochMilli(timestamp);
+    }
+
+    private String getUser(final String qr) {
+        return getTimestampAndUser(qr)[0];
+    }
+
+    private String[] getTimestampAndUser(final String qr) {
+        final Integer signatureSize = Integer.valueOf(qr.substring(0, 3));
+        return qr.substring(3 + signatureSize, qr.length()).split(" ");
     }
 
     @PutMapping("/tempCode/upload")
