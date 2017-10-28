@@ -37,7 +37,7 @@ public class UserProfileServiceTest {
         when(repository.findByUsername(anyString())).thenReturn(new UserFront());
         final UserProfileDTO userProfileDTO = new UserProfileDTO();
         userProfileDTO.setBirthDate(LocalDateTime.of(1990, 9, 18, 0,0,0));
-        service.update(user, userProfileDTO);
+        service.update(user, userProfileDTO, false);
         verify(repository).save(any(UserFront.class));
     }
 }

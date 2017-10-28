@@ -3,6 +3,7 @@ package ar.com.utn.proyecto.qremergencias.ws.controller;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.LoginUserDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.PublicKeyDTO;
+import ar.com.utn.proyecto.qremergencias.core.dto.UserProfileDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.VerificationDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
 import ar.com.utn.proyecto.qremergencias.ws.exceptions.PequeniaLisaException;
@@ -16,10 +17,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,6 +38,7 @@ import static ar.com.utn.proyecto.qremergencias.util.CryptoUtils.verifySignature
 public class MobileRestController {
 
     private final EmergencyDataController emergencyDataController;
+    private final ProfileController profileController;
     private final EmergencyDataService emergencyDataService;
     private final TempCodeService tempCodeService;
     private final CacheManager cacheManager;
@@ -51,10 +55,12 @@ public class MobileRestController {
 
     @Autowired
     public MobileRestController(final EmergencyDataController emergencyDataController,
+                                final ProfileController profileController,
                                 final EmergencyDataService emergencyDataService,
                                 final TempCodeService tempCodeService,
                                 final CacheManager cacheManager) {
         this.emergencyDataController = emergencyDataController;
+        this.profileController = profileController;
         this.emergencyDataService = emergencyDataService;
         this.tempCodeService = tempCodeService;
         this.cacheManager = cacheManager;
@@ -66,14 +72,15 @@ public class MobileRestController {
     }
 
     @GetMapping("/emergencyData")
-    public EmergencyDataDTO getEmergencyData() {
-        return new EmergencyDataDTO();
+    @PreAuthorize("hasRole('PACIENTE')")
+    public EmergencyDataDTO getEmergencyData(@AuthenticationPrincipal final UserFront userFront) {
+        return emergencyDataController.getEmergencyData(userFront.getUsername());
     }
 
     @GetMapping("/tempCode/pk")
     @PreAuthorize("hasRole('MEDICO')")
     @ResponseStatus(HttpStatus.OK)
-    public VerificationDTO getPublicKey(final String user) throws UnsupportedEncodingException {
+    public VerificationDTO verifyQRSignature(final String user) throws UnsupportedEncodingException {
 
         final Instant timestamp = getTimestamp(user);
         if (timestamp.isBefore(Instant.now().plus(3, ChronoUnit.HOURS))) {
@@ -89,6 +96,22 @@ public class MobileRestController {
             return new VerificationDTO(null, "QR Expirado");
         }
 
+    }
+
+    @GetMapping
+    @PreAuthorize("isFullyAuthenticated()")
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+    public UserProfileDTO getProfile(@AuthenticationPrincipal final UserFront userFront) {
+        return profileController.list(userFront);
+    }
+
+    @PatchMapping
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("isFullyAuthenticated()")
+    public void updateProfile(@RequestBody final UserProfileDTO userProfileDTO,
+                       @AuthenticationPrincipal final UserFront user,
+                       @RequestParam final boolean qrUpdateRequired) {
+        profileController.update(userProfileDTO, user, qrUpdateRequired);
     }
 
     private Instant getTimestamp(final String qr) {
@@ -109,8 +132,7 @@ public class MobileRestController {
     @PreAuthorize("hasRole('PACIENTE')")
     @ResponseStatus(HttpStatus.OK)
     public void uploadPublicKey(@RequestBody final PublicKeyDTO body,
-                                @AuthenticationPrincipal
-                                final UserFront user)
+                                @AuthenticationPrincipal final UserFront user)
             throws UnsupportedEncodingException {
         publicKeyCache.put(user.getUsername(), body.getPublicKey());
     }

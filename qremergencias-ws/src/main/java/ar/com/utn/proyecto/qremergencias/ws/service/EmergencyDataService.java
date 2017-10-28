@@ -80,7 +80,8 @@ public class EmergencyDataService {
         return repository.findByUuid(uuid);
     }
 
-    public void createOrUpdate(final String username, final EmergencyDataDTO emergencyDataDTO, final boolean qrUpdateRequired) {
+    public void createOrUpdate(final String username, final EmergencyDataDTO emergencyDataDTO,
+                               final boolean qrUpdateRequired) {
         final UserFront user = userFrontRepository.findByUsername(username);
         final Optional<EmergencyData> oldData = repository.findByUser(user);
         emergencyDataDTO.setUuid(UUID.randomUUID().toString());
