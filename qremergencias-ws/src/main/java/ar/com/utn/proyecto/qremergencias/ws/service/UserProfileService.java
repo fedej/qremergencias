@@ -22,7 +22,7 @@ public class UserProfileService {
     @Autowired
     private EmergencyDataService emergencyDataService;
 
-    public UserFront update(final UserFront userFront, final UserProfileDTO userProfileDTO) {
+    public UserFront update(final UserFront userFront, final UserProfileDTO userProfileDTO, final boolean qrUpdateRequired) {
         final UserFront toUpdate = userFrontRepository.findByUsername(userFront.getUsername());
         toUpdate.setBirthdate(userProfileDTO.getBirthDate().toLocalDate());
         toUpdate.setIdNumber(userProfileDTO.getIdNumber());
@@ -51,7 +51,7 @@ public class UserProfileService {
                 .stream()
                 .filter(UserEmergencyContact::isPrimary).findAny();
 
-        if (!oldPrimary.equals(newPrimary)) {
+        if (!oldPrimary.equals(newPrimary) || qrUpdateRequired) {
             emergencyDataService.sendDataChangeMail(userFront);
         }
 

@@ -16,12 +16,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.session.ExpiringSession;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import java.lang.invoke.MethodHandle;
@@ -95,9 +90,10 @@ public class ProfileController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isFullyAuthenticated()")
     public void update(@RequestBody final UserProfileDTO userProfileDTO,
-                       @AuthenticationPrincipal final UserFront user) {
+                       @AuthenticationPrincipal final UserFront user,
+                       @RequestParam final boolean qrUpdateRequired) {
         log.info("In ProfileController.update()");
-        final UserFront updated = userProfileService.update(user, userProfileDTO);
+        final UserFront updated = userProfileService.update(user, userProfileDTO, qrUpdateRequired);
         updateSession(updated);
     }
 
