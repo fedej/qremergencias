@@ -62,7 +62,8 @@ public class ProfileController {
             final UserContactDTO contactDTO = new UserContactDTO(
                 contact.getFirstName(),
                 contact.getLastName(),
-                contact.getPhoneNumber());
+                contact.getPhoneNumber(),
+                contact.isPrimary());
             contacts.add(contactDTO);
         }
 

@@ -40,7 +40,8 @@
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.UserEmergencyContact",
                       "firstName": "Federico",
                       "lastName": "Jaite",
-                      "phoneNumber": "1533323333"
+                      "phoneNumber": "1533323333",
+                      "primary": true
                     }
                   ]
                 ]

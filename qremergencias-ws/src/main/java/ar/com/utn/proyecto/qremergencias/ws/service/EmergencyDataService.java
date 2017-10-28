@@ -142,7 +142,7 @@ public class EmergencyDataService {
         userFrontRepository.save(userFront);
     }
 
-    private void sendDataChangeMail(final UserFront user) {
+    public void sendDataChangeMail(final UserFront user) {
         if (!StringUtils.isEmpty(user.getEmail())) {
             final Locale locale = LocaleContextHolder.getLocale();
             final Context ctx = new Context(locale);

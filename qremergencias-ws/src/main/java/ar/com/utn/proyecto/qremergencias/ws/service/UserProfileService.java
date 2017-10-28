@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.DataflowAnomalyAnalysis"})
@@ -17,6 +18,9 @@ public class UserProfileService {
 
     @Autowired
     private UserFrontRepository userFrontRepository;
+
+    @Autowired
+    private EmergencyDataService emergencyDataService;
 
     public UserFront update(final UserFront userFront, final UserProfileDTO userProfileDTO) {
         final UserFront toUpdate = userFrontRepository.findByUsername(userFront.getUsername());
@@ -33,11 +37,24 @@ public class UserProfileService {
                 final UserEmergencyContact contact = new UserEmergencyContact(
                         contactDTO.getFirstName(),
                         contactDTO.getLastName(),
-                        contactDTO.getPhoneNumber());
+                        contactDTO.getPhoneNumber(),
+                        contactDTO.isPrimary());
                 contacts.add(contact);
             }
             toUpdate.setContacts(contacts);
         }
+
+        final Optional<UserEmergencyContact> oldPrimary = userFront.getContacts()
+                .stream()
+                .filter(UserEmergencyContact::isPrimary).findAny();
+        final Optional<UserEmergencyContact> newPrimary = toUpdate.getContacts()
+                .stream()
+                .filter(UserEmergencyContact::isPrimary).findAny();
+
+        if (!oldPrimary.equals(newPrimary)) {
+            emergencyDataService.sendDataChangeMail(userFront);
+        }
+
         return userFrontRepository.save(toUpdate);
     }
 }
