@@ -98,14 +98,14 @@ public class MobileRestController {
 
     }
 
-    @GetMapping
+    @GetMapping("/profile")
     @PreAuthorize("isFullyAuthenticated()")
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public UserProfileDTO getProfile(@AuthenticationPrincipal final UserFront userFront) {
         return profileController.list(userFront);
     }
 
-    @PatchMapping
+    @PatchMapping("/profile")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isFullyAuthenticated()")
     public void updateProfile(@RequestBody final UserProfileDTO userProfileDTO,
