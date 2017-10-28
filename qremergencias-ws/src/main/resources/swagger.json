@@ -517,6 +517,13 @@
                         "name": "userId",
                         "required": true,
                         "type": "string"
+                    },
+                    {
+                        "description": "qrUpdateRequired",
+                        "in": "query",
+                        "name": "qrUpdateRequired",
+                        "required": true,
+                        "type": "boolean"
                     }
                 ],
                 "produces": [

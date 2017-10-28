@@ -54,8 +54,9 @@ public class EmergencyDataController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('MEDICO')")
     public void updateEmergencyData(@Valid @RequestBody final EmergencyDataDTO emergencyDataDTO,
-                                    @RequestParam final String userId) {
-        service.createOrUpdate(userId, emergencyDataDTO);
+                                    @RequestParam final String userId,
+                                    @RequestParam final boolean qrUpdateRequired) {
+        service.createOrUpdate(userId, emergencyDataDTO, qrUpdateRequired);
     }
 
     @GetMapping
