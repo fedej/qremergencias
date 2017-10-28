@@ -1178,6 +1178,13 @@
                         "schema": {
                             "$ref": "#/definitions/UserProfileDTO"
                         }
+                    },
+                    {
+                        "description": "qrUpdateRequired",
+                        "in": "query",
+                        "name": "qrUpdateRequired",
+                        "required": true,
+                        "type": "boolean"
                     }
                 ],
                 "produces": [
