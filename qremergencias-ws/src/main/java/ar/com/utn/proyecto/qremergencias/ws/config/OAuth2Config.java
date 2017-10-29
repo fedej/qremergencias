@@ -33,6 +33,10 @@ public class OAuth2Config {
         @Override
         public void configure(final HttpSecurity http) throws Exception {
             http
+                    .antMatcher("/api/mobile/emergencyData")
+                    .authorizeRequests()
+                    .anyRequest().permitAll()
+            .and()
                     .antMatcher("/api/mobile/**")
                     .authorizeRequests()
                     .antMatchers("/api/mobile/**").access("#oauth2.hasScope('read')");

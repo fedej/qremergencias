@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -67,7 +69,9 @@ public class MobileRestController {
     }
 
     @GetMapping("/emergencyData/{uuid}")
-    public String getEmergencyDataByUuid(@PathVariable final String uuid) throws PequeniaLisaException {
+    public String getEmergencyDataByUuid(@PathVariable final String uuid,
+                                         @RequestHeader(HttpHeaders.AUTHORIZATION) final String authorization)
+            throws PequeniaLisaException {
         return emergencyDataController.getEmergencyDataByUuid(uuid);
     }
 
