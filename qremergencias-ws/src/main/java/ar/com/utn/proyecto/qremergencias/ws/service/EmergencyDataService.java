@@ -84,7 +84,11 @@ public class EmergencyDataService {
                                final boolean qrUpdateRequired) {
         final UserFront user = userFrontRepository.findByUsername(username);
         final Optional<EmergencyData> oldData = repository.findByUser(user);
-        emergencyDataDTO.setUuid(UUID.randomUUID().toString());
+
+        if (qrUpdateRequired) {
+            emergencyDataDTO.setUuid(UUID.randomUUID().toString());
+        }
+
         if (oldData.isPresent()) {
             final EmergencyData emergencyData = EMERGENCY_DATA_MAPPER.apply(emergencyDataDTO, oldData.get());
             repository.save(emergencyData);
