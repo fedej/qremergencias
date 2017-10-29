@@ -453,6 +453,41 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/check/ping": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "pingUsingGET",
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "ping",
+                "tags": [
+                    "header-check-controller"
+                ]
+            }
+        },
         "/api/emergencyData": {
             "get": {
                 "consumes": [
@@ -1616,6 +1651,10 @@
         {
             "description": "Emergency Data Controller",
             "name": "emergency-data-controller"
+        },
+        {
+            "description": "Header Check Controller",
+            "name": "header-check-controller"
         },
         {
             "description": "Medical Record Controller",
