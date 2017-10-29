@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import java.util.Optional;
 
 public final class QRUtils {
 
@@ -124,24 +125,27 @@ public final class QRUtils {
         System.arraycopy(urlBytes, 0, message, 4, urlBytes.length);
 
         if (user.getContacts() != null && !user.getContacts().isEmpty()) {
-            UserEmergencyContact contact = user.getContacts().get(0);
+            final Optional<UserEmergencyContact> contact = user.getContacts().stream()
+                    .filter(UserEmergencyContact::isPrimary).findAny();
 
-            final byte[] nameBytes = contact.getFirstName().getBytes(CHARSET_NAME);
-            final byte[] phoneBytes = contact.getPhoneNumber().getBytes(CHARSET_NAME);
-            final byte[] contacts = new byte[nameBytes.length + phoneBytes.length + 2];
+            if (contact.isPresent()) {
+                final byte[] nameBytes = contact.get().getFirstName().getBytes(CHARSET_NAME);
+                final byte[] phoneBytes = contact.get().getPhoneNumber().getBytes(CHARSET_NAME);
+                final byte[] contacts = new byte[nameBytes.length + phoneBytes.length + 2];
 
-            contacts[0] = (byte) nameBytes.length;
-            System.arraycopy(nameBytes, 0, contacts, 1, nameBytes.length);
+                contacts[0] = (byte) nameBytes.length;
+                System.arraycopy(nameBytes, 0, contacts, 1, nameBytes.length);
 
-            contacts[nameBytes.length + 1] = (byte) phoneBytes.length;
-            System.arraycopy(phoneBytes, 0, contacts, nameBytes.length + 2, phoneBytes.length);
+                contacts[nameBytes.length + 1] = (byte) phoneBytes.length;
+                System.arraycopy(phoneBytes, 0, contacts, nameBytes.length + 2, phoneBytes.length);
 
-            final byte[] result = new byte[message.length + contacts.length];
-            System.arraycopy(message, 0, result, 0, message.length);
-            System.arraycopy(contacts, 0, result, message.length, contacts.length);
-            return result;
+                final byte[] result = new byte[message.length + contacts.length];
+                System.arraycopy(message, 0, result, 0, message.length);
+                System.arraycopy(contacts, 0, result, message.length, contacts.length);
+                return result;
+            }
+
         }
-
 
         return message;
     }
