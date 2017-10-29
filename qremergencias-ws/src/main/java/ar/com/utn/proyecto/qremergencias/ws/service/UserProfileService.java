@@ -53,6 +53,7 @@ public class UserProfileService {
                 .filter(UserEmergencyContact::isPrimary).findAny();
 
         if (!oldPrimary.equals(newPrimary) || qrUpdateRequired) {
+            emergencyDataService.updateUuid(userFront);
             emergencyDataService.sendDataChangeMail(userFront);
         }
 
