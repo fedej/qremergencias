@@ -9,7 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -36,7 +36,7 @@ public class UserProfileServiceTest {
     public void testUpdate() {
         when(repository.findByUsername(anyString())).thenReturn(new UserFront());
         final UserProfileDTO userProfileDTO = new UserProfileDTO();
-        userProfileDTO.setBirthDate(LocalDateTime.of(1990, 9, 18, 0,0,0));
+        userProfileDTO.setBirthDate(LocalDate.of(1990, 9, 18));
         service.update(user, userProfileDTO, false);
         verify(repository).save(any(UserFront.class));
     }

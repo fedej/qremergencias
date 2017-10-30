@@ -29,9 +29,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.List;
 
-import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.addTimeConverter;
 import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.listConverter;
-import static java.time.LocalTime.MIDNIGHT;
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
 @RestController
@@ -53,7 +51,7 @@ public class ProfileController {
         final UserProfileDTO userProfileDTO = new UserProfileDTO();
         userProfileDTO.setFirstName(userFront.getName());
         userProfileDTO.setLastName(userFront.getLastname());
-        userProfileDTO.setBirthDate(addTimeConverter(MIDNIGHT).apply(userFront.getBirthdate()));
+        userProfileDTO.setBirthDate(userFront.getBirthdate());
         userProfileDTO.setIdNumber(userFront.getIdNumber());
         userProfileDTO.setSex(userFront.getSex());
         final List<UserContactDTO> contacts = listConverter(UserContactDTO.USER_CONTACT_DTO_MAPPER)

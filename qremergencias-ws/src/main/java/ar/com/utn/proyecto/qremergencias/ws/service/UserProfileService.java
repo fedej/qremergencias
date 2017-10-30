@@ -25,7 +25,7 @@ public class UserProfileService {
     public UserFront update(final UserFront userFront, final UserProfileDTO userProfileDTO,
                             final boolean qrUpdateRequired) {
         final UserFront toUpdate = userFrontRepository.findByUsername(userFront.getUsername());
-        toUpdate.setBirthdate(userProfileDTO.getBirthDate().toLocalDate());
+        toUpdate.setBirthdate(userProfileDTO.getBirthDate());
         toUpdate.setIdNumber(userProfileDTO.getIdNumber());
         toUpdate.setName(userProfileDTO.getFirstName());
         toUpdate.setLastname(userProfileDTO.getLastName());
