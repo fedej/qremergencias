@@ -6,11 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
-import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.addTimeConverter;
-import static java.time.LocalTime.MIDNIGHT;
+import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.localDateToInstantConverter;
 
 @Data
 @NoArgsConstructor
@@ -23,7 +22,7 @@ public class GeneralDataDTO {
                     .fields(GeneralData::isOrganDonor, GeneralDataDTO::setOrganDonor)
                     .fields(GeneralData::getAllergies, GeneralDataDTO::setAllergies)
                     .fields(d -> d.getAllergies() != null && !d.getAllergies().isEmpty(), GeneralDataDTO::setAllergic)
-                    .fields(GeneralData::getLastMedicalCheck, GeneralDataDTO::setLastMedicalCheck, addTimeConverter(MIDNIGHT));
+                    .fields(GeneralData::getLastMedicalCheck, GeneralDataDTO::setLastMedicalCheck, localDateToInstantConverter());
 
     @Length(min = 1, max = 3)
     private String bloodType;
@@ -33,7 +32,7 @@ public class GeneralDataDTO {
     private boolean allergic;
     private List<String> allergies;
 
-    private LocalDateTime lastMedicalCheck;
+    private Instant lastMedicalCheck;
 
 
 }

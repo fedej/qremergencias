@@ -1,8 +1,10 @@
 package ar.com.utn.proyecto.qremergencias.core.mapper;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -37,8 +39,16 @@ public final class Converters {
         return localDate -> LocalDateTime.of(localDate, localTime);
     }
 
+    public static Function<LocalDate, Instant> localDateToInstantConverter() {
+        return localDate -> localDate.atStartOfDay().toInstant(ZoneOffset.UTC);
+    }
+
     public static Function<LocalDateTime, LocalDate> localDateConverter() {
         return LocalDateTime::toLocalDate;
+    }
+
+    public static Function<Instant, LocalDate> instantToLocalDateConverter() {
+        return instant -> instant.atZone(ZoneOffset.UTC).toLocalDate();
     }
     
     private Converters() {
