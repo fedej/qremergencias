@@ -12,8 +12,6 @@ import ar.com.utn.proyecto.qremergencias.core.dto.emergency.MedicationDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.PathologyDTO;
 import ar.com.utn.proyecto.qremergencias.core.mapper.Mapper;
 
-import java.time.LocalDate;
-
 import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.listConverter;
 import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.localDateConverter;
 
@@ -25,7 +23,8 @@ class DomainMappers {
                     .fields(GeneralDataDTO::getBloodType, GeneralData::setBloodType)
                     .fields(GeneralDataDTO::isOrganDonor, GeneralData::setOrganDonor)
                     .fields(GeneralDataDTO::getAllergies, GeneralData::setAllergies)
-                    .fields(GeneralDataDTO::getLastMedicalCheck, GeneralData::setLastMedicalCheck, localDateConverter());
+                    .fields(GeneralDataDTO::getLastMedicalCheck, GeneralData::setLastMedicalCheck,
+                            localDateConverter());
 
     private static final Mapper<HospitalizationDTO, Hospitalization> HOSPITALIZATION_MAPPER =
             Mapper.mapping(HospitalizationDTO.class, Hospitalization.class)

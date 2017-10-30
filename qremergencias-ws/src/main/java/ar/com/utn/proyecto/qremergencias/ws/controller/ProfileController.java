@@ -1,6 +1,5 @@
 package ar.com.utn.proyecto.qremergencias.ws.controller;
 
-import ar.com.utn.proyecto.qremergencias.core.domain.UserEmergencyContact;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.UserContactDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.UserProfileDTO;
@@ -28,10 +27,10 @@ import org.springframework.web.context.request.RequestContextHolder;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.util.ArrayList;
 import java.util.List;
 
 import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.addTimeConverter;
+import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.listConverter;
 import static java.time.LocalTime.MIDNIGHT;
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
@@ -57,17 +56,8 @@ public class ProfileController {
         userProfileDTO.setBirthDate(addTimeConverter(MIDNIGHT).apply(userFront.getBirthdate()));
         userProfileDTO.setIdNumber(userFront.getIdNumber());
         userProfileDTO.setSex(userFront.getSex());
-
-        final List<UserContactDTO> contacts = new ArrayList<>();
-        for (final UserEmergencyContact contact : userFront.getContacts()) {
-            final UserContactDTO contactDTO = new UserContactDTO(
-                contact.getFirstName(),
-                contact.getLastName(),
-                contact.getPhoneNumber(),
-                contact.isPrimary());
-            contacts.add(contactDTO);
-        }
-
+        final List<UserContactDTO> contacts = listConverter(UserContactDTO.USER_CONTACT_DTO_MAPPER)
+                .apply(userFront.getContacts());
         userProfileDTO.setContacts(contacts);
         return userProfileDTO;
     }

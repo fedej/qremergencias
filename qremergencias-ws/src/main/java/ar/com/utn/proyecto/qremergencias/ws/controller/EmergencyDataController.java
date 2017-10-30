@@ -76,7 +76,8 @@ public class EmergencyDataController {
     public String getEmergencyDataByUuid(@PathVariable final String uuid) throws PequeniaLisaException {
         final Optional<EmergencyData> emergencyData = service.findByUuid(uuid);
         if (emergencyData.isPresent()) {
-            final EmergencyDataDTO emergencyDataDTO = new EmergencyDataDTO(emergencyData.get());
+            final EmergencyData dbEmergencyData = emergencyData.get();
+            final EmergencyDataDTO emergencyDataDTO = new EmergencyDataDTO(dbEmergencyData);
             try {
                 final String emergencyDTOString = objectMapper.writeValueAsString(emergencyDataDTO);
                 return CryptoUtils.encryptText(emergencyDTOString.getBytes(CHARSET_NAME));
