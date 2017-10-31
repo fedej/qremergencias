@@ -37,6 +37,7 @@ import java.util.Optional;
 public class EmergencyDataController {
 
     private static final String CHARSET_NAME = "ISO-8859-1";
+    private static final String HAS_ROLE_PACIENTE = "hasRole('PACIENTE')";
 
     private final EmergencyDataService service;
     private final ObjectMapper objectMapper;
@@ -67,7 +68,7 @@ public class EmergencyDataController {
     }
 
     @GetMapping("/changes")
-    @PreAuthorize("hasRole('PACIENTE')")
+    @PreAuthorize(HAS_ROLE_PACIENTE)
     public Page<ChangesDTO> getChanges(@AuthenticationPrincipal final UserFront user) {
         return changesService.getEmergencyDataChanges(user);
     }
@@ -90,6 +91,7 @@ public class EmergencyDataController {
     }
 
     @GetMapping(value = "/qr", produces = MediaType.IMAGE_PNG_VALUE)
+    @PreAuthorize(HAS_ROLE_PACIENTE)
     public Resource getQR(@RequestParam(name = "user") final String user, final HttpServletResponse response) {
         final Resource userQR = service.getUserQR(user);
 
@@ -102,13 +104,13 @@ public class EmergencyDataController {
     }
 
     @PostMapping("/qr")
-    @PreAuthorize("hasRole('PACIENTE')")
+    @PreAuthorize(HAS_ROLE_PACIENTE)
     public void createQR(@AuthenticationPrincipal final UserFront user) {
         service.createQR(user.getUsername());
     }
 
     @DeleteMapping("/qr")
-    @PreAuthorize("hasRole('PACIENTE')")
+    @PreAuthorize(HAS_ROLE_PACIENTE)
     public void deleteQR(@AuthenticationPrincipal final UserFront user) {
         service.deleteQR(user.getUsername());
     }

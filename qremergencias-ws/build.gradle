@@ -44,6 +44,7 @@ swagger {
                 'library'        : 'retrofit2',
                 'parcelableModel': 'false'
         ]
+        // compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
     } else {
         lang = 'javascript'
         additionalProperties = [

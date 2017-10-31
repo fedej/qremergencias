@@ -43,7 +43,7 @@ import java.util.Map;
 @RequestMapping("/api/medicalRecord")
 public class MedicalRecordController {
 
-    private static final String HAS_ROLE_MEDICO = "hasRole('MEDICO')";
+    public static final String HAS_ROLE_MEDICO = "hasRole('MEDICO')";
 
     @Value("${qremergencias.baseUrl.file}")
     private UriTemplate fileUriTemplate;
