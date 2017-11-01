@@ -15,7 +15,8 @@
                 "@class": "ar.com.utn.proyecto.qremergencias.core.domain.UserFront",
                 "name": "Federico",
                 "lastname": "Jaite",
-                "numeroDocumento": "30.756.124",
+                "sex": "M",
+                "idNumber": "30756124",
                 "birthdate": "1989-06-06",
                 "version": 0,
                 "username": "paciente@rrramundo.com.ar",
@@ -31,6 +32,18 @@
                     "ROLE_PACIENTE",
                     "ROLE_USER"
                   ]
+                ],
+                "contacts": [
+                  "java.util.List",
+                  [
+                    {
+                      "@class": "ar.com.utn.proyecto.qremergencias.core.domain.UserEmergencyContact",
+                      "firstName": "Federico",
+                      "lastName": "Jaite",
+                      "phoneNumber": "1533323333",
+                      "primary": true
+                    }
+                  ]
                 ]
               }
             },
@@ -40,7 +53,8 @@
                 "@class": "ar.com.utn.proyecto.qremergencias.core.domain.UserFront",
                 "name": "Federico",
                 "lastname": "Jaite",
-                "numeroDocumento": "30.756.124",
+                "sex": "M",
+                "idNumber": "30756124",
                 "birthdate": "1989-06-06",
                 "version": 0,
                 "username": "medico@rrramundo.com.ar",
@@ -96,8 +110,8 @@
               "data": {
                 "@class": "ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord",
                 "version": 0,
-                "name": "Colonoscopia",
-                "text": "Salio muy bien",
+                "name": "colonoscopia",
+                "text": "salio muy bien",
                 "performed": "2017-07-16T03:00:00Z",
                 "changes": [
                   "java.util.Set",
@@ -128,81 +142,82 @@
               "data": {
                 "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData",
                 "version": 0,
+                "uuid": "7a5a6766-c04e-49d7-ecdb-5e5e5b16f5c3",
                 "general": {
                   "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.GeneralData",
                   "bloodType": "0+",
                   "allergies": [
                     "java.util.List",
                     [
-                      "Estudiar",
-                      "Pasear"
+                      "penicilina",
+                      "pasear"
                     ]
-                  ]
+                  ],
+                  "lastMedicalCheck": "2016-10-10"
                 },
-                "medications" : [
+                "medications": [
                   "java.util.List",
                   [
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Medication",
-                      "name":"Cafe Veloz",
-                      "description":"La que toma Maradona",
-                      "amount":3,
-                      "period":"WEEKLY"
+                      "name": "cafe veloz",
+                      "description": "La que toma Maradona",
+                      "amount": 3,
+                      "period": "semanalmente"
                     }
                   ]
                 ],
-                "pathologies" : [
+                "pathologies": [
                   "java.util.List",
                   [
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology",
-                      "type":"CLINICAL",
-                      "description":"Infarto",
-                      "date":"2016-10-10"
+                      "type": "asma",
+                      "date": "2016-10-10"
                     },
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology",
-                      "type":"MOLECULAR",
-                      "description":"ADN",
-                      "date":"2015-07-10"
+                      "type": "otro",
+                      "description": "adn",
+                      "date": "2015-07-10"
                     }
                   ]
                 ],
-                "hospitalizations" : [
+                "hospitalizations": [
                   "java.util.List",
                   [
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Hospitalization",
-                      "type":"ADMISSION",
-                      "institution":"San Camilo",
-                      "date":"2016-10-10",
-                      "reason":"Infartirigillo"
+                      "type": "admision",
+                      "institution": "san camilo",
+                      "date": "2016-10-10",
+                      "reason": "infartirigillo"
                     },
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Hospitalization",
-                      "type":"ADMISSION",
-                      "institution":"Hospital Publico 2",
-                      "date":"2016-10-10",
-                      "reason":"Otro Infarto"
+                      "type": "admision",
+                      "institution": "hospital publico 2",
+                      "date": "2016-10-10",
+                      "reason": "otro infarto"
                     }
                   ]
                 ],
-                "surgeries" : [
+                "surgeries": [
                   "java.util.List",
                   [
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Hospitalization",
-                      "type":"SURGERY",
-                      "institution":"San Camilo",
-                      "date":"2016-10-10",
-                      "reason":"Cambio de sexo"
+                      "type": "cirugia",
+                      "institution": "san camilo",
+                      "date": "2016-10-10",
+                      "reason": "cambio de sexo"
                     },
                     {
                       "@class": "ar.com.utn.proyecto.qremergencias.core.domain.emergency.Hospitalization",
-                      "type":"SURGERY",
-                      "institution":"Hospital Publico 2",
-                      "date":"2016-10-10",
-                      "reason":"Cambio de sexo invertido"
+                      "type": "cirugia",
+                      "institution": "hospital publico 2",
+                      "date": "2016-10-10",
+                      "reason": "cambio de sexo invertido"
                     }
                   ]
                 ]

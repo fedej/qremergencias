@@ -8,27 +8,20 @@ import ar.com.utn.proyecto.qremergencias.core.dto.MedicalRecordDTO;
 import ar.com.utn.proyecto.qremergencias.core.mapper.Mapper;
 import ar.com.utn.proyecto.qremergencias.core.repository.MedicalRecordRepository;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserFrontRepository;
-import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSFile;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Function;
 
 import static ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord.MedicalRecordChange.Action.CREATE;
 import static ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord.MedicalRecordChange.Action.DELETE;
 import static ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord.MedicalRecordChange.Action.UPDATE;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service
 public class MedicalRecordService {
@@ -39,14 +32,18 @@ public class MedicalRecordService {
                         new MedicalRecord(source.getName(), source.getText(), source.getPerformed())
                 );
 
-    @Autowired
-    private MedicalRecordRepository medicalRecordRepository;
+    private final MedicalRecordRepository medicalRecordRepository;
+    private final UserFrontRepository userFrontRepository;
+    private final GridFsTemplate gridFsTemplate;
 
     @Autowired
-    private UserFrontRepository userFrontRepository;
-
-    @Autowired
-    private GridFsTemplate gridFsTemplate;
+    public MedicalRecordService(final MedicalRecordRepository medicalRecordRepository,
+                                final UserFrontRepository userFrontRepository,
+                                final GridFsTemplate gridFsTemplate) {
+        this.medicalRecordRepository = medicalRecordRepository;
+        this.userFrontRepository = userFrontRepository;
+        this.gridFsTemplate = gridFsTemplate;
+    }
 
     public Page<MedicalRecord> findByUser(final User user, final Pageable page) {
         return medicalRecordRepository.findByUserAndDeletedIsFalse(user, page);
@@ -62,7 +59,8 @@ public class MedicalRecordService {
         if (files != null) {
             files.stream().map(f -> {
                 try {
-                    return gridFsTemplate.store(f.getInputStream(), f.getOriginalFilename(),
+                    return gridFsTemplate.store(f.getInputStream(),
+                            f.getOriginalFilename().replace(' ', '_'),
                             f.getContentType());
                 } catch (final IOException e) {
                     throw new RuntimeException(e);
@@ -92,21 +90,6 @@ public class MedicalRecordService {
 
     public MedicalRecord findById(final String id) {
         return medicalRecordRepository.findOne(id);
-    }
-
-    public Resource findFileById(final String fileId) {
-        final GridFSDBFile file = findGridFSFile().apply(fileId);
-
-        if (file != null) {
-            return new InputStreamResource(file.getInputStream());
-        }
-
-        return null;
-    }
-
-    public Function<String, GridFSDBFile> findGridFSFile() {
-        return (fileId) -> gridFsTemplate.findOne(new Query()
-                    .addCriteria(where("_id").is(new ObjectId(fileId))));
     }
 
     public Page<MedicalRecord> findByUsername(final String username, final Pageable page) {

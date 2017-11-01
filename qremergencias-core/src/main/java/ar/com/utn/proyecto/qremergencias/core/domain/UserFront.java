@@ -29,4 +29,5 @@ public class UserFront extends User {
 
     @OneToMany
     private List<UserEmergencyContact> contacts = new ArrayList<>();
+    private String qr;
 }

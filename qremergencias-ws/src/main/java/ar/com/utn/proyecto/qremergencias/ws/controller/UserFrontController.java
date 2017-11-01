@@ -1,5 +1,6 @@
 package ar.com.utn.proyecto.qremergencias.ws.controller;
 
+import ar.com.utn.proyecto.qremergencias.core.domain.DoctorFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserVerificationToken;
@@ -7,10 +8,12 @@ import ar.com.utn.proyecto.qremergencias.core.dto.ChangePasswordDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.ConfirmRegistrationDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.CreateUserDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.ResetPasswordDTO;
+import ar.com.utn.proyecto.qremergencias.core.dto.emergency.CreateDoctorDTO;
 import ar.com.utn.proyecto.qremergencias.core.service.CaptchaService;
 import ar.com.utn.proyecto.qremergencias.core.service.ForgotPasswordService;
 import ar.com.utn.proyecto.qremergencias.core.service.MailService;
 import ar.com.utn.proyecto.qremergencias.core.service.PasswordChangeService;
+import ar.com.utn.proyecto.qremergencias.ws.exceptions.InvalidTokenException;
 import ar.com.utn.proyecto.qremergencias.ws.service.UserFrontService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,12 +28,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.context.Context;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,8 +54,6 @@ public class UserFrontController {
     private static final String SUBJECT = "default.forgot.email.subject";
     private static final String GREETING_SUBJECT = "default.greeting.email.subject";
     private static final String INVALID_PASSWORD = "Invalid password";
-    private static final String INVALID_TOKEN = "Invalid token";
-    private static final String TOKEN_NOT_FOUND = "Token not found";
     private static final String USER_NOT_FOUND = "User not found";
 
     @Value("${qremergencias.front.resetPasswordUrl}")
@@ -92,7 +96,16 @@ public class UserFrontController {
         if (user != null) {
             sendMailConfirmation(user);
         }
+    }
 
+    @PostMapping(value = "/register/doctor", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public void registerDoctor(@Valid final CreateDoctorDTO model,
+                      @RequestPart(required = true, name = "file") final MultipartFile file) {
+        final DoctorFront user = userFrontService.createDoctor(model,file);
+        if (user != null) {
+            sendMailInformation(user);
+        }
     }
 
     @RequestMapping(value = "/sendForgotPassword", method = RequestMethod.POST)
@@ -172,7 +185,24 @@ public class UserFrontController {
             throw new RuntimeException(INVALID_PASSWORD);
         }
 
-        passwordChangeService.changePassword(user, changePassword.getNewPassword());
+        passwordChangeService.changePassword(user.getUsername(), changePassword.getNewPassword());
+    }
+
+    private void sendMailInformation(final DoctorFront doctor) {
+        if (!StringUtils.isEmpty(doctor.getEmail())) {
+            final Locale locale = LocaleContextHolder.getLocale();
+            final Context ctx = new Context(locale);
+            ctx.setVariable("username", doctor.getUsername());
+            final Resource header = resourceLoader
+                    .getResource("classpath:static/images/mail/header-mail.jpg");
+            final Resource footer = resourceLoader
+                    .getResource("classpath:static/images/mail/logo-footer.png");
+
+            mailService.sendMail(doctor.getEmail(),
+                    messageSource.getMessage(GREETING_SUBJECT, null, locale), "mail/information", ctx,
+                    Arrays.asList(header, footer));
+
+        }
     }
 
     private void sendMailConfirmation(final UserFront user) {
@@ -210,12 +240,12 @@ public class UserFrontController {
                 .getUserVerificationByToken(request.getToken());
 
         if (userVerificationToken == null) {
-            throw new RuntimeException(TOKEN_NOT_FOUND);
+            throw new InvalidTokenException();
         }
 
         if (userVerificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             userFrontService.deleteVerificationToken(userVerificationToken);
-            throw new RuntimeException(INVALID_TOKEN);
+            throw new InvalidTokenException();
         }
 
         final User user = userVerificationToken.getUser();

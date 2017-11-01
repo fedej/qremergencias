@@ -38,6 +38,7 @@ public class EmergencyData {
     @javax.persistence.ElementCollection
     private List<Pathology> pathologies;
     private LocalDate lastMedicalCheck;
+    private String uuid;
 
     @DBRef
     @ManyToOne

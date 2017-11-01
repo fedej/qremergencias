@@ -43,7 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .formLogin()
-                    .loginPage(ERROR_PAGE)
+                    .loginPage(loginPage)
                     .defaultSuccessUrl(defaultSuccessUrl, true)
                     .loginProcessingUrl(loginPage)
                     .failureHandler(new AuthFailureHandler(loginPage + "?error",

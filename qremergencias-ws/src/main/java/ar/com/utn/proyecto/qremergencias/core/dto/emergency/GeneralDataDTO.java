@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -18,8 +19,8 @@ public class GeneralDataDTO {
                     .fields(GeneralData::getBloodType, GeneralDataDTO::setBloodType)
                     .fields(GeneralData::isOrganDonor, GeneralDataDTO::setOrganDonor)
                     .fields(GeneralData::getAllergies, GeneralDataDTO::setAllergies)
-                    .fields(d -> d.getAllergies() != null && !d.getAllergies().isEmpty(),
-                            GeneralDataDTO::setAllergic);
+                    .fields(d -> d.getAllergies() != null && !d.getAllergies().isEmpty(), GeneralDataDTO::setAllergic)
+                    .fields(GeneralData::getLastMedicalCheck, GeneralDataDTO::setLastMedicalCheck);
 
     @Length(min = 1, max = 3)
     private String bloodType;
@@ -28,5 +29,8 @@ public class GeneralDataDTO {
 
     private boolean allergic;
     private List<String> allergies;
+
+    private LocalDate lastMedicalCheck;
+
 
 }

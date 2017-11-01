@@ -90,6 +90,21 @@
                     </ul>
                     <!-- /.nav-second-level -->
                 </li>
+                <li sec:authorize="hasRole('ROLE_OPERATOR')" th:classappend="${currentUrl.contains('/verification/') ? 'active' : null}">
+                    <a href="#"><i class="fa fa-wrench fa-fw"></i> Verificacion de Medicos<span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li th:classappend="${currentUrl.contains('/verification/') ? 'active' : null}">
+                            <a href="#" th:inline="text"><i class="fa fa-user fa-fw"></i> [[#{default.users.label}]]<span class="fa arrow"></span></a>
+                            <ul class="nav nav-third-level">
+                                <li>
+                                    <a th:href="@{/verification/index}" href="#" th:inline="text"><i class="fa fa-list-ul fa-fw"></i> [[#{default.list.label}]]</a>
+                                </li>
+                            </ul>
+                            <!-- /.nav-third-level -->
+                        </li>
+                    </ul>
+                    <!-- /.nav-second-level -->
+                </li>
             </ul>
         </div>
         <!-- /.sidebar-collapse -->

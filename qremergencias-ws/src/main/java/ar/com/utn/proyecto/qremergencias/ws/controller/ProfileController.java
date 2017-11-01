@@ -1,6 +1,5 @@
 package ar.com.utn.proyecto.qremergencias.ws.controller;
 
-import ar.com.utn.proyecto.qremergencias.core.domain.UserEmergencyContact;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.UserContactDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.UserProfileDTO;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -27,11 +27,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.util.ArrayList;
 import java.util.List;
 
-import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.addTimeConverter;
-import static java.time.LocalTime.MIDNIGHT;
+import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.listConverter;
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
 @RestController
@@ -53,19 +51,11 @@ public class ProfileController {
         final UserProfileDTO userProfileDTO = new UserProfileDTO();
         userProfileDTO.setFirstName(userFront.getName());
         userProfileDTO.setLastName(userFront.getLastname());
-        userProfileDTO.setBirthDate(addTimeConverter(MIDNIGHT).apply(userFront.getBirthdate()));
+        userProfileDTO.setBirthDate(userFront.getBirthdate());
         userProfileDTO.setIdNumber(userFront.getIdNumber());
         userProfileDTO.setSex(userFront.getSex());
-
-        final List<UserContactDTO> contacts = new ArrayList<>();
-        for (final UserEmergencyContact contact : userFront.getContacts()) {
-            final UserContactDTO contactDTO = new UserContactDTO(
-                contact.getFirstName(),
-                contact.getLastName(),
-                contact.getPhoneNumber());
-            contacts.add(contactDTO);
-        }
-
+        final List<UserContactDTO> contacts = listConverter(UserContactDTO.USER_CONTACT_DTO_MAPPER)
+                .apply(userFront.getContacts());
         userProfileDTO.setContacts(contacts);
         return userProfileDTO;
     }
@@ -94,10 +84,11 @@ public class ProfileController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isFullyAuthenticated()")
     public void update(@RequestBody final UserProfileDTO userProfileDTO,
-                       @AuthenticationPrincipal final UserFront user) {
+                       @AuthenticationPrincipal final UserFront user,
+                       @RequestParam final boolean qrUpdateRequired) {
         log.info("In ProfileController.update()");
-        userProfileService.update(user, userProfileDTO);
-        updateSession(user);
+        final UserFront updated = userProfileService.update(user, userProfileDTO, qrUpdateRequired);
+        updateSession(updated);
     }
 
 }

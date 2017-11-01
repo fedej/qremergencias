@@ -31,6 +31,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         corsConfig.addAllowedMethod("POST");
         corsConfig.addAllowedMethod("PATCH");
         corsConfig.addAllowedMethod("DELETE");
+        corsConfig.addAllowedMethod("HEAD");
         corsConfig.addAllowedMethod("OPTIONS");
         return corsConfig;
     }

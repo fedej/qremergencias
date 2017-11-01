@@ -3,10 +3,12 @@ package ar.com.utn.proyecto.qremergencias.ws.auth;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.LoginUserDTO;
 import ar.com.utn.proyecto.qremergencias.core.service.LoginAttemptCacheService;
+import ar.com.utn.proyecto.qremergencias.ws.controller.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -36,6 +38,9 @@ public class AuthHandler implements AuthenticationSuccessHandler, Authentication
     @Autowired
     private ObjectMapper mapper;
 
+    @Autowired
+    private GlobalExceptionHandler globalExceptionHandler;
+
     @Value("${qremergencias.login.attempts.captcha}")
     private Integer loginAttempts;
 
@@ -63,6 +68,10 @@ public class AuthHandler implements AuthenticationSuccessHandler, Authentication
             resp.addCookie(cookie);
         }
 
+        resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        final ResponseEntity<GlobalExceptionHandler.ApiError> error = globalExceptionHandler.error(event);
+        resp.getWriter().print(mapper.writeValueAsString(error.getBody()));
+
     }
 
     private String getUsername(final HttpServletRequest req) {
@@ -80,7 +89,7 @@ public class AuthHandler implements AuthenticationSuccessHandler, Authentication
         final UserFront user = (UserFront) auth.getPrincipal();
 
         final LoginUserDTO dto =
-                new LoginUserDTO(user.getName(), user.getLastname(), user.getRoles());
+                new LoginUserDTO(user.getName(), user.getLastname(), user.getRoles(), user.getEmail());
 
         resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
         resp.getWriter().print(mapper.writeValueAsString(dto));

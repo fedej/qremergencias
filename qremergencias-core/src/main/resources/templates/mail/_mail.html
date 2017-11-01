@@ -88,10 +88,7 @@
                                                     <div style="padding-top: 10px; text-align:center; background-color: white; vertical-align: bottom; width: 600px; height: 80px;">
                                                         <p style="color: black; text-decoration: none; font-size: 14px; font-family: Arial; color: black; margin: 0px;">
                                                             <span th:inline="text">&nbsp;&nbsp; &copy; [[${#temporals.year(#temporals.createNow())}]]</span>
-                                                            <a target="_blank" href="http://qr.rrramundo.com.ar/">QR Emergencias</a>, Todos los derechos reservados.
-                                                            <br/>
-                                                            <a href="http://qr.rrramundo.com.ar/terminos_condiciones.html">T&eacute;rminos y Condiciones</a> |
-                                                            <a href="http://qr.rrramundo.com.ar/privacidad.html">Pol&iacute;ticas de Privacidad</a>
+                                                            <a target="_blank" href="https://qr.rrramundo.com.ar/">QR Emergencias</a>, Todos los derechos reservados.
                                                         </p>
                                                     </div>
                                                 </td>
@@ -125,6 +122,31 @@
         <br/>
         <br/>
         <a th:href="${url}" style="color: #4b98d7; text-decoration: none;"><img th:src="'cid:btn-codigo.png'" src="../../static/images/mail/btn-codigo.png"/></a>
+        <br/>
+        <br/>
+        Si no ves el botón, hace click <a th:href="${url}">aquí</a>
+    </p>
+</td>
+<td th:fragment="information" style="font-family: Arial; text-align:center; margin: 0px;">
+    <h2 style="font-size: 28px; color: #084B8A;">&iexcl;Te damos la bienvenida a QR Emergencias!</h2>
+    <p style="font-size: 18px; line-height: 24px; color: #333;" th:inline="text">
+        El usuario ha sido creado con éxito. Revisaremos la documentación que nos enviaste y en los próximos días recibirás un nuevo mail con los pasos a seguir!.
+        <br/>
+        <br/>
+        &iexcl;Muchas gracias por elegirnos!
+        <br/>
+        <br/>
+    </p>
+</td>
+<td th:fragment="datachange" style="font-family: Arial; text-align:center; margin: 0px;">
+    <h2 style="font-size: 28px; color: #084B8A;">&iexcl;Se modificaron tus datos de emergencia!</h2>
+    <p style="font-size: 18px; line-height: 24px; color: #333;" th:inline="text">
+        Se realizaron cambios en tus datos de emergencia. Es necesario que vuelvas a imprimir tu QR para que esté actualizado. Podes hacerlo ingresando en Gestionar QR > Generar QR.
+        <br/>
+        <br/>
+        &iexcl;Muchas gracias por elegirnos!
+        <br/>
+        <br/>
     </p>
 </td>
 

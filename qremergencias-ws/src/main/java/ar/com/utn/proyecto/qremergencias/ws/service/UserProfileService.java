@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.DataflowAnomalyAnalysis"})
@@ -18,12 +19,17 @@ public class UserProfileService {
     @Autowired
     private UserFrontRepository userFrontRepository;
 
-    public void update(final UserFront userFront, final UserProfileDTO userProfileDTO) {
-        userFront.setBirthdate(userProfileDTO.getBirthDate().toLocalDate());
-        userFront.setIdNumber(userProfileDTO.getIdNumber());
-        userFront.setName(userProfileDTO.getFirstName());
-        userFront.setLastname(userProfileDTO.getLastName());
-        userFront.setSex(userProfileDTO.getSex());
+    @Autowired
+    private EmergencyDataService emergencyDataService;
+
+    public UserFront update(final UserFront userFront, final UserProfileDTO userProfileDTO,
+                            final boolean qrUpdateRequired) {
+        final UserFront toUpdate = userFrontRepository.findByUsername(userFront.getUsername());
+        toUpdate.setBirthdate(userProfileDTO.getBirthDate());
+        toUpdate.setIdNumber(userProfileDTO.getIdNumber());
+        toUpdate.setName(userProfileDTO.getFirstName());
+        toUpdate.setLastname(userProfileDTO.getLastName());
+        toUpdate.setSex(userProfileDTO.getSex());
 
         if (userProfileDTO.getContacts() != null) {
             final List<UserEmergencyContact> contacts = new ArrayList<>();
@@ -32,11 +38,25 @@ public class UserProfileService {
                 final UserEmergencyContact contact = new UserEmergencyContact(
                         contactDTO.getFirstName(),
                         contactDTO.getLastName(),
-                        contactDTO.getPhoneNumber());
+                        contactDTO.getPhoneNumber(),
+                        contactDTO.isPrimary());
                 contacts.add(contact);
             }
-            userFront.setContacts(contacts);
+            toUpdate.setContacts(contacts);
         }
-        userFrontRepository.save(userFront);
+
+        final Optional<UserEmergencyContact> oldPrimary = userFront.getContacts()
+                .stream()
+                .filter(UserEmergencyContact::isPrimaryContact).findAny();
+        final Optional<UserEmergencyContact> newPrimary = toUpdate.getContacts()
+                .stream()
+                .filter(UserEmergencyContact::isPrimaryContact).findAny();
+
+        if (!oldPrimary.equals(newPrimary) || qrUpdateRequired) {
+            emergencyDataService.updateUuid(userFront);
+            emergencyDataService.sendDataChangeMail(userFront);
+        }
+
+        return userFrontRepository.save(toUpdate);
     }
 }

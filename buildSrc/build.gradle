@@ -1,0 +1,30 @@
+buildscript {
+    repositories {
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+    }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'maven'
+
+dependencies {
+    compile 'io.swagger:swagger-codegen:2.3.0-SNAPSHOT'
+    compile gradleApi()
+    compile localGroovy()
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+}
+
+version = '1.0'
+group = 'ar.com.utn.proyecto.qremergencias'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8

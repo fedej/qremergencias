@@ -3,50 +3,72 @@ package ar.com.utn.proyecto.qremergencias.ws.service;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
-import ar.com.utn.proyecto.qremergencias.core.dto.emergency.changelog.ChangeDTO;
-import ar.com.utn.proyecto.qremergencias.core.dto.emergency.changelog.ChangeDTOId;
-import ar.com.utn.proyecto.qremergencias.core.dto.emergency.changelog.ChangesDTO;
 import ar.com.utn.proyecto.qremergencias.core.repository.EmergencyDataRepository;
 import ar.com.utn.proyecto.qremergencias.core.repository.UserFrontRepository;
-import lombok.Data;
-import org.javers.core.Javers;
-import org.javers.core.commit.CommitMetadata;
-import org.javers.core.diff.Change;
-import org.javers.core.diff.changetype.ValueChange;
-import org.javers.core.diff.changetype.container.ListChange;
-import org.javers.core.metamodel.object.InstanceId;
-import org.javers.core.metamodel.object.ValueObjectId;
-import org.javers.repository.jql.JqlQuery;
-import org.javers.repository.jql.QueryBuilder;
+import ar.com.utn.proyecto.qremergencias.core.service.MailService;
+import ar.com.utn.proyecto.qremergencias.util.CryptoUtils;
+import ar.com.utn.proyecto.qremergencias.util.QRUtils;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.thymeleaf.context.Context;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static ar.com.utn.proyecto.qremergencias.ws.service.DomainMappers.EMERGENCY_DATA_MAPPER;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toConcurrentMap;
-import static java.util.stream.Collectors.groupingBy;
 
 @Service
 public class EmergencyDataService {
 
+    private static final int WIDTH = 340;
+    private static final int HEIGHT = 340;
+    private static final int WHITE = 255 << 16 | 255 << 8 | 255;
+    private static final String CHARSET_NAME = "ISO-8859-1";
+    private static final String DATA_CHANGE_SUBJECT = "default.datachange.email.subject";
+
     private final EmergencyDataRepository repository;
     private final UserFrontRepository userFrontRepository;
-    private final Javers javers;
+    private final GridFsService gridFsService;
+    private final MailService mailService;
+    private final MessageSource messageSource;
+    private final ResourceLoader resourceLoader;
 
     @Autowired
     public EmergencyDataService(final EmergencyDataRepository repository,
                                 final UserFrontRepository userFrontRepository,
-                                final Javers javers) {
+                                final GridFsService gridFsService,
+                                final MailService mailService,
+                                final MessageSource messageSource,
+                                final ResourceLoader resourceLoader) {
         this.repository = repository;
         this.userFrontRepository = userFrontRepository;
-        this.javers = javers;
+        this.gridFsService = gridFsService;
+        this.mailService = mailService;
+        this.messageSource = messageSource;
+        this.resourceLoader = resourceLoader;
     }
 
     public Optional<EmergencyData> findByUser(final String username) {
@@ -54,9 +76,27 @@ public class EmergencyDataService {
         return repository.findByUser(user);
     }
 
-    public void createOrUpdate(final String username, final EmergencyDataDTO emergencyDataDTO) {
+    public Optional<EmergencyData> findByUuid(final String uuid) {
+        return repository.findByUuid(uuid);
+    }
+
+    public void updateUuid(final UserFront userFront) {
+        final Optional<EmergencyData> optEmergencyData = repository.findByUser(userFront);
+        if (optEmergencyData.isPresent()) {
+            final EmergencyData emergencyData = optEmergencyData.get();
+            emergencyData.setUuid(UUID.randomUUID().toString());
+            repository.save(emergencyData);
+        }
+    }
+
+    public void createOrUpdate(final String username, final EmergencyDataDTO emergencyDataDTO,
+                               final boolean qrUpdateRequired) {
         final UserFront user = userFrontRepository.findByUsername(username);
         final Optional<EmergencyData> oldData = repository.findByUser(user);
+
+        if (qrUpdateRequired) {
+            emergencyDataDTO.setUuid(UUID.randomUUID().toString());
+        }
 
         if (oldData.isPresent()) {
             final EmergencyData emergencyData = EMERGENCY_DATA_MAPPER.apply(emergencyDataDTO, oldData.get());
@@ -66,94 +106,73 @@ public class EmergencyDataService {
             emergencyData.setUser(user);
             repository.save(emergencyData);
         }
-
-    }
-
-    @SuppressWarnings("PMD.UseConcurrentHashMap")
-    public PageImpl<ChangesDTO> getEmergencyDataChanges(final UserFront user) {
-        final Optional<EmergencyData> optionalData = repository.findByUser(user);
-
-        if (!optionalData.isPresent()) {
-            return new PageImpl<>(Collections.emptyList());
+        if (qrUpdateRequired) {
+            sendDataChangeMail(user);
         }
-
-        final EmergencyData ed = optionalData.get();
-        final String id1 = ed.getId();
-        final List<ChangeInner> changesInner = new ArrayList<>();
-        final QueryBuilder qbPathologies = QueryBuilder.byInstanceId(id1, EmergencyData.class).withChildValueObjects();
-        final JqlQuery jqlPathologies = qbPathologies.build();
-        final List<Change> changess = javers.findChanges(jqlPathologies);
-        changesInner.addAll(changess
-                .stream()
-                .filter(c -> !(c.getAffectedGlobalId() instanceof InstanceId))
-                .map(ChangeInner::new).collect(toList()));
-
-        final List<ChangesDTO> changes = new ArrayList<>();
-        changesInner
-                .stream()
-                .collect(groupingBy(ChangeInner::getId, groupingBy(ChangeInner::getGroup)))
-                .forEach((key, value) -> {
-                    final Map<String, List<ChangeDTO>> copy = value.entrySet()
-                        .stream()
-                        .collect(toConcurrentMap(Map.Entry::getKey,
-                            e -> e.getValue().stream()
-                                .map(innerChange -> new ChangeDTO(innerChange.getProperty(), innerChange.getOldValue(),
-                                                innerChange.getNewValue(), innerChange.getAdded(),
-                                                innerChange.getRemoved()))
-                                .collect(toList())
-                        ));
-                    changes.add(new ChangesDTO(key.getId(), key.getDate(), key.getAuthor(), copy));
-                });
-        return new PageImpl<>(changes);
     }
 
+    public Resource getUserQR(final String user) {
+        final UserFront userFront = userFrontRepository.findByUsername(user);
+        return userFront.getQr() == null ? null : gridFsService.findFileById(userFront.getQr());
+    }
 
-    @Data
-    private static class ChangeInner {
-        private final ChangeDTOId id;
-        private final String group;
-        private final String property;
-        private Object oldValue;
-        private Object newValue;
-        private List<String> added;
-        private List<String> removed;
-
-        public ChangeInner(final Change cambio) {
-            final CommitMetadata commitMetadata = cambio.getCommitMetadata().get();
-            this.id = new ChangeDTOId(commitMetadata.getId().value(),
-                    commitMetadata.getCommitDate(), commitMetadata.getAuthor());
-
-            if (cambio instanceof ValueChange && cambio.getAffectedGlobalId() instanceof ValueObjectId) {
-                final ValueObjectId globalId = (ValueObjectId) cambio.getAffectedGlobalId();
-                final String fragment = globalId.getFragment();
-                final boolean isList = fragment.contains("/");
-                final int slash = fragment.lastIndexOf('/');
-                this.group = isList ? fragment.substring(0, slash) : fragment;
-
-                final ValueChange vc = (ValueChange) cambio;
-                this.oldValue = vc.getLeft();
-                this.newValue = vc.getRight();
-                this.property = isList ? group
-                        + "["
-                        + fragment.substring(slash + 1, fragment.length())
-                        + "]."
-                        + vc.getPropertyName() : vc.getPropertyName();
-            } else if (cambio instanceof ListChange && cambio.getAffectedGlobalId() instanceof ValueObjectId) {
-                final ValueObjectId globalId = (ValueObjectId) cambio.getAffectedGlobalId();
-                final String fragment = globalId.getFragment();
-                final boolean isList = fragment.contains("/");
-                final int slash = fragment.lastIndexOf('/');
-                this.group = isList ? fragment.substring(0, slash) : fragment;
-
-                final ListChange lc = (ListChange) cambio;
-                this.added = lc.getAddedValues().stream().map(Object::toString).collect(toList());
-                this.removed = lc.getRemovedValues().stream().map(Object::toString).collect(toList());
-                this.property = lc.getPropertyName();
-            } else {
-                this.group = "";
-                this.property = "";
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    public void createQR(final String user) {
+        final Optional<EmergencyData> emergencyDataOptional = findByUser(user);
+        final UserFront userFront = userFrontRepository.findByUsername(user);
+        try {
+            final EmergencyData emergencyData = emergencyDataOptional.orElse(new EmergencyData());
+            emergencyData.setUuid(UUID.randomUUID().toString());
+            emergencyData.setUser(userFront);
+            repository.save(emergencyData);
+            final byte[] message = QRUtils.encode(emergencyData);
+            final String encrypted = CryptoUtils.encryptText(message);
+            final Map<EncodeHintType, Object> hints = new ConcurrentHashMap<>(2);
+            hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
+            hints.put(EncodeHintType.CHARACTER_SET, CHARSET_NAME);
+            hints.put(EncodeHintType.MARGIN, 0);
+            final BitMatrix bitMatrix = new QRCodeWriter()
+                    .encode(encrypted, BarcodeFormat.QR_CODE, WIDTH, HEIGHT, hints);
+            final BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+            for (int i = 0; i < WIDTH; i++) {
+                for (int j = 0; j < HEIGHT; j++) {
+                    image.setRGB(i, j, bitMatrix.get(i, j) ? 0 : WHITE); // set pixel one by one
+                }
             }
 
+            final Object id = gridFsService.saveQRImage(userFront, image);
+            userFront.setQr(id.toString());
+            userFrontRepository.save(userFront);
+        } catch (IOException | NoSuchAlgorithmException | WriterException | InvalidKeyException
+                | InvalidAlgorithmParameterException | BadPaddingException
+                | NoSuchPaddingException | IllegalBlockSizeException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public void deleteQR(final String username) {
+        final UserFront userFront = userFrontRepository.findByUsername(username);
+        gridFsService.deleteQR(userFront);
+        userFront.setQr(null);
+        userFrontRepository.save(userFront);
+    }
+
+    public void sendDataChangeMail(final UserFront user) {
+        if (!StringUtils.isEmpty(user.getEmail())) {
+            final Locale locale = LocaleContextHolder.getLocale();
+            final Context ctx = new Context(locale);
+            ctx.setVariable("username", user.getUsername());
+            final Resource header = resourceLoader
+                    .getResource("classpath:static/images/mail/header-mail.jpg");
+            final Resource footer = resourceLoader
+                    .getResource("classpath:static/images/mail/logo-footer.png");
+
+            mailService.sendMail(user.getEmail(),
+                    messageSource.getMessage(DATA_CHANGE_SUBJECT, null, locale), "mail/datachange", ctx,
+                    Arrays.asList(header, footer));
+
         }
     }
+
 }

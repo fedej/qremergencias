@@ -5,10 +5,7 @@ import ar.com.utn.proyecto.qremergencias.core.mapper.Mapper;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-
-import static ar.com.utn.proyecto.qremergencias.core.mapper.Converters.addTimeConverter;
-import static java.time.LocalTime.MIDNIGHT;
+import java.time.LocalDate;
 
 @Data
 public class PathologyDTO {
@@ -19,19 +16,18 @@ public class PathologyDTO {
                     .constructor(PathologyDTO::new)
                     .fields(Pathology::getDescription, PathologyDTO::setDescription)
                     .fields(Pathology::getType, PathologyDTO::setType, PathologyDTO.Type::valueOf)
-                    .fields(Pathology::getDate, PathologyDTO::setDate, addTimeConverter(MIDNIGHT));
+                    .fields(Pathology::getDate, PathologyDTO::setDate);
 
     private Type type;
 
     public enum Type {
-        ANATOMICAL, CLINICAL, MOLECULAR, ORAL
+        asma, hipertension, antecedentes_oncologicos, insuficiencia_suprarrenal, otro
     }
 
-    @NotNull
     private String description;
 
     @NotNull
-    private LocalDateTime date;
+    private LocalDate date;
 
 
 

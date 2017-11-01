@@ -41,6 +41,56 @@
             },
             "type": "object"
         },
+        "ChangeDTO": {
+            "properties": {
+                "added": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "newValue": {
+                    "type": "object"
+                },
+                "oldValue": {
+                    "type": "object"
+                },
+                "property": {
+                    "type": "string"
+                },
+                "removed": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "ChangesDTO": {
+            "properties": {
+                "author": {
+                    "type": "string"
+                },
+                "changes": {
+                    "additionalProperties": {
+                        "items": {
+                            "$ref": "#/definitions/ChangeDTO"
+                        },
+                        "type": "array"
+                    },
+                    "type": "object"
+                },
+                "date": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "CreateUserDTO": {
             "properties": {
                 "email": {
@@ -66,10 +116,6 @@
                     },
                     "type": "array"
                 },
-                "lastMedicalCheck": {
-                    "format": "date-time",
-                    "type": "string"
-                },
                 "medications": {
                     "items": {
                         "$ref": "#/definitions/MedicationDTO"
@@ -87,6 +133,9 @@
                         "$ref": "#/definitions/HospitalizationDTO"
                     },
                     "type": "array"
+                },
+                "uuid": {
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -119,6 +168,10 @@
                 "bloodType": {
                     "type": "string"
                 },
+                "lastMedicalCheck": {
+                    "format": "date-time",
+                    "type": "string"
+                },
                 "organDonor": {
                     "type": "boolean"
                 }
@@ -139,16 +192,22 @@
                 },
                 "type": {
                     "enum": [
-                        "SURGERY",
-                        "ADMISSION"
+                        "cirugia",
+                        "admision"
                     ],
                     "type": "string"
                 }
             },
             "type": "object"
         },
+        "InputStream": {
+            "type": "object"
+        },
         "LoginUserDTO": {
             "properties": {
+                "email": {
+                    "type": "string"
+                },
                 "lastName": {
                     "type": "string"
                 },
@@ -226,11 +285,51 @@
                 },
                 "period": {
                     "enum": [
-                        "DAILY",
-                        "WEEKLY",
-                        "MONTHLY"
+                        "diariamente",
+                        "semanalmente",
+                        "mensualmente"
                     ],
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PageOfChangesDTO": {
+            "properties": {
+                "content": {
+                    "items": {
+                        "$ref": "#/definitions/ChangesDTO"
+                    },
+                    "type": "array"
+                },
+                "first": {
+                    "type": "boolean"
+                },
+                "last": {
+                    "type": "boolean"
+                },
+                "number": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "numberOfElements": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "size": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "sort": {
+                    "$ref": "#/definitions/Sort"
+                },
+                "totalElements": {
+                    "format": "int64",
+                    "type": "integer"
+                },
+                "totalPages": {
+                    "format": "int32",
+                    "type": "integer"
                 }
             },
             "type": "object"
@@ -286,10 +385,11 @@
                 },
                 "type": {
                     "enum": [
-                        "ANATOMICAL",
-                        "CLINICAL",
-                        "MOLECULAR",
-                        "ORAL"
+                        "asma",
+                        "hipertension",
+                        "antecedentes_oncologicos",
+                        "insuficiencia_suprarrenal",
+                        "otro"
                     ],
                     "type": "string"
                 }
@@ -309,6 +409,9 @@
                 },
                 "phoneNumber": {
                     "type": "string"
+                },
+                "primary": {
+                    "type": "boolean"
                 }
             },
             "type": "object"
@@ -350,6 +453,41 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/check/ping": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "pingUsingGET",
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "ping",
+                "tags": [
+                    "header-check-controller"
+                ]
+            }
+        },
         "/api/emergencyData": {
             "get": {
                 "consumes": [
@@ -414,6 +552,13 @@
                         "name": "userId",
                         "required": true,
                         "type": "string"
+                    },
+                    {
+                        "description": "qrUpdateRequired",
+                        "in": "query",
+                        "name": "qrUpdateRequired",
+                        "required": true,
+                        "type": "boolean"
                     }
                 ],
                 "produces": [
@@ -437,6 +582,189 @@
                     }
                 },
                 "summary": "updateEmergencyData",
+                "tags": [
+                    "emergency-data-controller"
+                ]
+            }
+        },
+        "/api/emergencyData/changes": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "getChangesUsingGET",
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PageOfChangesDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "getChanges",
+                "tags": [
+                    "emergency-data-controller"
+                ]
+            }
+        },
+        "/api/emergencyData/qr": {
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "deleteQRUsingDELETE",
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "deleteQR",
+                "tags": [
+                    "emergency-data-controller"
+                ]
+            },
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "getQRUsingGET",
+                "parameters": [
+                    {
+                        "description": "user",
+                        "in": "query",
+                        "name": "user",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "image/png"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "getQR",
+                "tags": [
+                    "emergency-data-controller"
+                ]
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "createQRUsingPOST",
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "createQR",
+                "tags": [
+                    "emergency-data-controller"
+                ]
+            }
+        },
+        "/api/emergencyData/{uuid}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "getEmergencyDataByUuidUsingGET",
+                "parameters": [
+                    {
+                        "description": "uuid",
+                        "in": "path",
+                        "name": "uuid",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "getEmergencyDataByUuid",
                 "tags": [
                     "emergency-data-controller"
                 ]
@@ -476,6 +804,12 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/LoginUserDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Error al loguearse",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
                         }
                     }
                 },
@@ -879,6 +1213,13 @@
                         "schema": {
                             "$ref": "#/definitions/UserProfileDTO"
                         }
+                    },
+                    {
+                        "description": "qrUpdateRequired",
+                        "in": "query",
+                        "name": "qrUpdateRequired",
+                        "required": true,
+                        "type": "boolean"
                     }
                 ],
                 "produces": [
@@ -904,6 +1245,51 @@
                 "summary": "update",
                 "tags": [
                     "profile-controller"
+                ]
+            }
+        },
+        "/api/tempCode/verify/{tempCode}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "verifyTempCodeUsingGET",
+                "parameters": [
+                    {
+                        "description": "tempCode",
+                        "format": "int32",
+                        "in": "path",
+                        "name": "tempCode",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "verifyTempCode",
+                "tags": [
+                    "temp-code-controller"
                 ]
             }
         },
@@ -1085,6 +1471,71 @@
                 ]
             }
         },
+        "/api/userFront/register/doctor": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "operationId": "registerDoctorUsingPOST",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "password",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "email",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "role",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "registrationNumber",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "file",
+                        "in": "formData",
+                        "name": "file",
+                        "required": true,
+                        "type": "file"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Dato erroneo",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "schema": {
+                            "$ref": "#/definitions/ApiError"
+                        }
+                    }
+                },
+                "summary": "registerDoctor",
+                "tags": [
+                    "user-front-controller"
+                ]
+            }
+        },
         "/api/userFront/resetPassword": {
             "post": {
                 "consumes": [
@@ -1202,12 +1653,20 @@
             "name": "emergency-data-controller"
         },
         {
+            "description": "Header Check Controller",
+            "name": "header-check-controller"
+        },
+        {
             "description": "Medical Record Controller",
             "name": "medical-record-controller"
         },
         {
             "description": "Profile Controller",
             "name": "profile-controller"
+        },
+        {
+            "description": "Temp Code Controller",
+            "name": "temp-code-controller"
         },
         {
             "description": "User Front Controller",

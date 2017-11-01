@@ -30,7 +30,7 @@ public class PasswordExpiredService {
         final User user = userService.findByUsername(username);
         user.setCredentialsNonExpired(true);
         user.setAccountNonExpired(true);
-        passwordChangeService.changePassword(user, newPassword);
+        passwordChangeService.changePassword(user.getUsername(), newPassword);
     }
 
     /**
