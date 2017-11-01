@@ -5,6 +5,7 @@ plugins {
 
 bootRepackage {
     mainClass = 'ar.com.utn.proyecto.qremergencias.bo.QREmergenciasApplication'
+    executable = true
 }
 
 dependencies {
