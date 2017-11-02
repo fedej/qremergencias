@@ -48,7 +48,7 @@ public class GlobalExceptionHandler extends BasicErrorController {
     private static final String JSON_PARSE_ERROR = "Error de parseo de JSON";
     private static final int JSON_PARSE_ERROR_CODE = HttpStatus.INTERNAL_SERVER_ERROR.value();
 
-    public static final String UNAUTHORIZED_ERROR = "Error al loguearse";
+    public static final String UNAUTHORIZED_ERROR = "Error al loguearse. Usuario o contraseña inválidos.";
     public static final int UNAUTHORIZED_ERROR_CODE = HttpStatus.UNAUTHORIZED.value();
 
     private static final String DUPLICATE_USER_ERROR = "Usuario ya registrado";
@@ -59,8 +59,8 @@ public class GlobalExceptionHandler extends BasicErrorController {
     private static final ApiError JSON_PARSE = new ApiError(JSON_PARSE_ERROR, 1003, JSON_PARSE_ERROR_CODE);
     private static final ApiError LOGIN_ERROR = new ApiError(UNAUTHORIZED_ERROR, 1004, UNAUTHORIZED_ERROR_CODE);
     private static final ApiError DUPLICATE_USER = new ApiError(DUPLICATE_USER_ERROR, 1005, BAD_INPUT_CODE);
-    private static final ApiError INVALID_TOKEN_ERROR = new ApiError("Token invalido", 1006, BAD_INPUT_CODE);
-    private static final ApiError INVALID_QR_ERROR = new ApiError("QR invalido", 1007, BAD_INPUT_CODE);
+    private static final ApiError INVALID_TOKEN_ERROR = new ApiError("Token inválido", 1006, BAD_INPUT_CODE);
+    private static final ApiError INVALID_QR_ERROR = new ApiError("QR inválido", 1007, BAD_INPUT_CODE);
 
     @Autowired
     public GlobalExceptionHandler(final ErrorAttributes errorAttributes,
