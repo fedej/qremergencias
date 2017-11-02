@@ -83,4 +83,9 @@ public class UserFrontService extends UserService {
         return userFrontRepository.save(toUpdate);
     }
 
+    public void setUserToken(final UserFront user, final String token) {
+        final UserFront toUpdate = userFrontRepository.findByUsername(user.getUsername());
+        toUpdate.setFirebaseToken(token);
+        userFrontRepository.save(toUpdate);
+    }
 }

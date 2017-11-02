@@ -22,4 +22,5 @@ public class UserFront extends User {
     private char sex;
     private List<UserEmergencyContact> contacts = new ArrayList<>();
     private String qr;
+    private String firebaseToken;
 }

@@ -10,6 +10,7 @@ import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
 import ar.com.utn.proyecto.qremergencias.ws.exceptions.PequeniaLisaException;
 import ar.com.utn.proyecto.qremergencias.ws.service.EmergencyDataService;
 import ar.com.utn.proyecto.qremergencias.ws.service.TempCodeService;
+import ar.com.utn.proyecto.qremergencias.ws.service.UserFrontService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
@@ -64,6 +65,7 @@ public class MobileRestController {
     private final EmergencyDataService emergencyDataService;
     private final TempCodeService tempCodeService;
     private final CacheManager cacheManager;
+    private final UserFrontService userFrontService;
 
     @Value("${qremergencias.tempCode.publicKey.cache}")
     private String publicKeyCacheName;
@@ -81,13 +83,15 @@ public class MobileRestController {
                                 final MedicalRecordController medicalRecordController,
                                 final EmergencyDataService emergencyDataService,
                                 final TempCodeService tempCodeService,
-                                final CacheManager cacheManager) {
+                                final CacheManager cacheManager,
+                                final UserFrontService userFrontService) {
         this.emergencyDataController = emergencyDataController;
         this.profileController = profileController;
         this.medicalRecordController = medicalRecordController;
         this.emergencyDataService = emergencyDataService;
         this.tempCodeService = tempCodeService;
         this.cacheManager = cacheManager;
+        this.userFrontService = userFrontService;
     }
 
     @GetMapping("/emergencyData/{uuid}")
@@ -172,7 +176,7 @@ public class MobileRestController {
         return qr.substring(3 + signatureSize, qr.length()).split(" ");
     }
 
-    @GetMapping
+    @GetMapping("/medicalRecord")
     @PreAuthorize(HAS_ROLE_PACIENTE)
     public Page<MedicalRecordDTO> listMyMedicalRecords(@PageableDefault final Pageable page,
                                                 @AuthenticationPrincipal final UserFront user) {
@@ -245,7 +249,8 @@ public class MobileRestController {
 
     @GetMapping("/user/me")
     @PreAuthorize("hasAnyRole('MEDICO', 'PACIENTE')")
-    public LoginUserDTO getUserInfo(@AuthenticationPrincipal final UserFront user) {
+    public LoginUserDTO getUserInfo(@AuthenticationPrincipal final UserFront user, final String token) {
+        userFrontService.setUserToken(user, token);
         return new LoginUserDTO(user.getName(), user.getLastname(), user.getRoles(), user.getEmail());
     }
 
