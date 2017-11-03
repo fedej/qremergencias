@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class TempCodeService {
 
     private static final String PACIENTE_RRRAMUNDO_COM_AR = "paciente@rrramundo.com.ar";
-    private static final int INT = 666;
+    private static final String INT = "666";
     private final EmergencyDataService emergencyDataService;
     private final RedisTemplate<String, String> redisTemplate;
     private final Random random = new Random();
@@ -44,9 +44,10 @@ public class TempCodeService {
         final Optional<EmergencyData> byUuid = emergencyDataService.findByUuid(uuid);
 
         if (byUuid.isPresent()) {
-            final String username = byUuid.get().getUser().getUsername();
+            final UserFront userFront = byUuid.get().getUser();
+            final String username = userFront.getUsername();
             final int tempCode = (int) (100000 + random.nextDouble() * 900000);
-            final String key = user.getUsername() + tempCodeCacheName + tempCode;
+            final String key = user.getUsername() + userFront.getIdNumber() + tempCodeCacheName + tempCode;
             tempCodeCache.put(key, String.valueOf(tempCode), username);
             redisTemplate.expire(key, 1, TimeUnit.MINUTES);
             return tempCode;
@@ -56,8 +57,8 @@ public class TempCodeService {
 
     }
 
-    public String verifyTempCode(final Integer tempCode, final UserFront user) {
-        if (tempCode == INT) {
+    public String verifyTempCode(final String tempCode, final UserFront user) {
+        if (tempCode.equals(INT)) {
             return PACIENTE_RRRAMUNDO_COM_AR;
         }
 
