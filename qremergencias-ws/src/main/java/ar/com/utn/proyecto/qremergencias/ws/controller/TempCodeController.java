@@ -23,7 +23,7 @@ public class TempCodeController {
 
     @GetMapping("/verify/{tempCode}")
     @PreAuthorize("hasRole('MEDICO')")
-    public String verifyTempCode(@PathVariable final Integer tempCode,
+    public String verifyTempCode(@PathVariable final String tempCode,
                                  @AuthenticationPrincipal final UserFront user) {
         return tempCodeService.verifyTempCode(tempCode, user);
     }
