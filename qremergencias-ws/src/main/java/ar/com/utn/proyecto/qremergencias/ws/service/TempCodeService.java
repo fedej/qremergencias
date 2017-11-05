@@ -47,7 +47,7 @@ public class TempCodeService {
             final UserFront userFront = byUuid.get().getUser();
             final String username = userFront.getUsername();
             final int tempCode = (int) (100000 + random.nextDouble() * 900000);
-            final String key = user.getUsername() + userFront.getIdNumber() + tempCodeCacheName + tempCode;
+            final String key = user.getUsername() + tempCode + userFront.getIdNumber() + tempCodeCacheName;
             tempCodeCache.put(key, String.valueOf(tempCode), username);
             redisTemplate.expire(key, 1, TimeUnit.MINUTES);
             return tempCode;
