@@ -62,7 +62,7 @@ public class TempCodeService {
             return PACIENTE_RRRAMUNDO_COM_AR;
         }
 
-        final String key = user.getUsername() + tempCodeCacheName + tempCode;
+        final String key = user.getUsername() + tempCode + tempCodeCacheName;
         final Object cached = tempCodeCache.get(key, String.valueOf(tempCode));
         return cached == null ? "" : cached.toString();
     }
