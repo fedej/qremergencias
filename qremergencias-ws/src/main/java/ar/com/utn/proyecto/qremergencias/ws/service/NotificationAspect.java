@@ -49,9 +49,11 @@ public class NotificationAspect {
         final String username = joinPoint.getArgs()[1].toString();
         final UserFront user = userFrontService.findByUsername(username);
         try {
-            final PushNotification pushNotification = new PushNotification(user.getFirebaseToken(), body);
-            final HttpEntity<PushNotification> request = new HttpEntity<>(pushNotification, headers);
-            new RestTemplate().postForObject(ANDROID_FCM_URL, request, String.class);
+            if (user.getFirebaseToken() != null) {
+                final PushNotification pushNotification = new PushNotification(user.getFirebaseToken(), body);
+                final HttpEntity<PushNotification> request = new HttpEntity<>(pushNotification, headers);
+                new RestTemplate().postForObject(ANDROID_FCM_URL, request, String.class);
+            }
         } catch (final Exception exception) {
             log.error("Error al enviar notificacion", exception);
         }

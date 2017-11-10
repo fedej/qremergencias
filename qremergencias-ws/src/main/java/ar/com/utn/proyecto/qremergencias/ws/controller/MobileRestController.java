@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -41,11 +42,13 @@ import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Locale;
 import java.util.Map;
 
 import static ar.com.utn.proyecto.qremergencias.util.CryptoUtils.verifySignature;
@@ -66,6 +69,7 @@ public class MobileRestController {
     private final TempCodeService tempCodeService;
     private final CacheManager cacheManager;
     private final UserFrontService userFrontService;
+    private final UserFrontController userFrontController;
 
     @Value("${qremergencias.tempCode.publicKey.cache}")
     private String publicKeyCacheName;
@@ -84,7 +88,8 @@ public class MobileRestController {
                                 final EmergencyDataService emergencyDataService,
                                 final TempCodeService tempCodeService,
                                 final CacheManager cacheManager,
-                                final UserFrontService userFrontService) {
+                                final UserFrontService userFrontService,
+                                final UserFrontController userFrontController) {
         this.emergencyDataController = emergencyDataController;
         this.profileController = profileController;
         this.medicalRecordController = medicalRecordController;
@@ -92,6 +97,7 @@ public class MobileRestController {
         this.tempCodeService = tempCodeService;
         this.cacheManager = cacheManager;
         this.userFrontService = userFrontService;
+        this.userFrontController = userFrontController;
     }
 
     @GetMapping("/emergencyData/{uuid}")
@@ -252,6 +258,14 @@ public class MobileRestController {
     public LoginUserDTO getUserInfo(@AuthenticationPrincipal final UserFront user, final String token) {
         userFrontService.setUserToken(user, token);
         return new LoginUserDTO(user.getName(), user.getLastname(), user.getRoles(), user.getEmail());
+    }
+
+    @RequestMapping(value = "/sendForgotPassword", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void sendForgotPassword(final HttpServletRequest request,
+                                   @RequestParam(value = "g-recaptcha-response") final String response,
+                                   @RequestParam final String username, final Locale locale) {
+        userFrontController.sendForgotPassword(request, response, username, locale);
     }
 
 }
