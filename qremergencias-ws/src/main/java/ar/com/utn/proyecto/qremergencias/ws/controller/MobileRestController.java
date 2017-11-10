@@ -145,8 +145,8 @@ public class MobileRestController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize(IS_FULLY_AUTHENTICATED)
     public void updateProfile(@RequestBody final UserProfileDTO userProfileDTO,
-                       @AuthenticationPrincipal final UserFront user,
-                       @RequestParam final boolean qrUpdateRequired) {
+                              @AuthenticationPrincipal final UserFront user,
+                              @RequestParam final boolean qrUpdateRequired) {
         profileController.update(userProfileDTO, user, qrUpdateRequired);
     }
 
@@ -185,7 +185,7 @@ public class MobileRestController {
     @GetMapping("/medicalRecord")
     @PreAuthorize(HAS_ROLE_PACIENTE)
     public Page<MedicalRecordDTO> listMyMedicalRecords(@PageableDefault final Pageable page,
-                                                @AuthenticationPrincipal final UserFront user) {
+                                                       @AuthenticationPrincipal final UserFront user) {
         return medicalRecordController.listMyRecords(page, user);
     }
 
@@ -224,8 +224,8 @@ public class MobileRestController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize(HAS_ROLE_MEDICO)
     public void updateMedicalRecord(@PathVariable final String id,
-                       @Valid @RequestBody final MedicalRecordDTO medicalRecord,
-                       @AuthenticationPrincipal final UserFront user) {
+                                    @Valid @RequestBody final MedicalRecordDTO medicalRecord,
+                                    @AuthenticationPrincipal final UserFront user) {
         medicalRecordController.update(id, medicalRecord, user);
     }
 
@@ -233,7 +233,7 @@ public class MobileRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize(HAS_ROLE_MEDICO)
     public void deleteMedicalRecord(@PathVariable final String id,
-                       @AuthenticationPrincipal final UserFront user) {
+                                    @AuthenticationPrincipal final UserFront user) {
         medicalRecordController.delete(id, user);
     }
 
@@ -263,9 +263,9 @@ public class MobileRestController {
     @RequestMapping(value = "/sendForgotPassword", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void sendForgotPassword(final HttpServletRequest request,
-                                   @RequestParam(value = "g-recaptcha-response") final String response,
-                                   @RequestParam final String username, final Locale locale) {
-        userFrontController.sendForgotPassword(request, response, username, locale);
+                                   @RequestParam final String username, final Locale locale,
+                                   @RequestHeader(HttpHeaders.AUTHORIZATION) final String authorization) {
+        userFrontController.sendForgotPassword(request, "HACK", username, locale);
     }
 
 }
