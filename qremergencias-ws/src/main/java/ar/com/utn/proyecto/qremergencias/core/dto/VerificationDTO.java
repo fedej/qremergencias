@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class VerificationDTO {
-    private final String uuid;
+    private final String user;
     private final String errorMessage;
 }

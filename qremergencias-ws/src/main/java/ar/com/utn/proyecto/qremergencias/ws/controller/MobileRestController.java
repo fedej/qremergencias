@@ -116,15 +116,15 @@ public class MobileRestController {
     @GetMapping("/tempCode/pk")
     @PreAuthorize("hasRole('MEDICO')")
     @ResponseStatus(HttpStatus.OK)
-    public VerificationDTO verifyQRSignature(final String user) throws UnsupportedEncodingException {
+    public VerificationDTO verifyQRSignature(final String qrContent) throws UnsupportedEncodingException {
 
-        final Instant timestamp = getTimestamp(user);
-        if (timestamp.isBefore(Instant.now().plus(3, ChronoUnit.HOURS))) {
-            final String username = getUser(user);
-            if (verifySignature(publicKeyCache.get(username, String.class), user)) {
+        final Instant timestamp = getTimestamp(qrContent);
+        if (timestamp.isBefore(Instant.now().plus(3, ChronoUnit.MINUTES))) {
+            final String username = getUser(qrContent);
+            if (verifySignature(publicKeyCache.get(username, String.class), qrContent)) {
                 return emergencyDataService.findByUser(username)
-                        .map(emergencyData1 -> new VerificationDTO(emergencyData1.getUuid(), null))
-                        .orElseGet(() -> new VerificationDTO(null, "Datos insuficientes"));
+                        .map(emergencyData -> new VerificationDTO(emergencyData.getUser().getUsername(), null))
+                        .orElseGet(() -> new VerificationDTO(null, "Datos no cargados aun"));
             } else {
                 return new VerificationDTO(null, "Firma invalida");
             }
