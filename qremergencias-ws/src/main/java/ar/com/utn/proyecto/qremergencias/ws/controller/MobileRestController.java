@@ -107,6 +107,15 @@ public class MobileRestController {
         return emergencyDataController.getEmergencyDataByUuid(uuid);
     }
 
+    @PatchMapping("/emergencyData")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('MEDICO')")
+    public void updateEmergencyData(@Valid @RequestBody final EmergencyDataDTO emergencyDataDTO,
+                                    @RequestParam final String userId,
+                                    @RequestParam final boolean qrUpdateRequired) {
+        emergencyDataController.updateEmergencyData(emergencyDataDTO, userId, qrUpdateRequired);
+    }
+
     @GetMapping("/emergencyData")
     @PreAuthorize(HAS_ROLE_PACIENTE)
     public EmergencyDataDTO getEmergencyData(@AuthenticationPrincipal final UserFront userFront) {
