@@ -3,6 +3,7 @@ package ar.com.utn.proyecto.qremergencias.ws.controller;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.UserContactDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.UserProfileDTO;
+import ar.com.utn.proyecto.qremergencias.core.repository.UserFrontRepository;
 import ar.com.utn.proyecto.qremergencias.ws.service.UserProfileService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,13 +42,17 @@ public class ProfileController {
     private UserProfileService userProfileService;
 
     @Autowired
+    private UserFrontRepository userFrontRepository;
+
+    @Autowired
     private SessionRepository<? extends ExpiringSession> sessionRepository;
 
     @GetMapping
     @PreAuthorize("isFullyAuthenticated()")
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-    public UserProfileDTO list(@AuthenticationPrincipal final UserFront userFront) {
+    public UserProfileDTO list(@AuthenticationPrincipal final UserFront loggedInUser) {
         log.info("In ProfileController.list()");
+        final UserFront userFront = userFrontRepository.findByUsername(loggedInUser.getUsername());
         final UserProfileDTO userProfileDTO = new UserProfileDTO();
         userProfileDTO.setFirstName(userFront.getName());
         userProfileDTO.setLastName(userFront.getLastname());
