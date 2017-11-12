@@ -63,19 +63,22 @@ public class ProfileController {
     private void updateSession(final UserFront user) {
         final String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
         final ExpiringSession session = sessionRepository.getSession(sessionId);
-        final SecurityContext context = session.getAttribute(SPRING_SECURITY_CONTEXT_KEY);
-        final Authentication auth = context.getAuthentication();
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(user,
-                auth.getCredentials(), auth.getAuthorities()));
-        session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, context);
 
-        try {
-            final MethodHandle saver = MethodHandles.lookup()
-                    .findVirtual(sessionRepository.getClass(), "save",
-                            MethodType.methodType(void.class, Session.class));
-            saver.invoke(sessionRepository, session);
-        } catch (final Throwable throwable) {
-            throw new RuntimeException(throwable);
+        if (session != null) {
+            final SecurityContext context = session.getAttribute(SPRING_SECURITY_CONTEXT_KEY);
+            final Authentication auth = context.getAuthentication();
+            context.setAuthentication(new UsernamePasswordAuthenticationToken(user,
+                    auth.getCredentials(), auth.getAuthorities()));
+            session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, context);
+
+            try {
+                final MethodHandle saver = MethodHandles.lookup()
+                        .findVirtual(sessionRepository.getClass(), "save",
+                                MethodType.methodType(void.class, Session.class));
+                saver.invoke(sessionRepository, session);
+            } catch (final Throwable throwable) {
+                throw new RuntimeException(throwable);
+            }
         }
 
     }
