@@ -122,6 +122,12 @@ public class MobileRestController {
         return emergencyDataController.getEmergencyData(userFront.getUsername());
     }
 
+    @GetMapping("/emergencyData/medic")
+    @PreAuthorize("isFullyAuthenticated()")
+    public EmergencyDataDTO getUserEmergencyData(@RequestParam final String userId) {
+        return emergencyDataController.getEmergencyData(userId);
+    }
+
     @GetMapping("/tempCode/pk")
     @PreAuthorize("hasRole('MEDICO')")
     @ResponseStatus(HttpStatus.OK)
