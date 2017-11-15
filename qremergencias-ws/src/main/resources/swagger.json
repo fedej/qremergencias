@@ -107,6 +107,12 @@
         },
         "EmergencyDataDTO": {
             "properties": {
+                "contacts": {
+                    "items": {
+                        "$ref": "#/definitions/UserContactDTO"
+                    },
+                    "type": "array"
+                },
                 "general": {
                     "$ref": "#/definitions/GeneralDataDTO"
                 },
@@ -169,7 +175,7 @@
                     "type": "string"
                 },
                 "lastMedicalCheck": {
-                    "format": "date-time",
+                    "format": "date",
                     "type": "string"
                 },
                 "organDonor": {
@@ -181,7 +187,7 @@
         "HospitalizationDTO": {
             "properties": {
                 "date": {
-                    "format": "date-time",
+                    "format": "date",
                     "type": "string"
                 },
                 "institution": {
@@ -377,7 +383,7 @@
         "PathologyDTO": {
             "properties": {
                 "date": {
-                    "format": "date-time",
+                    "format": "date",
                     "type": "string"
                 },
                 "description": {
@@ -419,7 +425,7 @@
         "UserProfileDTO": {
             "properties": {
                 "birthDate": {
-                    "format": "date-time",
+                    "format": "date",
                     "type": "string"
                 },
                 "contacts": {
@@ -807,7 +813,7 @@
                         }
                     },
                     "401": {
-                        "description": "Error al loguearse",
+                        "description": "Error al loguearse. Usuario o contrase\u00f1a inv\u00e1lidos.",
                         "schema": {
                             "$ref": "#/definitions/ApiError"
                         }
@@ -1257,11 +1263,10 @@
                 "parameters": [
                     {
                         "description": "tempCode",
-                        "format": "int32",
                         "in": "path",
                         "name": "tempCode",
                         "required": true,
-                        "type": "integer"
+                        "type": "string"
                     }
                 ],
                 "produces": [
