@@ -49,6 +49,7 @@ import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/userFront")
+@SuppressWarnings("PMD")
 public class UserFrontController {
 
     private static final String SUBJECT = "default.forgot.email.subject";
@@ -94,7 +95,7 @@ public class UserFrontController {
         final UserFront user = userFrontService.create(model);
 
         if (user != null) {
-            sendMailConfirmation(user);
+            //sendMailConfirmation(user);
         }
     }
 

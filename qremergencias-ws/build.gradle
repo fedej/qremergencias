@@ -20,6 +20,7 @@ dependencies {
 
     compile group: 'com.google.zxing', name: 'core', version: '3.3.0'
     compile 'com.google.apis:google-api-services-urlshortener:v1-rev48-1.22.0'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
 
     if (profiles =~ ".*local.*") {
         compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'

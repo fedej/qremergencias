@@ -36,6 +36,7 @@ import static org.springframework.security.web.context.HttpSessionSecurityContex
 @RestController
 @RequestMapping("/api/profile")
 @Log
+@SuppressWarnings("PMD")
 public class ProfileController {
 
     @Autowired
@@ -95,8 +96,8 @@ public class ProfileController {
                        @AuthenticationPrincipal final UserFront user,
                        @RequestParam final boolean qrUpdateRequired) {
         log.info("In ProfileController.update()");
-        final UserFront updated = userProfileService.update(user, userProfileDTO, qrUpdateRequired);
-        updateSession(updated);
+        userProfileService.update(user, userProfileDTO, qrUpdateRequired);
+        //updateSession(updated);
     }
 
 }
