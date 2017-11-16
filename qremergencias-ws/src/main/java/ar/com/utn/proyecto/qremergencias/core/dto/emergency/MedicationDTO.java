@@ -1,13 +1,14 @@
 package ar.com.utn.proyecto.qremergencias.core.dto.emergency;
 
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.Medication;
-import ar.com.utn.proyecto.qremergencias.core.domain.emergency.Pathology;
 import ar.com.utn.proyecto.qremergencias.core.mapper.Mapper;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class MedicationDTO {
 
     static final Mapper<Medication, MedicationDTO> MEDICATION_DTO_MAPPER =
