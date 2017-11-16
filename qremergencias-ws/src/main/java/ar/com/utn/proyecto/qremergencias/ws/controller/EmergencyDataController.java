@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -90,7 +91,7 @@ public class EmergencyDataController {
         }
     }
 
-    @GetMapping(value = "/qr", produces = MediaType.IMAGE_PNG_VALUE)
+    @RequestMapping(value = "/qr", method = { RequestMethod.HEAD, RequestMethod.GET })
     @PreAuthorize(HAS_ROLE_PACIENTE)
     public Resource getQR(@RequestParam(name = "user") final String user, final HttpServletResponse response) {
         final Resource userQR = service.getUserQR(user);
@@ -99,7 +100,7 @@ public class EmergencyDataController {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
-
+        response.setContentType(MediaType.IMAGE_PNG_VALUE);
         return userQR;
     }
 
