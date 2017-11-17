@@ -201,14 +201,14 @@ public class MobileRestController {
     @PreAuthorize(HAS_ROLE_PACIENTE)
     public Page<MedicalRecordDTO> listMyMedicalRecords(@PageableDefault final Pageable page,
                                                        @AuthenticationPrincipal final UserFront user) {
-        return medicalRecordController.listMyRecords(page, user);
+        return medicalRecordController.listMyRecords(page, user, null);
     }
 
     @GetMapping("/medicalRecord/user")
     @PreAuthorize(HAS_ROLE_MEDICO)
     public Page<MedicalRecordDTO> listPatientRecords(@PageableDefault final Pageable page,
                                                      @RequestParam final String username) {
-        return medicalRecordController.listPatientRecords(page, username);
+        return medicalRecordController.listPatientRecords(page, username, null);
     }
 
     @GetMapping("/medicalRecord/{id}")

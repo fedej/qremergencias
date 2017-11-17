@@ -160,6 +160,22 @@
             },
             "type": "object"
         },
+        "FilterDTO": {
+            "properties": {
+                "from": {
+                    "format": "date",
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "to": {
+                    "format": "date",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GeneralDataDTO": {
             "properties": {
                 "allergic": {
@@ -674,7 +690,7 @@
                     }
                 ],
                 "produces": [
-                    "image/png"
+                    "*/*"
                 ],
                 "responses": {
                     "200": {
@@ -694,6 +710,45 @@
                         "schema": {
                             "$ref": "#/definitions/ApiError"
                         }
+                    }
+                },
+                "summary": "getQR",
+                "tags": [
+                    "emergency-data-controller"
+                ]
+            },
+            "head": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "getQRUsingHEAD",
+                "parameters": [
+                    {
+                        "description": "user",
+                        "in": "query",
+                        "name": "user",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
                     }
                 },
                 "summary": "getQR",
@@ -843,6 +898,15 @@
                 "operationId": "listMyRecordsUsingGET",
                 "parameters": [
                     {
+                        "description": "filter",
+                        "in": "body",
+                        "name": "filter",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/FilterDTO"
+                        }
+                    },
+                    {
                         "description": "Results page you want to retrieve (0..N)",
                         "format": "int32",
                         "in": "query",
@@ -982,6 +1046,15 @@
                         "name": "username",
                         "required": true,
                         "type": "string"
+                    },
+                    {
+                        "description": "filter",
+                        "in": "body",
+                        "name": "filter",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/FilterDTO"
+                        }
                     },
                     {
                         "description": "Results page you want to retrieve (0..N)",

@@ -3,6 +3,7 @@ package ar.com.utn.proyecto.qremergencias.ws.controller;
 import ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.dto.MedicalRecordDTO;
+import ar.com.utn.proyecto.qremergencias.core.dto.FilterDTO;
 import ar.com.utn.proyecto.qremergencias.ws.service.GridFsService;
 import ar.com.utn.proyecto.qremergencias.ws.service.MedicalRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,9 +62,10 @@ public class MedicalRecordController {
     @GetMapping
     @PreAuthorize("hasRole('PACIENTE')")
     public Page<MedicalRecordDTO> listMyRecords(@PageableDefault final Pageable page,
-                                       @AuthenticationPrincipal final UserFront user) {
+                                       @AuthenticationPrincipal final UserFront user,
+                                                @RequestBody(required = false) final FilterDTO filter) {
 
-        final Page<MedicalRecord> domainPage = medicalRecordService.findByUser(user, page);
+        final Page<MedicalRecord> domainPage = medicalRecordService.findByUser(user, page, filter);
         return domainPage.map(m -> new MedicalRecordDTO(m, fileUriTemplate,
                 gridFsService.findGridFSFile()));
     }
@@ -71,9 +73,10 @@ public class MedicalRecordController {
     @GetMapping("/user")
     @PreAuthorize(HAS_ROLE_MEDICO)
     public Page<MedicalRecordDTO> listPatientRecords(@PageableDefault final Pageable page,
-                                       @RequestParam final String username) {
+                                       @RequestParam final String username,
+                                                     @RequestBody(required = false) final FilterDTO filter) {
 
-        final Page<MedicalRecord> domainPage = medicalRecordService.findByUsername(username, page);
+        final Page<MedicalRecord> domainPage = medicalRecordService.findByUsername(username, page, filter);
         return domainPage.map(m -> new MedicalRecordDTO(m, fileUriTemplate,
                 gridFsService.findGridFSFile()));
     }
