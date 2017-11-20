@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,6 +36,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -63,8 +65,12 @@ public class MedicalRecordController {
     @PreAuthorize("hasRole('PACIENTE')")
     public Page<MedicalRecordDTO> listMyRecords(@PageableDefault final Pageable page,
                                        @AuthenticationPrincipal final UserFront user,
-                                                @RequestBody(required = false) final FilterDTO filter) {
-
+                                                @RequestParam(required = false) final String text,
+                                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                    @RequestParam(required = false) final LocalDate from,
+                                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                    @RequestParam(required = false) final LocalDate to) {
+        final FilterDTO filter = new FilterDTO(from, to, text);
         final Page<MedicalRecord> domainPage = medicalRecordService.findByUser(user, page, filter);
         return domainPage.map(m -> new MedicalRecordDTO(m, fileUriTemplate,
                 gridFsService.findGridFSFile()));
@@ -74,8 +80,12 @@ public class MedicalRecordController {
     @PreAuthorize(HAS_ROLE_MEDICO)
     public Page<MedicalRecordDTO> listPatientRecords(@PageableDefault final Pageable page,
                                        @RequestParam final String username,
-                                                     @RequestBody(required = false) final FilterDTO filter) {
-
+                                                     @RequestParam(required = false) final String text,
+                                                     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                     @RequestParam(required = false) final LocalDate from,
+                                                     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                     @RequestParam(required = false) final LocalDate to) {
+        final FilterDTO filter = new FilterDTO(from, to, text);
         final Page<MedicalRecord> domainPage = medicalRecordService.findByUsername(username, page, filter);
         return domainPage.map(m -> new MedicalRecordDTO(m, fileUriTemplate,
                 gridFsService.findGridFSFile()));

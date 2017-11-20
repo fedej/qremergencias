@@ -12,7 +12,8 @@ public interface MedicalRecordRepository extends MongoRepository<MedicalRecord, 
 
     Page<MedicalRecord> findByUserAndDeletedIsFalse(User user, Pageable pageable);
 
-    Page<MedicalRecord> findByUserAndDeletedIsFalseAndPerformedBetweenAndTextLike(User user, LocalDate from,
-                                                                          LocalDate to, String text, Pageable pageable);
+    Page<MedicalRecord> findByUserAndDeletedIsFalseAndPerformedBetweenAndNameLike(User user, LocalDate from,
+                                                                                  LocalDate to, String text,
+                                                                                  Pageable pageable);
 
 }

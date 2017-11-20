@@ -62,7 +62,7 @@ public class MedicalRecordService {
             if (filter.getText() != null) {
                 text = filter.getText();
             }
-            return medicalRecordRepository.findByUserAndDeletedIsFalseAndPerformedBetweenAndTextLike(user, from, to,
+            return medicalRecordRepository.findByUserAndDeletedIsFalseAndPerformedBetweenAndNameLike(user, from, to,
                     text, page);
         }
 

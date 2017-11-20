@@ -160,22 +160,6 @@
             },
             "type": "object"
         },
-        "FilterDTO": {
-            "properties": {
-                "from": {
-                    "format": "date",
-                    "type": "string"
-                },
-                "text": {
-                    "type": "string"
-                },
-                "to": {
-                    "format": "date",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
         "GeneralDataDTO": {
             "properties": {
                 "allergic": {
@@ -898,13 +882,27 @@
                 "operationId": "listMyRecordsUsingGET",
                 "parameters": [
                     {
-                        "description": "filter",
-                        "in": "body",
-                        "name": "filter",
+                        "description": "text",
+                        "in": "query",
+                        "name": "text",
                         "required": false,
-                        "schema": {
-                            "$ref": "#/definitions/FilterDTO"
-                        }
+                        "type": "string"
+                    },
+                    {
+                        "description": "from",
+                        "format": "date",
+                        "in": "query",
+                        "name": "from",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "to",
+                        "format": "date",
+                        "in": "query",
+                        "name": "to",
+                        "required": false,
+                        "type": "string"
                     },
                     {
                         "description": "Results page you want to retrieve (0..N)",
@@ -1048,13 +1046,27 @@
                         "type": "string"
                     },
                     {
-                        "description": "filter",
-                        "in": "body",
-                        "name": "filter",
+                        "description": "text",
+                        "in": "query",
+                        "name": "text",
                         "required": false,
-                        "schema": {
-                            "$ref": "#/definitions/FilterDTO"
-                        }
+                        "type": "string"
+                    },
+                    {
+                        "description": "from",
+                        "format": "date",
+                        "in": "query",
+                        "name": "from",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "to",
+                        "format": "date",
+                        "in": "query",
+                        "name": "to",
+                        "required": false,
+                        "type": "string"
                     },
                     {
                         "description": "Results page you want to retrieve (0..N)",
