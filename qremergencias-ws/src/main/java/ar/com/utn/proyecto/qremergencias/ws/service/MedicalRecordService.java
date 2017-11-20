@@ -4,6 +4,7 @@ import ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord;
 import ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord.MedicalRecordChange;
 import ar.com.utn.proyecto.qremergencias.core.domain.User;
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
+import ar.com.utn.proyecto.qremergencias.core.dto.FilterDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.MedicalRecordDTO;
 import ar.com.utn.proyecto.qremergencias.core.mapper.Mapper;
 import ar.com.utn.proyecto.qremergencias.core.repository.MedicalRecordRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 import static ar.com.utn.proyecto.qremergencias.core.domain.MedicalRecord.MedicalRecordChange.Action.CREATE;
@@ -45,7 +47,25 @@ public class MedicalRecordService {
         this.gridFsTemplate = gridFsTemplate;
     }
 
-    public Page<MedicalRecord> findByUser(final User user, final Pageable page) {
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    public Page<MedicalRecord> findByUser(final User user, final Pageable page, final FilterDTO filter) {
+        if (filter != null) {
+            LocalDate from = LocalDate.ofYearDay(1900, 1);
+            LocalDate to = LocalDate.now().plusDays(1L);
+            String text = "";
+            if (filter.getFrom() != null) {
+                from = filter.getFrom().minusDays(1L);
+            }
+            if (filter.getTo() != null) {
+                to = filter.getTo().plusDays(1L);
+            }
+            if (filter.getText() != null) {
+                text = filter.getText();
+            }
+            return medicalRecordRepository.findByUserAndDeletedIsFalseAndPerformedBetweenAndNameLike(user, from, to,
+                    text, page);
+        }
+
         return medicalRecordRepository.findByUserAndDeletedIsFalse(user, page);
     }
 
@@ -92,8 +112,8 @@ public class MedicalRecordService {
         return medicalRecordRepository.findOne(id);
     }
 
-    public Page<MedicalRecord> findByUsername(final String username, final Pageable page) {
+    public Page<MedicalRecord> findByUsername(final String username, final Pageable page, final FilterDTO filter) {
         final UserFront user = userFrontRepository.findByUsername(username);
-        return medicalRecordRepository.findByUserAndDeletedIsFalse(user, page);
+        return findByUser(user, page, filter);
     }
 }

@@ -674,7 +674,7 @@
                     }
                 ],
                 "produces": [
-                    "image/png"
+                    "*/*"
                 ],
                 "responses": {
                     "200": {
@@ -694,6 +694,45 @@
                         "schema": {
                             "$ref": "#/definitions/ApiError"
                         }
+                    }
+                },
+                "summary": "getQR",
+                "tags": [
+                    "emergency-data-controller"
+                ]
+            },
+            "head": {
+                "consumes": [
+                    "application/json"
+                ],
+                "operationId": "getQRUsingHEAD",
+                "parameters": [
+                    {
+                        "description": "user",
+                        "in": "query",
+                        "name": "user",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
                     }
                 },
                 "summary": "getQR",
@@ -843,6 +882,29 @@
                 "operationId": "listMyRecordsUsingGET",
                 "parameters": [
                     {
+                        "description": "text",
+                        "in": "query",
+                        "name": "text",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "from",
+                        "format": "date",
+                        "in": "query",
+                        "name": "from",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "to",
+                        "format": "date",
+                        "in": "query",
+                        "name": "to",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
                         "description": "Results page you want to retrieve (0..N)",
                         "format": "int32",
                         "in": "query",
@@ -981,6 +1043,29 @@
                         "in": "query",
                         "name": "username",
                         "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "text",
+                        "in": "query",
+                        "name": "text",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "from",
+                        "format": "date",
+                        "in": "query",
+                        "name": "from",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "to",
+                        "format": "date",
+                        "in": "query",
+                        "name": "to",
+                        "required": false,
                         "type": "string"
                     },
                     {

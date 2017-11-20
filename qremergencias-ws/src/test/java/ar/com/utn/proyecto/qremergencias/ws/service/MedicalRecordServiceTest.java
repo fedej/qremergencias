@@ -58,7 +58,7 @@ public class MedicalRecordServiceTest {
                 .thenReturn(new PageImpl<>(medicalRecordList));
 
         final Page<MedicalRecord> page = service.findByUser(new UserFront(),
-                new PageRequest(0, 10));
+                new PageRequest(0, 10), null);
         assertEquals(mock, page.getContent().get(0));
     }
 
