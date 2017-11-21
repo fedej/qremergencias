@@ -2,6 +2,7 @@ package ar.com.utn.proyecto.qremergencias.ws.controller;
 
 import ar.com.utn.proyecto.qremergencias.core.domain.UserFront;
 import ar.com.utn.proyecto.qremergencias.core.domain.emergency.EmergencyData;
+import ar.com.utn.proyecto.qremergencias.core.dto.FilterDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.EmergencyDataDTO;
 import ar.com.utn.proyecto.qremergencias.core.dto.emergency.changelog.ChangesDTO;
 import ar.com.utn.proyecto.qremergencias.util.CryptoUtils;
@@ -13,6 +14,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
@@ -70,8 +75,15 @@ public class EmergencyDataController {
 
     @GetMapping("/changes")
     @PreAuthorize(HAS_ROLE_PACIENTE)
-    public Page<ChangesDTO> getChanges(@AuthenticationPrincipal final UserFront user) {
-        return changesService.getEmergencyDataChanges(user);
+    public Page<ChangesDTO> getChanges(@AuthenticationPrincipal final UserFront user,
+                                       @PageableDefault final Pageable page,
+                                       @RequestParam(required = false) final String text,
+                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                           @RequestParam(required = false) final LocalDate from,
+                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                           @RequestParam(required = false) final LocalDate to) {
+        final FilterDTO filter = new FilterDTO(from, to, text);
+        return changesService.getEmergencyDataChanges(user, page, filter);
     }
 
     @GetMapping("/{uuid}")
