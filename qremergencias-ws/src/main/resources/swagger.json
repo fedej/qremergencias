@@ -599,6 +599,58 @@
                     "application/json"
                 ],
                 "operationId": "getChangesUsingGET",
+                "parameters": [
+                    {
+                        "description": "text",
+                        "in": "query",
+                        "name": "text",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "from",
+                        "format": "date",
+                        "in": "query",
+                        "name": "from",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "to",
+                        "format": "date",
+                        "in": "query",
+                        "name": "to",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "Results page you want to retrieve (0..N)",
+                        "format": "int32",
+                        "in": "query",
+                        "name": "page",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "description": "Number of records per page",
+                        "format": "int32",
+                        "in": "query",
+                        "name": "size",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "collectionFormat": "multi",
+                        "description": "Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                        "in": "query",
+                        "items": {
+                            "type": "string"
+                        },
+                        "name": "sort",
+                        "required": false,
+                        "type": "array"
+                    }
+                ],
                 "produces": [
                     "*/*"
                 ],
